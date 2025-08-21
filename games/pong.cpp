@@ -22,6 +22,12 @@ public:
   float width, height;
   int speed;
 
+  void LimitMovement() {
+    if (y <= 0)
+      y = 0;
+    if (y + height >= GetScreenHeight())
+      y = GetScreenHeight() - height;
+  }
   void Draw() {
 
     DrawRectangle(
@@ -33,21 +39,31 @@ public:
       y -= speed;
     if (IsKeyDown(KEY_DOWN))
       y += speed;
-    if (y <= 0)
-      y = 0;
-    if (y + height >= GetScreenHeight())
-      y = GetScreenHeight() - height;
+    LimitMovement();
   }
 };
 
+class CpuPaddle : public Paddle {
+public:
+  // for cpu to follow the ball
+  void Update(int ball_y) {
+    if (y + height / 2 > ball_y)
+      y = y - speed;
+    if (y + height / 2 <= ball_y)
+      y = y + speed;
+    LimitMovement();
+  };
+}; // Inheriting from public paddle
+
 Ball ball;
 Paddle player;
+CpuPaddle cpu;
 
 int main() {
-  Color green = {20, 160, 133, 255};
-  // The paddles
+  // screen dimensions
   const int screenWidth = 1280;
   const int screenHeight = 800;
+  // Paddle dimensions actually we define them below to so not much necessary
   const int rectangleHeight = 120;
   const int rectangleWidth = 25;
   // Ball attributes
@@ -63,18 +79,41 @@ int main() {
   player.x = player.width - 10;
   player.y = screenHeight / 2 - player.height / 2;
   player.speed = 6;
+  // cpu attributes
+  cpu.width = 25;
+  cpu.height = 120;
+  cpu.x = screenWidth - cpu.width - 10;
+  cpu.y = screenHeight / 2 - cpu.height / 2;
+  cpu.speed = 7;
+
   InitWindow(screenWidth, screenHeight, "The pong");
   SetTargetFPS(60);
   while (!WindowShouldClose()) {
     BeginDrawing(); // Begin canvas drawing
     ClearBackground(BLACK);
-    ball.Draw();
+
+    // Update positions
     ball.Update();
-    player.Draw();
     player.Update();
+    cpu.Update(ball.y);
+
+    // check for collisions
+    if (CheckCollisionCircleRec(
+            Vector2{ball.x, ball.y}, ball.radius,
+            Rectangle{player.x, player.y, player.width, player.height}))
+      ball.speedX *= -1;
+    ;
+
+    if (CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius,
+                                Rectangle{cpu.x, cpu.y, cpu.width, cpu.height}))
+      ball.speedX *= -1;
+    ;
+
+    // Draw stuff
     DrawLine(screenWidth / 2, 0, screenWidth / 2, screenHeight, WHITE);
-    DrawRectangle(screenWidth - 35, (screenHeight - rectangleHeight) / 2,
-                  rectangleWidth, rectangleHeight, WHITE);
+    ball.Draw();
+    player.Draw();
+    cpu.Draw();
     EndDrawing(); // End canvas drawing
   }
 
