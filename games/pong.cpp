@@ -1,4 +1,9 @@
 #include <raylib.h>
+
+// Globals for scores
+int player_score{0};
+int cpu_score{0};
+
 class Ball {
 public:
   float x, y;
@@ -11,8 +16,12 @@ public:
     y += speedY;
     if (y + radius >= GetScreenHeight() || y - radius <= 0)
       speedY *= -1;
+    if (x + radius >= GetScreenWidth())
+      player_score++;
     if (x + radius >= GetScreenWidth() || x - radius <= 0)
       speedX *= -1;
+    if (x - radius < 0)
+      cpu_score++;
   }
 };
 
@@ -61,11 +70,11 @@ CpuPaddle cpu;
 
 int main() {
   // screen dimensions
-  const int screenWidth = 1280;
-  const int screenHeight = 800;
+  const int screenWidth{1280};
+  const int screenHeight{800};
   // Paddle dimensions actually we define them below to so not much necessary
-  const int rectangleHeight = 120;
-  const int rectangleWidth = 25;
+  const int rectangleHeight{120};
+  const int rectangleWidth{25};
   // Ball attributes
   ball.x = screenWidth / 2;
   ball.y = screenHeight / 2;
@@ -84,7 +93,7 @@ int main() {
   cpu.height = 120;
   cpu.x = screenWidth - cpu.width - 10;
   cpu.y = screenHeight / 2 - cpu.height / 2;
-  cpu.speed = 7;
+  cpu.speed = 5;
 
   InitWindow(screenWidth, screenHeight, "The pong");
   SetTargetFPS(60);
@@ -114,6 +123,10 @@ int main() {
     ball.Draw();
     player.Draw();
     cpu.Draw();
+    DrawText(TextFormat("%i", player_score), screenWidth / 4 - 20, 20, 80,
+             WHITE);
+    DrawText(TextFormat("%i", cpu_score), 3 * screenWidth / 4 - 20, 20, 80,
+             WHITE);
     EndDrawing(); // End canvas drawing
   }
 
