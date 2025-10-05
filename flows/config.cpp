@@ -4,7 +4,7 @@
 #include <cmath>
 using std::clamp;
 
-// the first argument is how man elements and second argument is what we are
+// the first argument is how many elements and second argument is what we are
 // initilaizing at each element
 vector<vector<slot>> BOARD(ROWS + 1, vector<slot>(COLS + 1));
 

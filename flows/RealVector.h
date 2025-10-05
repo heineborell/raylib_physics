@@ -5,7 +5,7 @@ public:
   float x{};
   float y{};
   RealVector(); // constructor default starts vector with no values
-  RealVector(float x, float y); // constructor paramterized
+  RealVector(float x, float y); // constructor parametrized
 
   RealVector add(RealVector &vec);
   RealVector sub(RealVector &vec);

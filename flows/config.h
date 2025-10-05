@@ -4,9 +4,9 @@
 
 using std::vector;
 
-#define WIDTH 800
-#define HEIGHT 800
-#define SCL 10 // scale means the dimensions of grid cells
+#define WIDTH 1200
+#define HEIGHT 1200
+#define SCL 50 // scale means the dimensions of grid cells
 #define ROWS (HEIGHT / SCL)
 #define COLS (WIDTH / SCL)
 
