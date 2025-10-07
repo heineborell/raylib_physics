@@ -18,12 +18,14 @@ double map_to(double minimum, double maximum, double new_min, double new_max,
 double field_func(double x, double y) { return RealVector(x, y).angleOf(); }
 
 double xComponent(double x, double y) {
-  return 1.0 / std::sqrt(std::pow(-300.0 + x, 2) + y * y) -
-         1.0 / std::sqrt(std::pow(-500.0 + x, 2) + y * y);
+  return 1.0 / std::sqrt(std::pow(-300.0 + x, 2) + std::pow(-400.0 + y, 2)) -
+         1.0 / std::sqrt(std::pow(-500.0 + x, 2) + std::pow(-400.0 + y, 2));
 }
 
 double yComponent(double x, double y) {
-  double term1 = (500.0 - x) / std::sqrt((x - 500) * (x - 500) + y * y);
-  double term2 = (300.0 - x) / std::sqrt((x - 300) * (x - 300) + y * y);
-  return (term1 - term2) / y;
+  double term1 =
+      (500.0 - x) / std::sqrt((x - 500) * (x - 500) + std::pow(-400.0 + y, 2));
+  double term2 =
+      (300.0 - x) / std::sqrt((x - 300) * (x - 300) + std::pow(-400.0 + y, 2));
+  return (term1 - term2) / 400;
 }

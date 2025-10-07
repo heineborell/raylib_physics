@@ -6,7 +6,7 @@ using std::vector;
 
 inline constexpr int WIDTH{800};
 inline constexpr int HEIGHT{800};
-inline constexpr int SCL{40}; // scale means the dimensions of grid cells
+inline constexpr int SCL{20}; // scale means the dimensions of grid cells
 inline constexpr int ROWS{(HEIGHT / SCL)};
 inline constexpr int COLS{(WIDTH / SCL)};
 inline constexpr int FPS{60};
