@@ -33,17 +33,6 @@ int main() {
 
     for (int y = 0; y < ROWS; ++y) {
       for (int x = 0; x < COLS; x++) {
-        // std::cout << xComponent(BOARD[y][x].start_point.x,
-        //                         BOARD[y][x].start_point.y)
-        //           << '\n';
-        std::cout << BOARD[y][x].start_point.y
-                  << field_func(xComponent(BOARD[y][x].start_point.x,
-                                           BOARD[y][x].start_point.y),
-                                yComponent(BOARD[y][x].start_point.x,
-                                           BOARD[y][x].start_point.y))
-                  << '\n';
-
-        // double angle = field_func(0.0, 1.0);
         double angle = field_func(
             xComponent(BOARD[y][x].start_point.x, BOARD[y][x].start_point.y),
             yComponent(BOARD[y][x].start_point.x, BOARD[y][x].start_point.y));
