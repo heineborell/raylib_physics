@@ -4,11 +4,12 @@
 
 using std::vector;
 
-#define WIDTH 1200
-#define HEIGHT 1200
-#define SCL 50 // scale means the dimensions of grid cells
-#define ROWS (HEIGHT / SCL)
-#define COLS (WIDTH / SCL)
+inline constexpr int WIDTH{800};
+inline constexpr int HEIGHT{800};
+inline constexpr int SCL{40}; // scale means the dimensions of grid cells
+inline constexpr int ROWS{(HEIGHT / SCL)};
+inline constexpr int COLS{(WIDTH / SCL)};
+inline constexpr int FPS{60};
 
 // Board
 
