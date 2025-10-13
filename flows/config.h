@@ -11,6 +11,11 @@ inline constexpr int ROWS{(HEIGHT / SCL)};
 inline constexpr int COLS{(WIDTH / SCL)};
 inline constexpr int FPS{60};
 
+inline constexpr int PARTICLE_RADIUS{2};
+inline constexpr int PARTICLE_MAX_SPEED{2};
+inline constexpr int PARTICLE_MIN_SPEED{1};
+inline constexpr int NUM_PARTICLES{200};
+
 // Board
 
 struct slot {
@@ -22,4 +27,5 @@ extern vector<vector<slot>> BOARD;
 
 double map_to(double minimum, double maximum, double new_min, double new_max,
               double value);
-double field_func(double x, double y);
+double field_func(const double &x, const double &y);
+double getMax(std::vector<vector<slot>> &BOARD, int COLS, int ROWS);
