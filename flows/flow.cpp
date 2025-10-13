@@ -40,10 +40,13 @@ int main() {
         BOARD[y][x].vec = RealVector(cos(angle) * length, sin(angle) * length);
         Vector2 end = {BOARD[y][x].start_point.x + BOARD[y][x].vec.x,
                        BOARD[y][x].start_point.y + BOARD[y][x].vec.y};
-        u_char c{static_cast<u_char>(map_to(0, 2 * PI, 0, 255, PI * 3 / 4))};
-        DrawLineEx(BOARD[y][x].start_point, end, 2, (Color){0, c, c, 255});
+
+        DrawLineEx(BOARD[y][x].start_point, end, 2, (Color){0, 0, 0, 255});
       }
     }
+    Vector2 charge_start = {300, 400};
+    Vector2 charge_end = {500, 400};
+    DrawLineEx(charge_start, charge_end, 4, RED);
 
     EndDrawing();
   }
