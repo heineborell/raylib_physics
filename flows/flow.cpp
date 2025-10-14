@@ -53,6 +53,7 @@ int main() {
         double x_component{getQuadrant(x, y, HALF_CELLS, BOARD).x};
         double y_component{getQuadrant(x, y, HALF_CELLS, BOARD).y};
         double angle = field_func(x_component, y_component);
+        std::cout << HALF_CELLS << '\n';
         BOARD[y][x].vec = RealVector(cos(angle) * length, sin(angle) * length);
         Vector2 end = {BOARD[y][x].start_point.x + BOARD[y][x].vec.x,
                        BOARD[y][x].start_point.y + BOARD[y][x].vec.y};
@@ -69,11 +70,11 @@ int main() {
                                .vec;
       particles[i].applyForce(mv);
       particles[i].update();
-      particles[i].show();
+      // particles[i].show();
     }
     // charged object drawing
-    Vector2 charge_start = {300, 400};
-    Vector2 charge_end = {500, 400};
+    Vector2 charge_start = {300, 420};
+    Vector2 charge_end = {500, 420};
     DrawLineEx(charge_start, charge_end, 4, RED);
 
     EndDrawing();

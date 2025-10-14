@@ -20,16 +20,20 @@ double field_func(const double &x, const double &y) {
 }
 
 double xComponent(double x, double y) {
-  return 1.0 / std::sqrt(std::pow(-300.0 + x, 2) + std::pow(-400.0 + y, 2)) -
-         1.0 / std::sqrt(std::pow(-500.0 + x, 2) + std::pow(-400.0 + y, 2));
+  return 0.0;
+  // return 1.0 / std::sqrt(std::pow(-200.0 + x, 2) + std::pow(-400.0 + y, 2)) -
+  //        1.0 / std::sqrt(std::pow(200.0 + x, 2) + std::pow(-400.0 + y, 2));
 }
 
 double yComponent(double x, double y) {
-  double term1 =
-      (500.0 - x) / std::sqrt((x - 500) * (x - 500) + std::pow(-400.0 + y, 2));
-  double term2 =
-      (300.0 - x) / std::sqrt((x - 300) * (x - 300) + std::pow(-400.0 + y, 2));
-  return (term1 - term2) / 400;
+  return y;
+  // double term1 =
+  //     (200.0 - x) / std::sqrt((x - 200) * (x - 200) + std::pow(-400.0 + y,
+  //     2));
+  // double term2 =
+  //     (200.0 + x) / std::sqrt((x + 200) * (x + 200) + std::pow(-400.0 + y,
+  //     2));
+  // return (term1 - term2) / 400;
 }
 
 double getMax(std::vector<vector<slot>> &BOARD, int ROWS, int COLS) {

@@ -9,13 +9,13 @@ inline constexpr int HEIGHT{800};
 inline constexpr int SCL{20}; // scale means the dimensions of grid cells
 inline constexpr int ROWS{(HEIGHT / SCL)};
 inline constexpr int COLS{(WIDTH / SCL)};
-inline constexpr int HALF_CELLS{(ROWS / SCL)};
+inline constexpr int HALF_CELLS{(ROWS / 2)};
 inline constexpr int FPS{60};
 
 inline constexpr int PARTICLE_RADIUS{2};
 inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
-inline constexpr int NUM_PARTICLES{2000};
+inline constexpr int NUM_PARTICLES{4000};
 
 // Board
 
