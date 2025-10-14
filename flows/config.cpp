@@ -47,3 +47,15 @@ double getMax(std::vector<vector<slot>> &BOARD, int ROWS, int COLS) {
   }
   return max_length;
 }
+
+Coordinates getQuadrant(int x, int y, int half_no_cells,
+                        std::vector<std::vector<slot>> &BOARD) {
+
+  int sign_x = (x <= half_no_cells) ? -1 : 1;
+  int sign_y = (y <= half_no_cells) ? 1 : -1;
+
+  return {xComponent(sign_x * BOARD[y][x].start_point.x,
+                     sign_y * BOARD[y][x].start_point.y),
+          yComponent(sign_x * BOARD[y][x].start_point.x,
+                     sign_y * BOARD[y][x].start_point.y)};
+}

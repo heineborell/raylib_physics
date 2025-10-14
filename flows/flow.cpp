@@ -50,10 +50,8 @@ int main() {
 
     for (int y = 0; y < ROWS; ++y) {
       for (int x = 0; x < COLS; ++x) {
-        double x_component{
-            xComponent(BOARD[y][x].start_point.x, BOARD[y][x].start_point.y)};
-        double y_component{
-            yComponent(BOARD[y][x].start_point.x, BOARD[y][x].start_point.y)};
+        double x_component{getQuadrant(x, y, HALF_CELLS, BOARD).x};
+        double y_component{getQuadrant(x, y, HALF_CELLS, BOARD).y};
         double angle = field_func(x_component, y_component);
         BOARD[y][x].vec = RealVector(cos(angle) * length, sin(angle) * length);
         Vector2 end = {BOARD[y][x].start_point.x + BOARD[y][x].vec.x,
