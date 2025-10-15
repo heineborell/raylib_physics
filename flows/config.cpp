@@ -20,20 +20,16 @@ double field_func(const double &x, const double &y) {
 }
 
 double xComponent(double x, double y) {
-  return 0.0;
-  // return 1.0 / std::sqrt(std::pow(-200.0 + x, 2) + std::pow(-400.0 + y, 2)) -
-  //        1.0 / std::sqrt(std::pow(200.0 + x, 2) + std::pow(-400.0 + y, 2));
+  return 1.0 / std::sqrt(std::pow(-200.0 + x, 2) + std::pow(-400.0 + y, 2)) -
+         1.0 / std::sqrt(std::pow(200.0 + x, 2) + std::pow(-400.0 + y, 2));
 }
 
 double yComponent(double x, double y) {
-  return y;
-  // double term1 =
-  //     (200.0 - x) / std::sqrt((x - 200) * (x - 200) + std::pow(-400.0 + y,
-  //     2));
-  // double term2 =
-  //     (200.0 + x) / std::sqrt((x + 200) * (x + 200) + std::pow(-400.0 + y,
-  //     2));
-  // return (term1 - term2) / 400;
+  double term1 =
+      (200.0 - x) / std::sqrt((x - 200) * (x - 200) + std::pow(-400.0 + y, 2));
+  double term2 =
+      (200.0 + x) / std::sqrt((x + 200) * (x + 200) + std::pow(-400.0 + y, 2));
+  return (term1 - term2) / 400;
 }
 
 double getMax(std::vector<vector<slot>> &BOARD, int ROWS, int COLS) {
@@ -52,14 +48,8 @@ double getMax(std::vector<vector<slot>> &BOARD, int ROWS, int COLS) {
   return max_length;
 }
 
-Coordinates getQuadrant(int x, int y, int half_no_cells,
-                        std::vector<std::vector<slot>> &BOARD) {
-
-  int sign_x = (x <= half_no_cells) ? -1 : 1;
-  int sign_y = (y <= half_no_cells) ? 1 : -1;
-
-  return {xComponent(sign_x * BOARD[y][x].start_point.x,
-                     sign_y * BOARD[y][x].start_point.y),
-          yComponent(sign_x * BOARD[y][x].start_point.x,
-                     sign_y * BOARD[y][x].start_point.y)};
+Vector2 projectedVector(float x, float y, float xRange) {
+  Vector2 projected = {WIDTH / 2 + x * (WIDTH / (2 * xRange)),
+                       HEIGHT / 2 - y * (HEIGHT / (2 * xRange))};
+  return projected;
 }
