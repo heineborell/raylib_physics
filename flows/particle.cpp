@@ -16,14 +16,14 @@ Particle::Particle(RealVector p, RealVector v, float min_speed,
 void Particle::update() {
   pos = pos.add(vel);
 
-  if (pos.x > WIDTH)
-    pos.x = 0;
-  if (pos.x < 0)
-    pos.x = WIDTH;
-  if (pos.y > HEIGHT)
-    pos.y = 0;
-  if (pos.y < 0)
-    pos.y = HEIGHT;
+  // if (pos.x > WIDTH)
+  //   pos.x = 0;
+  // if (pos.x < 0)
+  //   pos.x = WIDTH;
+  // if (pos.y > HEIGHT)
+  //   pos.y = 0;
+  // if (pos.y < 0)
+  //   pos.y = HEIGHT;
 }
 
 void Particle::applyForce(RealVector force) {

@@ -6,12 +6,12 @@ using std::vector;
 
 inline constexpr int WIDTH{800};
 inline constexpr int HEIGHT{800};
-inline constexpr int SCL{1}; // scale means the dimensions of grid cells
+inline constexpr int SCL{20}; // scale means the dimensions of grid cells
 inline constexpr int ROWS{(HEIGHT / SCL)};
 inline constexpr int COLS{(WIDTH / SCL)};
 inline constexpr int HALF_CELLS{(ROWS / 2)};
 inline constexpr int FPS{60};
-inline constexpr double MULT{0.08f};
+inline constexpr double MULT{0.0038f};
 inline constexpr double length{SCL * MULT}; // size of the vectors we draw
 
 inline constexpr int PARTICLE_RADIUS{2};
@@ -19,7 +19,7 @@ inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
 inline constexpr int NUM_PARTICLES{4000};
 
-inline constexpr int wavePoints{40};
+inline constexpr int wavePoints{80};
 inline constexpr float zoomSpeed{1.1f};
 
 // Board

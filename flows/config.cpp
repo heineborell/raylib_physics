@@ -6,7 +6,7 @@ using std::clamp;
 
 // the first argument is how many elements and second argument is what we are
 // initializing at each element
-vector<vector<slot>> BOARD(ROWS + 1, vector<slot>(COLS + 1));
+vector<vector<slot>> BOARD(wavePoints + 1, vector<slot>(wavePoints + 1));
 
 double map_to(double minimum, double maximum, double new_min, double new_max,
               double value) {
@@ -20,16 +20,16 @@ double field_func(const double &x, const double &y) {
 }
 
 double xComponent(double x, double y) {
-  return 1.0 / std::sqrt(std::pow(-200.0 + x, 2) + std::pow(-400.0 + y, 2)) -
-         1.0 / std::sqrt(std::pow(200.0 + x, 2) + std::pow(-400.0 + y, 2));
+  // return x / (std::pow(std::pow(x, 2) + std::pow(y, 2), 3 / 2));
+  return 1.0 / std::sqrt(std::pow(-1.0 + x, 2) + std::pow(y, 2)) -
+         1.0 / std::sqrt(std::pow(1.0 + x, 2) + std::pow(y, 2));
 }
 
 double yComponent(double x, double y) {
-  double term1 =
-      (200.0 - x) / std::sqrt((x - 200) * (x - 200) + std::pow(-400.0 + y, 2));
-  double term2 =
-      (200.0 + x) / std::sqrt((x + 200) * (x + 200) + std::pow(-400.0 + y, 2));
-  return (term1 - term2) / 400;
+  // return y / (std::pow(std::pow(x, 2) + std::pow(y, 2), 3 / 2));
+  double term1 = (1.0 - x) / std::sqrt((x - 1) * (x - 1) + std::pow(y, 2));
+  double term2 = (1.0 + x) / std::sqrt((x + 1) * (x + 1) + std::pow(y, 2));
+  return (term1 + term2) / y;
 }
 
 double getMax(std::vector<vector<slot>> &BOARD, int ROWS, int COLS) {
