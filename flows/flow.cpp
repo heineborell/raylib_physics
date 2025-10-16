@@ -88,10 +88,10 @@ int main() {
       RealVector mv = BOARD[static_cast<int>(particles[i].pos.y / step)]
                            [static_cast<int>(particles[i].pos.x / step)]
                                .vec;
-      particles[i].applyForce(mv);
-      std::cout << particles[i].pos.x << '\n';
+      // particles[i].applyForce(mv);
+      // std::cout << particles[i].pos.x << '\n';
       // particles[i].update();
-      //   particles[i].show();
+      particles[i].show();
     }
 
     // for (int y = 0; y < ROWS; ++y) {

@@ -16,14 +16,14 @@ Particle::Particle(RealVector p, RealVector v, float min_speed,
 void Particle::update() {
   pos = pos.add(vel);
 
-  // if (pos.x > WIDTH)
-  //   pos.x = 0;
-  // if (pos.x < 0)
-  //   pos.x = WIDTH;
-  // if (pos.y > HEIGHT)
-  //   pos.y = 0;
-  // if (pos.y < 0)
-  //   pos.y = HEIGHT;
+  if (pos.x > 4.0f)
+    pos.x = 0;
+  if (pos.x < 0)
+    pos.x = 4.0f;
+  if (pos.y > 4.0f)
+    pos.y = 0;
+  if (pos.y < 0)
+    pos.y = 4.0f;
 }
 
 void Particle::applyForce(RealVector force) {
@@ -32,5 +32,6 @@ void Particle::applyForce(RealVector force) {
 }
 
 void Particle::show() {
-  DrawCircle(pos.x, pos.y, PARTICLE_RADIUS, {255, 0, 0, 255});
+  Vector2 projected{projectedVector(pos.x, pos.y, 4.0f)};
+  DrawCircle(projected.x, projected.y, PARTICLE_RADIUS, {255, 0, 0, 255});
 }
