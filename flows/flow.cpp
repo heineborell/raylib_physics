@@ -16,9 +16,6 @@ int main() {
   InitWindow(HEIGHT, WIDTH, "Vector PLots");
   SetTargetFPS(FPS);
 
-  // get the max length for coloring purposes
-  // double max_length{getMax(BOARD, COLS, ROWS)};
-
   float xRange{4.0f}; // x will range from -4 to 4 but then changed by scrolling
   float step{xRange * 2 / wavePoints}; // step size for plotting
   float length{step / 2};              // length of the vectors we draw
