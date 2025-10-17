@@ -19,6 +19,8 @@ int main() {
   float xRange{4.0f}; // x will range from -4 to 4 but then changed by scrolling
   float step{xRange * 2 / wavePoints}; // step size for plotting
   float length{step / 2};              // length of the vectors we draw
+  float arrowSin{cosf(arrowAngle)};
+  float arrowCos{sinf(arrowAngle)};
 
   while (!WindowShouldClose()) {
 
@@ -65,6 +67,21 @@ int main() {
         BOARD[y][x].vec = RealVector(cos(angle) * length, sin(angle) * length);
         Vector2 end = {BOARD[y][x].start_point.x + BOARD[y][x].vec.x,
                        BOARD[y][x].start_point.y + BOARD[y][x].vec.y};
+        //
+        // Vector2 leftWing = {projectedVector(end.x - arrowCos * (length / 2),
+        //                                     end.y - arrowSin * (length / 2),
+        //                                     xRange)};
+        // Vector2 rightWing = {projectedVector(end.x - arrowCos * (length / 2),
+        //                                      end.y - arrowSin * (length / 2),
+        //                                      xRange)};
+
+        // Vector2 leftWing = {projectedVector(end.x + 0.03 * Rotate(dir, 30).x,
+        //                                     end.y + 0.03 * Rotate(dir, 30).y,
+        //                                     xRange)};
+        // Vector2 rightWing = {projectedVector(end.x + 0.03 * Rotate(dir,
+        // -30).x,
+        //                                      end.y + 0.03 * Rotate(dir,
+        //                                      -30).y, xRange)};
 
         // // Map x and y values to screen coordinates
         Vector2 projectedStart{projectedVector(
@@ -72,6 +89,11 @@ int main() {
         Vector2 projectedEnd{projectedVector(end.x, end.y, xRange)};
 
         DrawLineEx(projectedStart, projectedEnd, 1, (Color){0, 255, 0, 255});
+        // DrawLineEx(projectedEnd, rightWing, 1, (Color){0, 255, 0, 255});
+        // DrawLineEx(projectedEnd, leftWing, 1, (Color){0, 255, 0, 255});
+        // DrawLineEx(projectedEnd, baseleft, 1, (Color){0, 255, 0, 255});
+        // DrawTriangleLines(baseright, baseleft, projectedEnd,
+        //                   (Color){0, 255, 0, 255});
       }
     }
 

@@ -53,3 +53,8 @@ Vector2 projectedVector(float x, float y, float xRange) {
                        HEIGHT / 2 - y * (HEIGHT / (2 * xRange))};
   return projected;
 }
+
+Vector2 Rotate(Vector2 v, float angle) {
+  return {v.x * cos(angle) - v.y * sin(angle),
+          v.x * sin(angle) + v.y * cos(angle)};
+}

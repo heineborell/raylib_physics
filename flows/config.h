@@ -1,5 +1,6 @@
 #include "RealVector.h"
 #include "raylib.h"
+#include <cmath>
 #include <vector>
 
 using std::vector;
@@ -15,6 +16,7 @@ inline constexpr int NUM_PARTICLES{4000};
 
 inline constexpr int wavePoints{40};
 inline constexpr float zoomSpeed{1.1f};
+inline constexpr float arrowAngle{3.14f / 7};
 
 // Board
 
@@ -39,3 +41,4 @@ double getMax(std::vector<vector<slot>> &BOARD, int COLS, int ROWS);
 Coordinates getQuadrant(int x, int y, int half_no_cells,
                         std::vector<std::vector<slot>> &BOARD);
 Vector2 projectedVector(float x, float y, float xRange);
+Vector2 Rotate(Vector2 v, float angle);
