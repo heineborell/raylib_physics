@@ -21,24 +21,36 @@ inline constexpr float arrowAngle{3.14f / 7};
 // Board
 
 struct slot {
-  RealVector vec;
+  Vector2 vec;
   Vector2 start_point; // starting position where to draw the vector on screen
 };
 
 struct Coordinates {
-  double x;
-  double y;
+  float x;
+  float y;
 };
+
+struct Magnitudes {
+  float max;
+  float min;
+};
+
+struct rgbValues {
+  char r;
+  char g;
+  char b;
+};
+
+enum class Categories { VeryLow, Low, Medium, High, VeryHigh };
 
 extern vector<vector<slot>> BOARD;
 
-double xComponent(double x, double y);
-double yComponent(double x, double y);
-double map_to(double minimum, double maximum, double new_min, double new_max,
-              double value);
-double field_func(const double &x, const double &y);
-double getMax(std::vector<vector<slot>> &BOARD, int COLS, int ROWS);
-Coordinates getQuadrant(int x, int y, int half_no_cells,
-                        std::vector<std::vector<slot>> &BOARD);
+float xComponent(float x, float y);
+float yComponent(float x, float y);
+float map_to(float minimum, float maximum, float new_min, float new_max,
+             float value);
+float getMax(std::vector<vector<slot>> &BOARD, int COLS, int ROWS);
+int classify(float value, float minVal, float maxVal, int numCategories);
+Magnitudes getMaxLength(std::vector<std::vector<float>> &array);
 Vector2 projectedVector(float x, float y, float xRange);
 Vector2 Rotate(Vector2 v, float angle);
