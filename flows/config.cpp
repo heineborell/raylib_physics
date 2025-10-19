@@ -3,7 +3,10 @@
 #include "raymath.h"
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
+#include <memory>
 using std::clamp;
+#include <iostream>
 
 // the first argument is how many elements and second argument is what we are
 // initializing at each element
@@ -65,19 +68,33 @@ Vector2 projectedVector(float x, float y, float xRange) {
   return projected;
 }
 
-int classify(float value, float minVal, float maxVal, int numCategories) {
-
+rgbValues getColorValue(float value, float minVal, float maxVal,
+                        const std::vector<rgbValues> &colors) {
   value = std::abs(value);
+  // // Handle edge cases
+  // if (value <= 0)
+  //   return colors[0];
+  // if (value <= minVal)
+  //   return colors[0];
+  // if (value >= maxVal)
+  //   return colors.back();
+
+  // Log transform
+  float logVal = std::log10(value);
   float logMin = std::log10(minVal);
   float logMax = std::log10(maxVal);
-  float logValue = std::log10(value);
 
-  float step = (logMax - logMin) / numCategories;
-  int index = static_cast<int>((logValue - logMin) / step);
-  if (index < 0)
-    index = 0;
-  if (index >= numCategories)
-    index = numCategories - 1;
+  // Normalize to [0, 1]
+  float normalized = (logVal - logMin) / (logMax - logMin);
 
-  return index;
+  // Map to color bins
+  int numBins = colors.size() - 1;
+  float binIndex = normalized * numBins;
+  int bin = std::min(static_cast<int>(binIndex), numBins - 1);
+
+  if (bin < 0)
+    bin = 1;
+  const rgbValues &c1 = colors[bin];
+
+  return {c1.r, c1.g, c1.b, c1.a};
 }

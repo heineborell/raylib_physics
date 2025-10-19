@@ -24,6 +24,13 @@ int main() {
   float arrowSin{cosf(arrowAngle)};
   float arrowCos{sinf(arrowAngle)};
 
+  std::vector<rgbValues> viridisColors = {
+      {53, 42, 135, 255},   // dark blue
+      {19, 123, 190, 255},  // blue
+      {120, 190, 125, 255}, // green
+      {250, 250, 110, 255}  // yellow
+  };
+
   while (!WindowShouldClose()) {
 
     BeginDrawing();
@@ -114,14 +121,21 @@ int main() {
     Magnitudes max_length{getMaxLength(magnitudes)};
     for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
       for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
-
-        std::cout << classify(magnitudes[y][x], max_length.min, max_length.max,
-                              5)
-                  << '\n';
-        // std::cout << magnitudes[y][x] << '\n';
-        // char c{static_cast<int>((255 / max_length) * magnitudes[y][x])};
-        DrawLineEx(BOARD[y][x].start_point, BOARD[y][x].vec, 1,
-                   (Color){255, 243, 59, 255});
+        Color c = {
+            getColorValue(magnitudes[y][x], max_length.min, max_length.max,
+                          viridisColors)
+                .r,
+            getColorValue(magnitudes[y][x], max_length.min, max_length.max,
+                          viridisColors)
+                .g,
+            getColorValue(magnitudes[y][x], max_length.min, max_length.max,
+                          viridisColors)
+                .b,
+            getColorValue(magnitudes[y][x], max_length.min, max_length.max,
+                          viridisColors)
+                .a,
+        };
+        DrawLineEx(BOARD[y][x].start_point, BOARD[y][x].vec, 3, c);
       }
     }
     // charged object drawing
