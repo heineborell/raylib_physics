@@ -76,45 +76,15 @@ int main() {
             yComponent(BOARD[y][x].start_point.x, BOARD[y][x].start_point.y)};
 
         // check for infty
-        if (std::isinf(x_component) || x_component > 1e+04) {
+        if (x_component > 1e+04) {
           x_component = 0;
         }
-        if (std::isinf(y_component) || y_component > 1e+04) {
+        if (y_component > 1e+04) {
           y_component = 0;
         }
 
         BOARD[y][x].vec = {x_component, y_component};
-        float angle{atan2(BOARD[y][x].vec.y, BOARD[y][x].vec.x)};
         magnitudes[y][x] = Vector2Length(BOARD[y][x].vec);
-        Vector2 end = {BOARD[y][x].start_point.x + cosf(angle) * length,
-                       BOARD[y][x].start_point.y + sinf(angle) * length};
-        //
-        // Vector2 leftWing = {projectedVector(end.x - arrowCos * (length / 2),
-        //                                     end.y - arrowSin * (length / 2),
-        //                                     xRange)};
-        // Vector2 rightWing = {projectedVector(end.x - arrowCos * (length / 2),
-        //                                      end.y - arrowSin * (length / 2),
-        //                                      xRange)};
-
-        // Vector2 leftWing = {projectedVector(end.x + 0.03 * Rotate(dir, 30).x,
-        //                                     end.y + 0.03 * Rotate(dir, 30).y,
-        //                                     xRange)};
-        // Vector2 rightWing = {projectedVector(end.x + 0.03 * Rotate(dir,
-        // -30).x,
-        //                                      end.y + 0.03 * Rotate(dir,
-        //                                      -30).y, xRange)};
-
-        // // Map x and y values to screen coordinates
-        BOARD[y][x].start_point = {projectedVector(
-            BOARD[y][x].start_point.x, BOARD[y][x].start_point.y, xRange)};
-        BOARD[y][x].vec = {projectedVector(end.x, end.y, xRange)};
-
-        // DrawLineEx(projectedStart, projectedEnd, 1, (Color){0, 255, 0, 255});
-        // DrawLineEx(projectedEnd, rightWing, 1, (Color){0, 255, 0, 255});
-        // DrawLineEx(projectedEnd, leftWing, 1, (Color){0, 255, 0, 255});
-        // DrawLineEx(projectedEnd, baseleft, 1, (Color){0, 255, 0, 255});
-        // DrawTriangleLines(baseright, baseleft, projectedEnd,
-        //                   (Color){0, 255, 0, 255});
       }
     }
 
@@ -135,13 +105,32 @@ int main() {
                           viridisColors)
                 .a,
         };
-        DrawLineEx(BOARD[y][x].start_point, BOARD[y][x].vec, 3, c);
+
+        float angle{atan2(BOARD[y][x].vec.y, BOARD[y][x].vec.x)};
+        Vector2 end = {BOARD[y][x].start_point.x + cosf(angle) * length,
+                       BOARD[y][x].start_point.y + sinf(angle) * length};
+        //
+        Vector2 leftWing = {projectedVector(
+            end.x - cosf(angle - arrowAngle) * (length / 3),
+            end.y - sinf(angle - arrowAngle) * (length / 3), xRange)};
+        Vector2 rightWing = {projectedVector(
+            end.x - cosf(angle + arrowAngle) * (length / 3),
+            end.y - sinf(angle + arrowAngle) * (length / 3), xRange)};
+
+        // // Map x and y values to screen coordinates
+        BOARD[y][x].start_point = {projectedVector(
+            BOARD[y][x].start_point.x, BOARD[y][x].start_point.y, xRange)};
+        BOARD[y][x].vec = {projectedVector(end.x, end.y, xRange)};
+
+        DrawLineEx(BOARD[y][x].vec, rightWing, 2, c);
+        DrawLineEx(BOARD[y][x].vec, leftWing, 2, c);
+        DrawLineEx(BOARD[y][x].start_point, BOARD[y][x].vec, 2, c);
       }
     }
     // charged object drawing
     Vector2 charge_start = {projectedVector(-1, 0, xRange)};
     Vector2 charge_end = {projectedVector(1, 0, xRange)};
-    DrawLineEx(charge_start, charge_end, 4, RED);
+    DrawLineEx(charge_start, charge_end, 6, RED);
 
     EndDrawing();
   }
