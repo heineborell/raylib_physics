@@ -2,15 +2,15 @@
 
 class RealVector {
 public:
-  float x{};
-  float y{};
+  double x{};
+  double y{};
   RealVector(); // constructor default starts vector with no values
-  RealVector(float x, float y); // constructor parametrized
+  RealVector(double x, double y); // constructor parametrized
 
   RealVector add(RealVector &vec);
   RealVector sub(RealVector &vec);
-  RealVector mult(float num);
-  RealVector limit(float min_speed, float max_speed);
-  float getMag();
-  float angleOf();
+  RealVector mult(double num);
+  RealVector limit(double min_speed, double max_speed);
+  double getMag();
+  double angleOf();
 };

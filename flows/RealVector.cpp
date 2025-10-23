@@ -2,7 +2,7 @@
 #include <cmath>
 
 RealVector::RealVector() {};
-RealVector::RealVector(float x_, float y_)
+RealVector::RealVector(double x_, double y_)
     : x{x_}, y{y_} {} // member initilaizer list
 
 RealVector RealVector::add(RealVector &vec) {
@@ -13,10 +13,10 @@ RealVector RealVector::sub(RealVector &vec) {
   return RealVector(x - vec.x, y - vec.y);
 }
 
-RealVector RealVector::mult(float num) { return RealVector(num * x, num * y); }
+RealVector RealVector::mult(double num) { return RealVector(num * x, num * y); }
 
-RealVector RealVector::limit(float min_speed, float max_speed) {
-  float mag{getMag()};
+RealVector RealVector::limit(double min_speed, double max_speed) {
+  double mag{getMag()};
   RealVector res{*this}; // *this is a dereferrncing the object you are applying
                          // this function like v.limit
   if (mag == 0)
@@ -30,6 +30,6 @@ RealVector RealVector::limit(float min_speed, float max_speed) {
   return res;
 }
 
-float RealVector::getMag() { return sqrt(pow(x, 2) + pow(y, 2)); }
+double RealVector::getMag() { return sqrt(pow(x, 2) + pow(y, 2)); }
 
-float RealVector::angleOf() { return atan2(y, x); }
+double RealVector::angleOf() { return atan2(y, x); }

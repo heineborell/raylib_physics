@@ -12,33 +12,33 @@ using std::clamp;
 // initializing at each element
 vector<vector<slot>> BOARD(wavePoints + 1, vector<slot>(wavePoints + 1));
 
-float map_to(float minimum, float maximum, float new_min, float new_max,
-             float value) {
+double map_to(double minimum, double maximum, double new_min, double new_max,
+              double value) {
   value = std::clamp(value, minimum, maximum);
   return new_min +
          (value - minimum) * (new_max - new_min) / (maximum - minimum);
 }
 
-float xComponent(float x, float y) {
+double xComponent(double x, double y) {
   // return x / (std::pow(std::pow(x, 2) + std::pow(y, 2), 3 / 2));
   return 1.0 / std::sqrt(std::pow(-1.0 + x, 2) + std::pow(y, 2)) -
          1.0 / std::sqrt(std::pow(1.0 + x, 2) + std::pow(y, 2));
 }
 
-float yComponent(float x, float y) {
+double yComponent(double x, double y) {
   // return y / (std::pow(std::pow(x, 2) + std::pow(y, 2), 3 / 2));
-  float term1 = (1.0 - x) / std::sqrt((x - 1) * (x - 1) + std::pow(y, 2));
-  float term2 = (1.0 + x) / std::sqrt((x + 1) * (x + 1) + std::pow(y, 2));
+  double term1 = (1.0 - x) / std::sqrt((x - 1) * (x - 1) + std::pow(y, 2));
+  double term2 = (1.0 + x) / std::sqrt((x + 1) * (x + 1) + std::pow(y, 2));
   return (term1 + term2) / y;
 }
 
-float getMax(std::vector<vector<slot>> &BOARD, int ROWS, int COLS) {
-  float max_length{0};
+double getMax(std::vector<vector<slot>> &BOARD, int ROWS, int COLS) {
+  double max_length{0};
   for (int y = 0; y < ROWS; ++y) {
     for (int x = 0; x < COLS; ++x) {
-      float x_component{
+      double x_component{
           xComponent(BOARD[y][x].start_point.x, BOARD[y][x].start_point.y)};
-      float y_component{
+      double y_component{
           yComponent(BOARD[y][x].start_point.x, BOARD[y][x].start_point.y)};
       if (max_length <
           std::abs(sqrt(pow(x_component, 2) + pow(y_component, 2))))
@@ -48,9 +48,9 @@ float getMax(std::vector<vector<slot>> &BOARD, int ROWS, int COLS) {
   return max_length;
 }
 
-Magnitudes getMaxLength(std::vector<vector<float>> &array) {
-  float max{0.0};
-  float min{100.0};
+Magnitudes getMaxLength(std::vector<vector<double>> &array) {
+  double max{0.0};
+  double min{100.0};
   for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
     for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
       if (std::abs(array[y][x]) > max && !std::isinf(array[y][x]))
@@ -62,13 +62,14 @@ Magnitudes getMaxLength(std::vector<vector<float>> &array) {
   return {max, min};
 }
 
-Vector2 projectedVector(float x, float y, float xRange) {
-  Vector2 projected = {WIDTH / 2 + x * (WIDTH / (2 * xRange)),
-                       HEIGHT / 2 - y * (HEIGHT / (2 * xRange))};
+Vector2 projectedVector(double x, double y, double xRange) {
+  Vector2 projected = {
+      static_cast<float>(WIDTH / 2 + x * (WIDTH / (2 * xRange))),
+      static_cast<float>(HEIGHT / 2 - y * (HEIGHT / (2 * xRange)))};
   return projected;
 }
 
-rgbValues getColorValue(float value, float minVal, float maxVal,
+rgbValues getColorValue(double value, double minVal, double maxVal,
                         const std::vector<rgbValues> &colors) {
   value = std::abs(value);
   // // Handle edge cases
@@ -80,16 +81,16 @@ rgbValues getColorValue(float value, float minVal, float maxVal,
   //   return colors.back();
 
   // Log transform
-  float logVal = std::log10(value);
-  float logMin = std::log10(minVal);
-  float logMax = std::log10(maxVal);
+  double logVal = std::log10(value);
+  double logMin = std::log10(minVal);
+  double logMax = std::log10(maxVal);
 
   // Normalize to [0, 1]
-  float normalized = (logVal - logMin) / (logMax - logMin);
+  double normalized = (logVal - logMin) / (logMax - logMin);
 
   // Map to color bins
   int numBins = colors.size() - 1;
-  float binIndex = normalized * numBins;
+  double binIndex = normalized * numBins;
   int bin = std::min(static_cast<int>(binIndex), numBins - 1);
 
   if (bin < 0)

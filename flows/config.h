@@ -16,8 +16,8 @@ inline constexpr int PARTICLE_MIN_SPEED{1};
 inline constexpr int NUM_PARTICLES{4000};
 
 inline constexpr int wavePoints{40};
-inline constexpr float zoomSpeed{1.1f};
-inline constexpr float arrowAngle{3.14f / 7};
+inline constexpr double zoomSpeed{1.1};
+inline constexpr double arrowAngle{3.14 / 7};
 
 // Board
 
@@ -27,13 +27,13 @@ struct slot {
 };
 
 struct Coordinates {
-  float x;
-  float y;
+  double x;
+  double y;
 };
 
 struct Magnitudes {
-  float max;
-  float min;
+  double max;
+  double min;
 };
 
 struct rgbValues {
@@ -45,13 +45,13 @@ struct rgbValues {
 
 extern vector<vector<slot>> BOARD;
 
-float xComponent(float x, float y);
-float yComponent(float x, float y);
-float map_to(float minimum, float maximum, float new_min, float new_max,
-             float value);
-float getMax(std::vector<vector<slot>> &BOARD, int COLS, int ROWS);
-rgbValues getColorValue(float value, float minVal, float maxVal,
+double xComponent(double x, double y);
+double yComponent(double x, double y);
+double map_to(double minimum, double maximum, double new_min, double new_max,
+              double value);
+double getMax(std::vector<vector<slot>> &BOARD, int COLS, int ROWS);
+rgbValues getColorValue(double value, double minVal, double maxVal,
                         const std::vector<rgbValues> &colors);
-Magnitudes getMaxLength(std::vector<std::vector<float>> &array);
-Vector2 projectedVector(float x, float y, float xRange);
-Vector2 Rotate(Vector2 v, float angle);
+Magnitudes getMaxLength(std::vector<std::vector<double>> &array);
+Vector2 projectedVector(double x, double y, double xRange);
+Vector2 Rotate(Vector2 v, double angle);
