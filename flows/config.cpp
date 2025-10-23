@@ -2,7 +2,8 @@
 #include "RealVector.h"
 #include "raymath.h"
 #include <algorithm>
-#include <cmath>
+#include <boost/math/quadrature/gauss_kronrod.hpp>
+#include <boost/math/quadrature/trapezoidal.hpp>
 #include <cstdint>
 #include <memory>
 using std::clamp;
@@ -21,15 +22,31 @@ double map_to(double minimum, double maximum, double new_min, double new_max,
 
 double xComponent(double x, double y) {
   // return x / (std::pow(std::pow(x, 2) + std::pow(y, 2), 3 / 2));
-  return 1.0 / std::sqrt(std::pow(-1.0 + x, 2) + std::pow(y, 2)) -
-         1.0 / std::sqrt(std::pow(1.0 + x, 2) + std::pow(y, 2));
+  // return 1.0 / std::sqrt(std::pow(-1.0 + x, 2) + std::pow(y, 2)) -
+  //        1.0 / std::sqrt(std::pow(1.0 + x, 2) + std::pow(y, 2));
+  auto f = [x, y](double x0) {
+    double dx = x - x0;
+    double r2 = dx * dx + y * y;      // (x-x0)^2 + y^2
+    double r3_2 = r2 * std::sqrt(r2); // r^(3/2) = r^2 * sqrt(r^2)
+    return dx / r3_2;
+  };
+  return boost::math::quadrature::gauss_kronrod<double, 5>::integrate(f, -1.0,
+                                                                      1.0);
 }
 
 double yComponent(double x, double y) {
   // return y / (std::pow(std::pow(x, 2) + std::pow(y, 2), 3 / 2));
-  double term1 = (1.0 - x) / std::sqrt((x - 1) * (x - 1) + std::pow(y, 2));
-  double term2 = (1.0 + x) / std::sqrt((x + 1) * (x + 1) + std::pow(y, 2));
-  return (term1 + term2) / y;
+  // double term1 = (1.0 - x) / std::sqrt((x - 1) * (x - 1) + std::pow(y, 2));
+  // double term2 = (1.0 + x) / std::sqrt((x + 1) * (x + 1) + std::pow(y, 2));
+  // return (term1 + term2) / y;
+  auto f = [x, y](double x0) {
+    double dx = x - x0;
+    double r2 = dx * dx + y * y;      // (x-x0)^2 + y^2
+    double r3_2 = r2 * std::sqrt(r2); // r^(3/2) = r^2 * sqrt(r^2)
+    return y / r3_2;
+  };
+  return boost::math::quadrature::gauss_kronrod<double, 5>::integrate(f, -1.0,
+                                                                      1.0);
 }
 
 double getMax(std::vector<vector<slot>> &BOARD, int ROWS, int COLS) {
