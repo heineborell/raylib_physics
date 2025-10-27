@@ -66,8 +66,10 @@ int main() {
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
 
+    // Define an array for the magnitudes
     std::vector<std::vector<double>> magnitudes(wavePoints + 1,
                                                 vector<double>(wavePoints + 1));
+
     for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
       for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
         double x_component{
