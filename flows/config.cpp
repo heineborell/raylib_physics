@@ -24,13 +24,13 @@ double xComponent(double x0, double y0) {
   // return x / (std::pow(std::pow(x, 2) + std::pow(y, 2), 3 / 2));
   // return 1.0 / std::sqrt(std::pow(-1.0 + x, 2) + std::pow(y, 2)) -
   //        1.0 / std::sqrt(std::pow(1.0 + x, 2) + std::pow(y, 2));
-  if (y0 == 0 && x0 < 1 && x0 > -1) {
+  if (y0 == 1 && x0 < 1 && x0 > -1) {
     return 0.0;
   } else {
     auto f = [x0, y0](double x) {
       double dx = x0 - x;
-      double r2 = dx * dx + y0 * y0;         // (x-x0)^2 + y^2
-      double r3_2 = r2 * r2 * std::sqrt(r2); // r^(5/2) = r^2 * sqrt(r^2)
+      double r2 = dx * dx + (y0 - 1) * (y0 - 1); // (x-x0)^2 + y^2
+      double r3_2 = r2 * r2 * std::sqrt(r2);     // r^(5/2) = r^2 * sqrt(r^2)
       return dx / r3_2;
     };
     return boost::math::quadrature::gauss_kronrod<double, 5>::integrate(f, -1.0,
@@ -43,14 +43,14 @@ double yComponent(double x0, double y0) {
   // double term1 = (1.0 - x) / std::sqrt((x - 1) * (x - 1) + std::pow(y, 2));
   // double term2 = (1.0 + x) / std::sqrt((x + 1) * (x + 1) + std::pow(y, 2));
   // return (term1 + term2) / y;
-  if (y0 == 0 && x0 < 1.0 && x0 > -1) {
+  if (y0 == 1 && x0 < 1.0 && x0 > -1) {
     return 0.0;
   } else {
     auto f = [x0, y0](double x) {
       double dx = x0 - x;
-      double r2 = dx * dx + y0 * y0;         // (x-x0)^2 + y^2
-      double r3_2 = r2 * r2 * std::sqrt(r2); // r^(5/2) = r^2 * sqrt(r^2)
-      return y0 / r3_2;
+      double r2 = dx * dx + (y0 - 1) * (y0 - 1); // (x-x0)^2 + y^2
+      double r3_2 = r2 * r2 * std::sqrt(r2);     // r^(5/2) = r^2 * sqrt(r^2)
+      return (y0 - 1) / r3_2;
     };
     return boost::math::quadrature::gauss_kronrod<double, 5>::integrate(f, -1.0,
                                                                         1.0);

@@ -133,9 +133,12 @@ int main() {
       }
     }
     // charged object drawing
-    Vector2 charge_start = {projectedVector(-1, 0, xRange)};
-    Vector2 charge_end = {projectedVector(1, 0, xRange)};
-    DrawLineEx(charge_start, charge_end, 6, RED);
+    Vector2 charge_start = {projectedVector(-1, 1, xRange)};
+    Vector2 charge_end = {projectedVector(1, 1, xRange)};
+    Vector2 charge_2_start = {projectedVector(-1, -1, xRange)};
+    Vector2 charge_2_end = {projectedVector(1, -1, xRange)};
+    DrawLineEx(charge_start, charge_end, 3, RED);
+    DrawLineEx(charge_2_start, charge_2_end, 3, RED);
 
     EndDrawing();
   }
