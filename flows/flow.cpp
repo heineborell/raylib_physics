@@ -72,10 +72,10 @@ int main() {
 
     for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
       for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
-        double x_component{
-            xComponent(BOARD[y][x].start_point.x, BOARD[y][x].start_point.y)};
-        double y_component{
-            yComponent(BOARD[y][x].start_point.x, BOARD[y][x].start_point.y)};
+        double x0{BOARD[y][x].start_point.x};
+        double y0{BOARD[y][x].start_point.y};
+        double x_component{xComponent(x0, y0, exFunc)};
+        double y_component{yComponent(x0, y0, eyFunc)};
 
         // check for infty
         if (x_component > 1e+08) {

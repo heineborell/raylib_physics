@@ -45,8 +45,12 @@ struct rgbValues {
 
 extern vector<vector<slot>> BOARD;
 
-double xComponent(double x0, double y0);
-double yComponent(double x0, double y0);
+double exFunc(double &x0, double &y0, double x, double distance_y);
+double eyFunc(double &x0, double &y0, double x, double distance_y);
+double xComponent(double &x0, double &y0,
+                  double (*exFunc)(double &, double &, double, double));
+double yComponent(double &x0, double &y0,
+                  double (*eyFunc)(double &, double &, double, double));
 double map_to(double minimum, double maximum, double new_min, double new_max,
               double value);
 double getMax(std::vector<vector<slot>> &BOARD, int COLS, int ROWS);
