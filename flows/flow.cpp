@@ -1,7 +1,6 @@
 #include "config.h"
 #include "particle.h"
 #include "raymath.h"
-#include <cmath>
 #include <cstddef>
 #include <cstdlib>
 #include <raylib.h>
@@ -64,10 +63,22 @@ int main() {
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
 
     Field efield_1{getEfield(1.0)};
-    drawEfield(efield_1, viridisColors, length, xRange);
-
     Field efield_2{getEfield(-1.0)};
-    drawEfield(efield_2, viridisColors, length, xRange);
+
+    std::vector<std::vector<double>> sumMagnitudes(
+        wavePoints + 1, vector<double>(wavePoints + 1));
+    vector<vector<Vector2>> sumEfield(wavePoints + 1,
+                                      vector<Vector2>(wavePoints + 1));
+    for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
+      for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
+        sumEfield[y][x].x = efield_1.Efield[y][x].x - efield_2.Efield[y][x].x;
+        sumEfield[y][x].y = efield_1.Efield[y][x].y - efield_2.Efield[y][x].y;
+        sumMagnitudes[y][x] = Vector2Length(sumEfield[y][x]);
+      }
+    }
+    Field resultant{sumEfield, sumMagnitudes};
+
+    drawEfield(resultant, viridisColors, length, xRange);
 
     // charged object drawing
     Vector2 charge_start = {projectedVector(-1, 1, xRange)};

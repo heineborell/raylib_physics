@@ -39,7 +39,7 @@ double xCompIntegrate(double &x0, double &y0, double y_pos,
     return 0.0; // if x0,y0 on charge dont integrate just give 0
   } else {
     auto f = [&](double x) { return exFunc(x0, y0, x, y_pos); };
-    return boost::math::quadrature::gauss_kronrod<double, 8>::integrate(
+    return boost::math::quadrature::gauss_kronrod<double, 15>::integrate(
         f, -integral_lim, integral_lim);
   }
 }
@@ -51,7 +51,7 @@ double yCompIntegrate(double &x0, double &y0, double y_pos,
     return 0.0; // if x0,y0 on charge dont integrate just give 0
   } else {
     auto f = [&](double x) { return eyFunc(x0, y0, x, y_pos); };
-    return boost::math::quadrature::gauss_kronrod<double, 8>::integrate(
+    return boost::math::quadrature::gauss_kronrod<double, 15>::integrate(
         f, -integral_lim, integral_lim);
   }
 }
