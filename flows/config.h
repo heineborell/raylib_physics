@@ -18,8 +18,8 @@ inline constexpr int NUM_PARTICLES{4000};
 inline constexpr int wavePoints{20};
 inline constexpr double zoomSpeed{1.1};
 inline constexpr double arrowAngle{3.14 / 7};
-inline constexpr double arrowSin{sinf(arrowAngle)};
-inline constexpr double arrowCos{cosf(arrowAngle)};
+inline const double arrowSin{std::sin(arrowAngle)};
+inline const double arrowCos{std::cos(arrowAngle)};
 
 // Board
 
