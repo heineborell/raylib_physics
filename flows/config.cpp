@@ -14,22 +14,12 @@ double map_to(double minimum, double maximum, double new_min, double new_max,
          (value - minimum) * (new_max - new_min) / (maximum - minimum);
 }
 
+// These exFunc and eyFunc are for Electric fields of a line of charge
 double exFunc(double &x0, double &y0, double x, double distance_y) {
   double dx = x0 - x;
   double r2 = dx * dx + (y0 - distance_y) * (y0 - distance_y); // (x-x0)^2 + y^2
   double r3_2 = r2 * r2 * std::sqrt(r2); // r^(5/2) = r^2 * sqrt(r^2)
   return dx / r3_2;
-}
-
-double xComponent(double &x0, double &y0, double y_pos,
-                  double (*exFunc)(double &, double &, double, double)) {
-  if (y0 == 1 && x0 < 1 && x0 > -1) {
-    return 0.0;
-  } else {
-    auto f = [&](double x) { return exFunc(x0, y0, x, y_pos); };
-    return boost::math::quadrature::gauss_kronrod<double, 5>::integrate(f, -1.0,
-                                                                        1.0);
-  }
 }
 
 double eyFunc(double &x0, double &y0, double x, double distance_y) {
@@ -39,14 +29,27 @@ double eyFunc(double &x0, double &y0, double x, double distance_y) {
   return (y0 - 1) / r3_2;
 }
 
-double yComponent(double &x0, double &y0, double y_pos,
-                  double (*eyFunc)(double &, double &, double, double)) {
-  if (y0 == 1 && x0 < 1.0 && x0 > -1) {
-    return 0.0;
+double xCompIntegrate(double &x0, double &y0, double y_pos,
+                      double (*exFunc)(double &, double &, double, double)) {
+  double integral_lim{1.0};
+  if (y0 == y_pos && x0 < integral_lim && x0 > -integral_lim) {
+    return 0.0; // if x0,y0 on charge dont integrate just give 0
+  } else {
+    auto f = [&](double x) { return exFunc(x0, y0, x, y_pos); };
+    return boost::math::quadrature::gauss_kronrod<double, 8>::integrate(
+        f, -integral_lim, integral_lim);
+  }
+}
+
+double yCompIntegrate(double &x0, double &y0, double y_pos,
+                      double (*eyFunc)(double &, double &, double, double)) {
+  double integral_lim{1.0};
+  if (y0 == y_pos && x0 < integral_lim && x0 > -integral_lim) {
+    return 0.0; // if x0,y0 on charge dont integrate just give 0
   } else {
     auto f = [&](double x) { return eyFunc(x0, y0, x, y_pos); };
-    return boost::math::quadrature::gauss_kronrod<double, 5>::integrate(f, -1.0,
-                                                                        1.0);
+    return boost::math::quadrature::gauss_kronrod<double, 8>::integrate(
+        f, -integral_lim, integral_lim);
   }
 }
 
@@ -56,8 +59,8 @@ double getMax(std::vector<vector<slot>> &BOARD, int ROWS, int COLS) {
     for (int x = 0; x < COLS; ++x) {
       double x0{BOARD[y][x].start_point.x};
       double y0{BOARD[y][x].start_point.y};
-      double x_component{xComponent(x0, y0, 1.0, exFunc)};
-      double y_component{yComponent(x0, y0, 1.0, eyFunc)};
+      double x_component{xCompIntegrate(x0, y0, 1.0, exFunc)};
+      double y_component{yCompIntegrate(x0, y0, 1.0, eyFunc)};
       if (max_length <
           std::abs(sqrt(pow(x_component, 2) + pow(y_component, 2))))
         max_length = std::abs(sqrt(pow(x_component, 2) + pow(y_component, 2)));

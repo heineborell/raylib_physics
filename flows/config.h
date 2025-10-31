@@ -50,10 +50,10 @@ extern vector<vector<slot>> BOARD;
 double exFunc(double &x0, double &y0, double x, double distance_y);
 double eyFunc(double &x0, double &y0, double x, double distance_y);
 
-double xComponent(double &x0, double &y0, double y_pos,
-                  double (*exFunc)(double &, double &, double, double));
-double yComponent(double &x0, double &y0, double y_pos,
-                  double (*eyFunc)(double &, double &, double, double));
+double xCompIntegrate(double &x0, double &y0, double y_pos,
+                      double (*exFunc)(double &, double &, double, double));
+double yCompIntegrate(double &x0, double &y0, double y_pos,
+                      double (*eyFunc)(double &, double &, double, double));
 
 double map_to(double minimum, double maximum, double new_min, double new_max,
               double value);
