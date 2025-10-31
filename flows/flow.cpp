@@ -50,6 +50,12 @@ int main() {
       }
     }
 
+    for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
+      for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
+        projectedBOARD[y][x] = {
+            projectedVector(BOARD[y][x].x, BOARD[y][x].y, xRange)};
+      }
+    }
     // Draw axes
     DrawLine(WIDTH / 2, 0, WIDTH / 2, HEIGHT, GRAY);
     DrawLine(0, HEIGHT / 2, WIDTH, HEIGHT / 2, GRAY);

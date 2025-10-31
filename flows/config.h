@@ -46,6 +46,7 @@ struct rgbValues {
 };
 
 extern vector<vector<Vector2>> BOARD;
+extern vector<vector<Vector2>> projectedBOARD;
 
 double exFunc(double &x0, double &y0, double x, double distance_y);
 double eyFunc(double &x0, double &y0, double x, double distance_y);

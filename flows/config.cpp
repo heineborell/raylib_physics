@@ -7,6 +7,8 @@
 // the first argument is how many elements and second argument is what we are
 // initializing at each element
 vector<vector<Vector2>> BOARD(wavePoints + 1, vector<Vector2>(wavePoints + 1));
+vector<vector<Vector2>> projectedBOARD(wavePoints + 1,
+                                       vector<Vector2>(wavePoints + 1));
 
 double map_to(double minimum, double maximum, double new_min, double new_max,
               double value) {
@@ -146,10 +148,6 @@ void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
           end.y - sinf(angle + arrowAngle) * (length / 3), xRange)};
 
       // // Map x and y values to screen coordinates
-      vector<vector<Vector2>> projectedBOARD(wavePoints + 1,
-                                             vector<Vector2>(wavePoints + 1));
-      projectedBOARD[y][x] = {
-          projectedVector(BOARD[y][x].x, BOARD[y][x].y, xRange)};
       efield.Efield[y][x] = {projectedVector(end.x, end.y, xRange)};
 
       DrawLineEx(efield.Efield[y][x], rightWing, 2, c);
