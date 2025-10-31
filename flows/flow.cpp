@@ -1,6 +1,5 @@
 #include "config.h"
 #include "particle.h"
-#include "raymath.h"
 #include <cstddef>
 #include <cstdlib>
 #include <raylib.h>
@@ -12,7 +11,8 @@ int main() {
   InitWindow(HEIGHT, WIDTH, "Vector PLots");
   SetTargetFPS(FPS);
 
-  double xRange{4.0}; // x will range from -4 to 4 but then changed by scrolling
+  double xRange{
+      10.0}; // x will range from -4 to 4 but then changed by scrolling
   double step{xRange * 2 / wavePoints}; // step size for plotting
   double length{step / 2};              // length of the vectors we draw
 
@@ -39,7 +39,7 @@ int main() {
       xRange = 50.0;
 
     step = xRange * 2 / wavePoints;
-    length = step / 1.5;
+    length = step / 2.75;
 
     // start points set by variable step size
     for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
@@ -62,22 +62,9 @@ int main() {
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
 
-    Field efield_1{getEfield(1.0)};
-    Field efield_2{getEfield(-1.0)};
-
-    std::vector<std::vector<double>> sumMagnitudes(
-        wavePoints + 1, vector<double>(wavePoints + 1));
-    vector<vector<Vector2>> sumEfield(wavePoints + 1,
-                                      vector<Vector2>(wavePoints + 1));
-    for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
-      for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
-        sumEfield[y][x].x = efield_1.Efield[y][x].x - efield_2.Efield[y][x].x;
-        sumEfield[y][x].y = efield_1.Efield[y][x].y - efield_2.Efield[y][x].y;
-        sumMagnitudes[y][x] = Vector2Length(sumEfield[y][x]);
-      }
-    }
-    Field resultant{sumEfield, sumMagnitudes};
-
+    Field efield_1{getEfield(1.0, 1)};
+    Field efield_2{getEfield(-1.0, -1)};
+    Field resultant{sumFields(efield_1, efield_2)};
     drawEfield(resultant, viridisColors, length, xRange);
 
     // charged object drawing

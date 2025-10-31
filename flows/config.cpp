@@ -86,7 +86,7 @@ Magnitudes getMaxLength(std::vector<vector<double>> &array) {
   return {max, min};
 }
 
-Field getEfield(double charge_position) {
+Field getEfield(double charge_position, int sign) {
   // Define an array for the magnitudes
   std::vector<std::vector<double>> magnitudes(wavePoints + 1,
                                               vector<double>(wavePoints + 1));
@@ -97,14 +97,16 @@ Field getEfield(double charge_position) {
     for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
       double x0{BOARD[y][x].x};
       double y0{BOARD[y][x].y};
-      double x_component{xCompIntegrate(x0, y0, charge_position, exFunc)};
-      double y_component{yCompIntegrate(x0, y0, charge_position, eyFunc)};
+      double x_component{sign *
+                         xCompIntegrate(x0, y0, charge_position, exFunc)};
+      double y_component{sign *
+                         yCompIntegrate(x0, y0, charge_position, eyFunc)};
 
       // check for infty
-      if (x_component > 1e+08) {
+      if (std::abs(x_component) > 1e+08) {
         x_component = 0;
       }
-      if (y_component > 1e+08) {
+      if (std::abs(y_component) > 1e+08) {
         y_component = 0;
       }
 
@@ -114,6 +116,21 @@ Field getEfield(double charge_position) {
     }
   }
   return {Efield, magnitudes};
+}
+
+Field sumFields(Field &efield_1, Field &efield_2) {
+  std::vector<std::vector<double>> sumMagnitudes(
+      wavePoints + 1, vector<double>(wavePoints + 1));
+  vector<vector<Vector2>> sumEfield(wavePoints + 1,
+                                    vector<Vector2>(wavePoints + 1));
+  for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
+    for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
+      sumEfield[y][x].x = efield_1.Efield[y][x].x + efield_2.Efield[y][x].x;
+      sumEfield[y][x].y = efield_1.Efield[y][x].y + efield_2.Efield[y][x].y;
+      sumMagnitudes[y][x] = Vector2Length(sumEfield[y][x]);
+    }
+  }
+  return {sumEfield, sumMagnitudes};
 }
 
 void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
