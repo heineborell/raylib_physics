@@ -1,13 +1,7 @@
 #include "config.h"
-#include "RealVector.h"
-#include "raymath.h"
 #include <algorithm>
 #include <boost/math/quadrature/gauss_kronrod.hpp>
 #include <boost/math/quadrature/trapezoidal.hpp>
-#include <cstdint>
-#include <memory>
-using std::clamp;
-#include <iostream>
 
 // the first argument is how many elements and second argument is what we are
 // initializing at each element
@@ -27,12 +21,12 @@ double exFunc(double &x0, double &y0, double x, double distance_y) {
   return dx / r3_2;
 }
 
-double xComponent(double &x0, double &y0,
+double xComponent(double &x0, double &y0, double y_pos,
                   double (*exFunc)(double &, double &, double, double)) {
   if (y0 == 1 && x0 < 1 && x0 > -1) {
     return 0.0;
   } else {
-    auto f = [&](double x) { return exFunc(x0, y0, x, 1.0); };
+    auto f = [&](double x) { return exFunc(x0, y0, x, y_pos); };
     return boost::math::quadrature::gauss_kronrod<double, 5>::integrate(f, -1.0,
                                                                         1.0);
   }
@@ -45,12 +39,12 @@ double eyFunc(double &x0, double &y0, double x, double distance_y) {
   return (y0 - 1) / r3_2;
 }
 
-double yComponent(double &x0, double &y0,
+double yComponent(double &x0, double &y0, double y_pos,
                   double (*eyFunc)(double &, double &, double, double)) {
   if (y0 == 1 && x0 < 1.0 && x0 > -1) {
     return 0.0;
   } else {
-    auto f = [&](double x) { return eyFunc(x0, y0, x, 1.0); };
+    auto f = [&](double x) { return eyFunc(x0, y0, x, y_pos); };
     return boost::math::quadrature::gauss_kronrod<double, 5>::integrate(f, -1.0,
                                                                         1.0);
   }
@@ -62,8 +56,8 @@ double getMax(std::vector<vector<slot>> &BOARD, int ROWS, int COLS) {
     for (int x = 0; x < COLS; ++x) {
       double x0{BOARD[y][x].start_point.x};
       double y0{BOARD[y][x].start_point.y};
-      double x_component{xComponent(x0, y0, exFunc)};
-      double y_component{yComponent(x0, y0, eyFunc)};
+      double x_component{xComponent(x0, y0, 1.0, exFunc)};
+      double y_component{yComponent(x0, y0, 1.0, eyFunc)};
       if (max_length <
           std::abs(sqrt(pow(x_component, 2) + pow(y_component, 2))))
         max_length = std::abs(sqrt(pow(x_component, 2) + pow(y_component, 2)));

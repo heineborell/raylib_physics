@@ -18,6 +18,8 @@ inline constexpr int NUM_PARTICLES{4000};
 inline constexpr int wavePoints{20};
 inline constexpr double zoomSpeed{1.1};
 inline constexpr double arrowAngle{3.14 / 7};
+inline constexpr double arrowSin{sinf(arrowAngle)};
+inline constexpr double arrowCos{cosf(arrowAngle)};
 
 // Board
 
@@ -47,10 +49,12 @@ extern vector<vector<slot>> BOARD;
 
 double exFunc(double &x0, double &y0, double x, double distance_y);
 double eyFunc(double &x0, double &y0, double x, double distance_y);
-double xComponent(double &x0, double &y0,
+
+double xComponent(double &x0, double &y0, double y_pos,
                   double (*exFunc)(double &, double &, double, double));
-double yComponent(double &x0, double &y0,
+double yComponent(double &x0, double &y0, double y_pos,
                   double (*eyFunc)(double &, double &, double, double));
+
 double map_to(double minimum, double maximum, double new_min, double new_max,
               double value);
 double getMax(std::vector<vector<slot>> &BOARD, int COLS, int ROWS);

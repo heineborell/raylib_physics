@@ -1,16 +1,11 @@
-#include "RealVector.h"
 #include "config.h"
 #include "particle.h"
-#include "random.h"
 #include "raymath.h"
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
-#include <iostream>
 #include <raylib.h>
-#include <string>
 #include <sys/types.h>
-#include <time.h>
 #include <vector>
 
 int main() {
@@ -21,8 +16,6 @@ int main() {
   double xRange{4.0}; // x will range from -4 to 4 but then changed by scrolling
   double step{xRange * 2 / wavePoints}; // step size for plotting
   double length{step / 2};              // length of the vectors we draw
-  double arrowSin{cosf(arrowAngle)};
-  double arrowCos{sinf(arrowAngle)};
 
   std::vector<rgbValues> viridisColors = {
       {53, 42, 135, 255},   // dark blue
@@ -74,8 +67,8 @@ int main() {
       for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
         double x0{BOARD[y][x].start_point.x};
         double y0{BOARD[y][x].start_point.y};
-        double x_component{xComponent(x0, y0, exFunc)};
-        double y_component{yComponent(x0, y0, eyFunc)};
+        double x_component{xComponent(x0, y0, 1.0, exFunc)};
+        double y_component{yComponent(x0, y0, 1.0, eyFunc)};
 
         // check for infty
         if (x_component > 1e+08) {
