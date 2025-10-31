@@ -23,9 +23,9 @@ inline const double arrowCos{std::cos(arrowAngle)};
 
 // Board
 
-struct slot {
-  Vector2 vec;
-  Vector2 start_point; // starting position where to draw the vector on screen
+struct Field {
+  vector<vector<Vector2>> Efield;
+  std::vector<std::vector<double>> magnitudes;
 };
 
 struct Coordinates {
@@ -45,7 +45,7 @@ struct rgbValues {
   unsigned char a;
 };
 
-extern vector<vector<slot>> BOARD;
+extern vector<vector<Vector2>> BOARD;
 
 double exFunc(double &x0, double &y0, double x, double distance_y);
 double eyFunc(double &x0, double &y0, double x, double distance_y);
@@ -55,9 +55,13 @@ double xCompIntegrate(double &x0, double &y0, double y_pos,
 double yCompIntegrate(double &x0, double &y0, double y_pos,
                       double (*eyFunc)(double &, double &, double, double));
 
+Field getEfield(double charge_position);
+
+void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
+                double xRange);
 double map_to(double minimum, double maximum, double new_min, double new_max,
               double value);
-double getMax(std::vector<vector<slot>> &BOARD, int COLS, int ROWS);
+double getMax(std::vector<vector<Vector2>> &BOARD, int COLS, int ROWS);
 rgbValues getColorValue(double value, double minVal, double maxVal,
                         const std::vector<rgbValues> &colors);
 Magnitudes getMaxLength(std::vector<std::vector<double>> &array);

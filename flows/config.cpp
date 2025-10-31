@@ -1,11 +1,12 @@
 #include "config.h"
+#include "raymath.h"
 #include <algorithm>
 #include <boost/math/quadrature/gauss_kronrod.hpp>
 #include <boost/math/quadrature/trapezoidal.hpp>
 
 // the first argument is how many elements and second argument is what we are
 // initializing at each element
-vector<vector<slot>> BOARD(wavePoints + 1, vector<slot>(wavePoints + 1));
+vector<vector<Vector2>> BOARD(wavePoints + 1, vector<Vector2>(wavePoints + 1));
 
 double map_to(double minimum, double maximum, double new_min, double new_max,
               double value) {
@@ -53,12 +54,12 @@ double yCompIntegrate(double &x0, double &y0, double y_pos,
   }
 }
 
-double getMax(std::vector<vector<slot>> &BOARD, int ROWS, int COLS) {
+double getMax(std::vector<vector<Vector2>> &BOARD, int ROWS, int COLS) {
   double max_length{0};
   for (int y = 0; y < ROWS; ++y) {
     for (int x = 0; x < COLS; ++x) {
-      double x0{BOARD[y][x].start_point.x};
-      double y0{BOARD[y][x].start_point.y};
+      double x0{BOARD[y][x].x};
+      double y0{BOARD[y][x].y};
       double x_component{xCompIntegrate(x0, y0, 1.0, exFunc)};
       double y_component{yCompIntegrate(x0, y0, 1.0, eyFunc)};
       if (max_length <
@@ -81,6 +82,78 @@ Magnitudes getMaxLength(std::vector<vector<double>> &array) {
     }
   }
   return {max, min};
+}
+
+Field getEfield(double charge_position) {
+  // Define an array for the magnitudes
+  std::vector<std::vector<double>> magnitudes(wavePoints + 1,
+                                              vector<double>(wavePoints + 1));
+
+  vector<vector<Vector2>> Efield(wavePoints + 1,
+                                 vector<Vector2>(wavePoints + 1));
+  for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
+    for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
+      double x0{BOARD[y][x].x};
+      double y0{BOARD[y][x].y};
+      double x_component{xCompIntegrate(x0, y0, charge_position, exFunc)};
+      double y_component{yCompIntegrate(x0, y0, charge_position, eyFunc)};
+
+      // check for infty
+      if (x_component > 1e+08) {
+        x_component = 0;
+      }
+      if (y_component > 1e+08) {
+        y_component = 0;
+      }
+
+      Efield[y][x] = {static_cast<float>(x_component),
+                      static_cast<float>(y_component)};
+      magnitudes[y][x] = Vector2Length(Efield[y][x]);
+    }
+  }
+  return {Efield, magnitudes};
+}
+
+void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
+                double xRange) {
+  Magnitudes max_length{getMaxLength(efield.magnitudes)};
+  for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
+    for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
+      Color c = {
+          getColorValue(efield.magnitudes[y][x], max_length.min, max_length.max,
+                        colors)
+              .r,
+          getColorValue(efield.magnitudes[y][x], max_length.min, max_length.max,
+                        colors)
+              .g,
+          getColorValue(efield.magnitudes[y][x], max_length.min, max_length.max,
+                        colors)
+              .b,
+          getColorValue(efield.magnitudes[y][x], max_length.min, max_length.max,
+                        colors)
+              .a,
+      };
+
+      double angle{atan2(efield.Efield[y][x].y, efield.Efield[y][x].x)};
+      Vector2 end = {static_cast<float>(BOARD[y][x].x + cosf(angle) * length),
+                     static_cast<float>(BOARD[y][x].y + sinf(angle) * length)};
+      //
+      Vector2 leftWing = {projectedVector(
+          end.x - cosf(angle - arrowAngle) * (length / 3),
+          end.y - sinf(angle - arrowAngle) * (length / 3), xRange)};
+      Vector2 rightWing = {projectedVector(
+          end.x - cosf(angle + arrowAngle) * (length / 3),
+          end.y - sinf(angle + arrowAngle) * (length / 3), xRange)};
+
+      // // Map x and y values to screen coordinates
+      BOARD[y][x] = {projectedVector(BOARD[y][x].x, BOARD[y][x].y, xRange)};
+      efield.Efield[y][x] = {projectedVector(end.x, end.y, xRange)};
+
+      DrawLineEx(efield.Efield[y][x], rightWing, 2, c);
+      DrawLineEx(efield.Efield[y][x], leftWing, 2, c);
+      DrawLineEx(BOARD[y][x], efield.Efield[y][x], 2, c);
+    }
+  }
 }
 
 Vector2 projectedVector(double x, double y, double xRange) {

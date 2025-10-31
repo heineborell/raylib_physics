@@ -45,10 +45,8 @@ int main() {
     // start points set by variable step size
     for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
       for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
-        slot s;
-        s.start_point = {static_cast<float>(-xRange + x * step),
-                         static_cast<float>(-xRange + y * step)};
-        BOARD[y][x] = s;
+        BOARD[y][x] = {static_cast<float>(-xRange + x * step),
+                       static_cast<float>(-xRange + y * step)};
       }
     }
 
@@ -59,72 +57,12 @@ int main() {
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
 
-    // Define an array for the magnitudes
-    std::vector<std::vector<double>> magnitudes(wavePoints + 1,
-                                                vector<double>(wavePoints + 1));
+    Field efield_1{getEfield(1.0)};
+    drawEfield(efield_1, viridisColors, length, xRange);
 
-    for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
-      for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
-        double x0{BOARD[y][x].start_point.x};
-        double y0{BOARD[y][x].start_point.y};
-        double x_component{xCompIntegrate(x0, y0, 1.0, exFunc)};
-        double y_component{yCompIntegrate(x0, y0, 1.0, eyFunc)};
+    Field efield_2{getEfield(-2.0)};
+    drawEfield(efield_2, viridisColors, length, xRange);
 
-        // check for infty
-        if (x_component > 1e+08) {
-          x_component = 0;
-        }
-        if (y_component > 1e+08) {
-          y_component = 0;
-        }
-
-        BOARD[y][x].vec = {static_cast<float>(x_component),
-                           static_cast<float>(y_component)};
-        magnitudes[y][x] = Vector2Length(BOARD[y][x].vec);
-      }
-    }
-
-    Magnitudes max_length{getMaxLength(magnitudes)};
-    for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
-      for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
-        Color c = {
-            getColorValue(magnitudes[y][x], max_length.min, max_length.max,
-                          viridisColors)
-                .r,
-            getColorValue(magnitudes[y][x], max_length.min, max_length.max,
-                          viridisColors)
-                .g,
-            getColorValue(magnitudes[y][x], max_length.min, max_length.max,
-                          viridisColors)
-                .b,
-            getColorValue(magnitudes[y][x], max_length.min, max_length.max,
-                          viridisColors)
-                .a,
-        };
-
-        double angle{atan2(BOARD[y][x].vec.y, BOARD[y][x].vec.x)};
-        Vector2 end = {static_cast<float>(BOARD[y][x].start_point.x +
-                                          cosf(angle) * length),
-                       static_cast<float>(BOARD[y][x].start_point.y +
-                                          sinf(angle) * length)};
-        //
-        Vector2 leftWing = {projectedVector(
-            end.x - cosf(angle - arrowAngle) * (length / 3),
-            end.y - sinf(angle - arrowAngle) * (length / 3), xRange)};
-        Vector2 rightWing = {projectedVector(
-            end.x - cosf(angle + arrowAngle) * (length / 3),
-            end.y - sinf(angle + arrowAngle) * (length / 3), xRange)};
-
-        // // Map x and y values to screen coordinates
-        BOARD[y][x].start_point = {projectedVector(
-            BOARD[y][x].start_point.x, BOARD[y][x].start_point.y, xRange)};
-        BOARD[y][x].vec = {projectedVector(end.x, end.y, xRange)};
-
-        DrawLineEx(BOARD[y][x].vec, rightWing, 2, c);
-        DrawLineEx(BOARD[y][x].vec, leftWing, 2, c);
-        DrawLineEx(BOARD[y][x].start_point, BOARD[y][x].vec, 2, c);
-      }
-    }
     // charged object drawing
     Vector2 charge_start = {projectedVector(-1, 1, xRange)};
     Vector2 charge_end = {projectedVector(1, 1, xRange)};
