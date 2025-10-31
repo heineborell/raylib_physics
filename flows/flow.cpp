@@ -60,7 +60,7 @@ int main() {
     Field efield_1{getEfield(1.0)};
     drawEfield(efield_1, viridisColors, length, xRange);
 
-    Field efield_2{getEfield(-2.0)};
+    Field efield_2{getEfield(-1.0)};
     drawEfield(efield_2, viridisColors, length, xRange);
 
     // charged object drawing

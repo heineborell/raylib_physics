@@ -27,7 +27,7 @@ double eyFunc(double &x0, double &y0, double x, double distance_y) {
   double dx = x0 - x;
   double r2 = dx * dx + (y0 - distance_y) * (y0 - distance_y); // (x-x0)^2 + y^2
   double r3_2 = r2 * r2 * std::sqrt(r2); // r^(5/2) = r^2 * sqrt(r^2)
-  return (y0 - 1) / r3_2;
+  return (y0 - distance_y) / r3_2;
 }
 
 double xCompIntegrate(double &x0, double &y0, double y_pos,
@@ -146,12 +146,15 @@ void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
           end.y - sinf(angle + arrowAngle) * (length / 3), xRange)};
 
       // // Map x and y values to screen coordinates
-      BOARD[y][x] = {projectedVector(BOARD[y][x].x, BOARD[y][x].y, xRange)};
+      vector<vector<Vector2>> projectedBOARD(wavePoints + 1,
+                                             vector<Vector2>(wavePoints + 1));
+      projectedBOARD[y][x] = {
+          projectedVector(BOARD[y][x].x, BOARD[y][x].y, xRange)};
       efield.Efield[y][x] = {projectedVector(end.x, end.y, xRange)};
 
       DrawLineEx(efield.Efield[y][x], rightWing, 2, c);
       DrawLineEx(efield.Efield[y][x], leftWing, 2, c);
-      DrawLineEx(BOARD[y][x], efield.Efield[y][x], 2, c);
+      DrawLineEx(projectedBOARD[y][x], efield.Efield[y][x], 2, c);
     }
   }
 }
