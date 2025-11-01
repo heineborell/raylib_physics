@@ -3,18 +3,31 @@
 #include <algorithm>
 #include <boost/math/quadrature/gauss_kronrod.hpp>
 #include <boost/math/quadrature/trapezoidal.hpp>
+#include <raylib.h>
 
 // the first argument is how many elements and second argument is what we are
 // initializing at each element
 vector<vector<Vector2>> BOARD(wavePoints + 1, vector<Vector2>(wavePoints + 1));
 vector<vector<Vector2>> projectedBOARD(wavePoints + 1,
                                        vector<Vector2>(wavePoints + 1));
-
+std::vector<Vector2> points{};
 double map_to(double minimum, double maximum, double new_min, double new_max,
               double value) {
   value = std::clamp(value, minimum, maximum);
   return new_min +
          (value - minimum) * (new_max - new_min) / (maximum - minimum);
+}
+
+void drawCharges() {
+  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    Vector2 mouse{GetMousePosition()};
+    points.push_back(mouse);
+  }
+  for (Vector2 point : points) {
+    DrawCircle(point.x, point.y, 10, RED);
+  }
+  if (IsKeyPressed(KEY_R))
+    points.clear();
 }
 
 // These exFunc and eyFunc are for Electric fields of a line of charge
@@ -32,8 +45,8 @@ double eyFunc(double &x0, double &y0, double x, double distance_y) {
   return (y0 - distance_y) / r3_2;
 }
 
-double xCompIntegrate(double &x0, double &y0, double y_pos,
-                      double (*exFunc)(double &, double &, double, double)) {
+double xComponent(double &x0, double &y0, double y_pos,
+                  double (*exFunc)(double &, double &, double, double)) {
   double integral_lim{1.0};
   if (y0 == y_pos && x0 < integral_lim && x0 > -integral_lim) {
     return 0.0; // if x0,y0 on charge dont integrate just give 0
@@ -44,8 +57,8 @@ double xCompIntegrate(double &x0, double &y0, double y_pos,
   }
 }
 
-double yCompIntegrate(double &x0, double &y0, double y_pos,
-                      double (*eyFunc)(double &, double &, double, double)) {
+double yComponent(double &x0, double &y0, double y_pos,
+                  double (*eyFunc)(double &, double &, double, double)) {
   double integral_lim{1.0};
   if (y0 == y_pos && x0 < integral_lim && x0 > -integral_lim) {
     return 0.0; // if x0,y0 on charge dont integrate just give 0
@@ -56,14 +69,34 @@ double yCompIntegrate(double &x0, double &y0, double y_pos,
   }
 }
 
+double xComponent(Vector2 &charge, Vector2 &position) {
+
+  if (position.x == charge.x && position.y == charge.y) {
+    return 0.0; // if x0,y0 on charge dont integrate just give 0
+  } else {
+    float dist{Vector2Distance(charge, position)};
+    return (position.x - charge.x) / (dist * dist * std::sqrt(dist));
+  }
+}
+
+double yComponent(Vector2 &charge, Vector2 &position) {
+
+  if (position.x == charge.x && position.y == charge.y) {
+    return 0.0; // if x0,y0 on charge dont integrate just give 0
+  } else {
+    float dist{Vector2Distance(charge, position)};
+    return (position.y - charge.y) / (dist * dist * std::sqrt(dist));
+  }
+}
+
 double getMax(std::vector<vector<Vector2>> &BOARD, int ROWS, int COLS) {
   double max_length{0};
   for (int y = 0; y < ROWS; ++y) {
     for (int x = 0; x < COLS; ++x) {
       double x0{BOARD[y][x].x};
       double y0{BOARD[y][x].y};
-      double x_component{xCompIntegrate(x0, y0, 1.0, exFunc)};
-      double y_component{yCompIntegrate(x0, y0, 1.0, eyFunc)};
+      double x_component{xComponent(x0, y0, 1.0, exFunc)};
+      double y_component{yComponent(x0, y0, 1.0, eyFunc)};
       if (max_length <
           std::abs(sqrt(pow(x_component, 2) + pow(y_component, 2))))
         max_length = std::abs(sqrt(pow(x_component, 2) + pow(y_component, 2)));
@@ -97,10 +130,8 @@ Field getEfield(double charge_position, int sign) {
     for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
       double x0{BOARD[y][x].x};
       double y0{BOARD[y][x].y};
-      double x_component{sign *
-                         xCompIntegrate(x0, y0, charge_position, exFunc)};
-      double y_component{sign *
-                         yCompIntegrate(x0, y0, charge_position, eyFunc)};
+      double x_component{sign * xComponent(x0, y0, charge_position, exFunc)};
+      double y_component{sign * yComponent(x0, y0, charge_position, eyFunc)};
 
       // check for infty
       if (std::abs(x_component) > 1e+08) {
@@ -118,6 +149,33 @@ Field getEfield(double charge_position, int sign) {
   return {Efield, magnitudes};
 }
 
+Field getEfield(Vector2 &charge_pos, Vector2 &position, int sign) {
+  // Define an array for the magnitudes
+  std::vector<std::vector<double>> magnitudes(wavePoints + 1,
+                                              vector<double>(wavePoints + 1));
+
+  vector<vector<Vector2>> Efield(wavePoints + 1,
+                                 vector<Vector2>(wavePoints + 1));
+  for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
+    for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
+      double x_component{sign * xComponent(charge_pos, position)};
+      double y_component{sign * yComponent(charge_pos, position)};
+
+      // check for infty
+      if (std::abs(x_component) > 1e+08) {
+        x_component = 0;
+      }
+      if (std::abs(y_component) > 1e+08) {
+        y_component = 0;
+      }
+
+      Efield[y][x] = {static_cast<float>(x_component),
+                      static_cast<float>(y_component)};
+      magnitudes[y][x] = Vector2Length(Efield[y][x]);
+    }
+  }
+  return {Efield, magnitudes};
+}
 Field sumFields(Field &efield_1, Field &efield_2) {
   std::vector<std::vector<double>> sumMagnitudes(
       wavePoints + 1, vector<double>(wavePoints + 1));
@@ -174,6 +232,7 @@ void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
   }
 }
 
+// Projecting to screen coordinates
 Vector2 projectedVector(double x, double y, double xRange) {
   Vector2 projected = {
       static_cast<float>(WIDTH / 2 + x * (WIDTH / (2 * xRange))),
@@ -181,6 +240,13 @@ Vector2 projectedVector(double x, double y, double xRange) {
   return projected;
 }
 
+// Projecting to screen coordinates
+Vector2 pullbackVector(Vector2 &screen, double xRange) {
+  Vector2 pullback = {
+      static_cast<float>(((2 * screen.x - WIDTH) * xRange) / WIDTH),
+      static_cast<float>(((HEIGHT - 2 * screen.y) * xRange) / HEIGHT)};
+  return pullback;
+}
 rgbValues getColorValue(double value, double minVal, double maxVal,
                         const std::vector<rgbValues> &colors) {
   value = std::abs(value);

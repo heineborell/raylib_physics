@@ -1,3 +1,4 @@
+#pragma once
 #include "RealVector.h"
 #include "raylib.h"
 #include <cmath>
@@ -47,16 +48,21 @@ struct rgbValues {
 
 extern vector<vector<Vector2>> BOARD;
 extern vector<vector<Vector2>> projectedBOARD;
+extern std::vector<Vector2> points;
 
+void drawCharges();
 double exFunc(double &x0, double &y0, double x, double distance_y);
 double eyFunc(double &x0, double &y0, double x, double distance_y);
 
-double xCompIntegrate(double &x0, double &y0, double y_pos,
-                      double (*exFunc)(double &, double &, double, double));
-double yCompIntegrate(double &x0, double &y0, double y_pos,
-                      double (*eyFunc)(double &, double &, double, double));
+double xComponent(double &x0, double &y0, double y_pos,
+                  double (*exFunc)(double &, double &, double, double));
+double yComponent(double &x0, double &y0, double y_pos,
+                  double (*eyFunc)(double &, double &, double, double));
 
+double xComponent(Vector2 &charge, Vector2 &position);
+double yComponent(Vector2 &charge, Vector2 &position);
 Field getEfield(double charge_position, int sign);
+Field getEfield(Vector2 &charge_pos, Vector2 &position, int sign);
 
 Field sumFields(Field &efield_1, Field &efield_2);
 void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
@@ -68,4 +74,5 @@ rgbValues getColorValue(double value, double minVal, double maxVal,
                         const std::vector<rgbValues> &colors);
 Magnitudes getMaxLength(std::vector<std::vector<double>> &array);
 Vector2 projectedVector(double x, double y, double xRange);
+Vector2 pullbackVector(Vector2 &screen, double xRange);
 Vector2 Rotate(Vector2 v, double angle);

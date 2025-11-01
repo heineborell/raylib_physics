@@ -6,14 +6,14 @@ using std::vector;
 
 class Particle {
 public:
-  RealVector pos;
-  RealVector vel;
+  Vector2 pos;
+  Vector2 vel;
   float mns, mas;
 
   Particle();
-  Particle(RealVector p, RealVector v, float min_speed, float max_speed);
+  Particle(Vector2 p, Vector2 v, float min_speed, float max_speed);
 
-  void applyForce(RealVector force);
+  void applyForce(Vector2 force);
   void update();
   void show();
 };

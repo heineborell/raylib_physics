@@ -11,8 +11,7 @@ int main() {
   InitWindow(HEIGHT, WIDTH, "Vector PLots");
   SetTargetFPS(FPS);
 
-  double xRange{
-      10.0}; // x will range from -4 to 4 but then changed by scrolling
+  double xRange{8.0}; // x will range from -4 to 4 but then changed by scrolling
   double step{xRange * 2 / wavePoints}; // step size for plotting
   double length{step / 2};              // length of the vectors we draw
 
