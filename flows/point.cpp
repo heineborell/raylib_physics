@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <raylib.h>
+#include <raymath.h>
 #include <sys/types.h>
 #include <vector>
 
@@ -15,6 +16,7 @@ int main() {
   double xRange{4.0}; // x will range from -4 to 4 but then changed by scrolling
   double step{xRange * 2 / wavePoints}; // step size for plotting
   double length{step / 2};              // length of the vectors we draw
+  std::vector<Vector2> test_points{{400, 400}};
 
   std::vector<rgbValues> viridisColors = {
       {53, 42, 135, 255},   // dark blue
@@ -25,7 +27,6 @@ int main() {
 
   while (!WindowShouldClose()) {
 
-    float dt{GetFrameTime()};
     BeginDrawing();
     ClearBackground(BLACK);
     DrawFPS(10, 10);
@@ -63,16 +64,16 @@ int main() {
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
 
-    drawCharges();
+    Field resultant{};
     for (Vector2 point : points) {
-      for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
-        for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
-          Vector2 screen_point{pullbackVector(point, xRange)};
-          Field eField{getEfield(screen_point, BOARD[y][x], 1)};
-          // drawEfield(eField, viridisColors, length, xRange);
-        }
-      }
+      Vector2 screen_point{pullbackVector(point, xRange)};
+      Field eField{getEfield(screen_point, 1)};
+      resultant = sumFields(resultant, eField);
     }
+
+    drawEfield(resultant, viridisColors, length, xRange);
+
+    drawCharges();
     ClearBackground(BLACK);
 
     EndDrawing();

@@ -24,7 +24,7 @@ void drawCharges() {
     points.push_back(mouse);
   }
   for (Vector2 point : points) {
-    DrawCircle(point.x, point.y, 10, RED);
+    DrawCircle(point.x, point.y, 3, RED);
   }
   if (IsKeyPressed(KEY_R))
     points.clear();
@@ -146,10 +146,13 @@ Field getEfield(double charge_position, int sign) {
       magnitudes[y][x] = Vector2Length(Efield[y][x]);
     }
   }
-  return {Efield, magnitudes};
+  Field f;
+  f.Efield = Efield;
+  f.magnitudes = magnitudes;
+  return f;
 }
 
-Field getEfield(Vector2 &charge_pos, Vector2 &position, int sign) {
+Field getEfield(Vector2 &charge_pos, int sign) {
   // Define an array for the magnitudes
   std::vector<std::vector<double>> magnitudes(wavePoints + 1,
                                               vector<double>(wavePoints + 1));
@@ -158,8 +161,8 @@ Field getEfield(Vector2 &charge_pos, Vector2 &position, int sign) {
                                  vector<Vector2>(wavePoints + 1));
   for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
     for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
-      double x_component{sign * xComponent(charge_pos, position)};
-      double y_component{sign * yComponent(charge_pos, position)};
+      double x_component{sign * xComponent(charge_pos, BOARD[y][x])};
+      double y_component{sign * yComponent(charge_pos, BOARD[y][x])};
 
       // check for infty
       if (std::abs(x_component) > 1e+08) {
@@ -174,7 +177,12 @@ Field getEfield(Vector2 &charge_pos, Vector2 &position, int sign) {
       magnitudes[y][x] = Vector2Length(Efield[y][x]);
     }
   }
-  return {Efield, magnitudes};
+  // Have to return like this as there is default constructor and can not
+  // aggragate initialize
+  Field f;
+  f.Efield = Efield;
+  f.magnitudes = magnitudes;
+  return f;
 }
 Field sumFields(Field &efield_1, Field &efield_2) {
   std::vector<std::vector<double>> sumMagnitudes(
@@ -188,7 +196,10 @@ Field sumFields(Field &efield_1, Field &efield_2) {
       sumMagnitudes[y][x] = Vector2Length(sumEfield[y][x]);
     }
   }
-  return {sumEfield, sumMagnitudes};
+  Field f;
+  f.Efield = sumEfield;
+  f.magnitudes = sumMagnitudes;
+  return f;
 }
 
 void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,

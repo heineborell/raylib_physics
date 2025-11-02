@@ -1,6 +1,7 @@
 #pragma once
 #include "RealVector.h"
 #include "raylib.h"
+#include "raymath.h"
 #include <cmath>
 #include <sys/types.h>
 #include <vector>
@@ -27,6 +28,14 @@ inline const double arrowCos{std::cos(arrowAngle)};
 struct Field {
   vector<vector<Vector2>> Efield;
   std::vector<std::vector<double>> magnitudes;
+
+  // Default constructor with zeros and wavePoints
+  Field()
+      : Efield(std::vector<std::vector<Vector2>>(
+            wavePoints + 1,
+            std::vector<Vector2>(wavePoints + 1, Vector2Zero()))),
+        magnitudes(std::vector<std::vector<double>>(
+            wavePoints + 1, vector<double>(wavePoints + 1, 0.0))) {}
 };
 
 struct Coordinates {
@@ -62,7 +71,7 @@ double yComponent(double &x0, double &y0, double y_pos,
 double xComponent(Vector2 &charge, Vector2 &position);
 double yComponent(Vector2 &charge, Vector2 &position);
 Field getEfield(double charge_position, int sign);
-Field getEfield(Vector2 &charge_pos, Vector2 &position, int sign);
+Field getEfield(Vector2 &charge_pos, int sign);
 
 Field sumFields(Field &efield_1, Field &efield_2);
 void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
