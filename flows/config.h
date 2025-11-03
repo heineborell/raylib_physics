@@ -17,7 +17,7 @@ inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
 inline constexpr int NUM_PARTICLES{4000};
 
-inline constexpr int wavePoints{20};
+inline constexpr int wavePoints{30};
 inline constexpr double zoomSpeed{1.1};
 inline constexpr double arrowAngle{3.14 / 7};
 inline const double arrowSin{std::sin(arrowAngle)};
@@ -58,6 +58,7 @@ struct rgbValues {
 extern vector<vector<Vector2>> BOARD;
 extern vector<vector<Vector2>> projectedBOARD;
 extern std::vector<Vector2> points;
+extern std::vector<std::vector<double>> potential;
 
 void drawCharges();
 double exFunc(double &x0, double &y0, double x, double distance_y);
@@ -70,12 +71,18 @@ double yComponent(double &x0, double &y0, double y_pos,
 
 double xComponent(Vector2 &charge, Vector2 &position);
 double yComponent(Vector2 &charge, Vector2 &position);
+
+double potentialFunc(Vector2 &charge, Vector2 &position);
+
 Field getEfield(double charge_position, int sign);
 Field getEfield(Vector2 &charge_pos, int sign);
+void getPotential(Vector2 &charge_pos, int sign);
 
 Field sumFields(Field &efield_1, Field &efield_2);
 void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
                 double xRange);
+void drawPotential(std::vector<rgbValues> &colors, double xRange);
+
 double map_to(double minimum, double maximum, double new_min, double new_max,
               double value);
 double getMax(std::vector<vector<Vector2>> &BOARD, int COLS, int ROWS);

@@ -11,6 +11,9 @@ vector<vector<Vector2>> BOARD(wavePoints + 1, vector<Vector2>(wavePoints + 1));
 vector<vector<Vector2>> projectedBOARD(wavePoints + 1,
                                        vector<Vector2>(wavePoints + 1));
 std::vector<Vector2> points{};
+std::vector<std::vector<double>> potential(wavePoints + 1,
+                                           vector<double>(wavePoints + 1));
+
 double map_to(double minimum, double maximum, double new_min, double new_max,
               double value) {
   value = std::clamp(value, minimum, maximum);
@@ -89,6 +92,15 @@ double yComponent(Vector2 &charge, Vector2 &position) {
   }
 }
 
+double potentialFunc(Vector2 &charge, Vector2 &position) {
+
+  if (position.x == charge.x && position.y == charge.y) {
+    return 0.0; // if x0,y0 on charge dont integrate just give 0
+  } else {
+    float dist{Vector2Distance(charge, position)};
+    return 1 / dist;
+  }
+}
 double getMax(std::vector<vector<Vector2>> &BOARD, int ROWS, int COLS) {
   double max_length{0};
   for (int y = 0; y < ROWS; ++y) {
@@ -184,6 +196,7 @@ Field getEfield(Vector2 &charge_pos, int sign) {
   f.magnitudes = magnitudes;
   return f;
 }
+
 Field sumFields(Field &efield_1, Field &efield_2) {
   std::vector<std::vector<double>> sumMagnitudes(
       wavePoints + 1, vector<double>(wavePoints + 1));
@@ -200,6 +213,22 @@ Field sumFields(Field &efield_1, Field &efield_2) {
   f.Efield = sumEfield;
   f.magnitudes = sumMagnitudes;
   return f;
+}
+
+void getPotential(Vector2 &charge_pos, int sign) {
+
+  for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
+    for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
+      double value{sign * potentialFunc(charge_pos, BOARD[y][x])};
+
+      // check for infty
+      if (std::abs(value) > 1e+08) {
+        value = 0;
+      }
+
+      potential[y][x] = value;
+    }
+  }
 }
 
 void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
@@ -239,6 +268,25 @@ void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
       DrawLineEx(efield.Efield[y][x], rightWing, 2, c);
       DrawLineEx(efield.Efield[y][x], leftWing, 2, c);
       DrawLineEx(projectedBOARD[y][x], efield.Efield[y][x], 2, c);
+    }
+  }
+}
+
+void drawPotential(std::vector<rgbValues> &colors, double xRange) {
+  Magnitudes max_length{getMaxLength(potential)};
+  for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
+    for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
+      Color c = {
+          getColorValue(potential[y][x], max_length.min, max_length.max, colors)
+              .r,
+          getColorValue(potential[y][x], max_length.min, max_length.max, colors)
+              .g,
+          getColorValue(potential[y][x], max_length.min, max_length.max, colors)
+              .b,
+          getColorValue(potential[y][x], max_length.min, max_length.max, colors)
+              .a,
+      };
+      DrawCircle(projectedBOARD[y][x].x, projectedBOARD[y][x].y, 4.0, c);
     }
   }
 }
