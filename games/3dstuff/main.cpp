@@ -155,8 +155,8 @@ int main() {
 
     // Enter 3D mode all drawing 3d will be rendered using specified camera
     BeginMode3D(camera);
-    DrawModelWires(terrainModel, Vector3Zero(), 1.0f, LIME);
     DrawModel(terrainModel, Vector3Zero(), 1.0f, WHITE);
+    DrawModelWires(terrainModel, Vector3Zero(), 1.0f, LIME);
 
     // Draw Ship
     //  1-create rotation matrix (shipRotationMatrix)
