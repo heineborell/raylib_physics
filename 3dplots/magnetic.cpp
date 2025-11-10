@@ -44,7 +44,7 @@ int main() {
 
   Mesh arrow = GenMeshCone(0.03f, 0.1f, 10);
   Model arrowModel = LoadModelFromMesh(arrow);
-  arrowModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].color = MAROON;
+  arrowModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].color = GREEN;
 
   while (!WindowShouldClose()) {
     // Update
@@ -70,36 +70,44 @@ int main() {
     DrawLine3D(center, Vx, RED);
 
     // Note that in raylib the up coordinate is y
-    for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
-      for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
-        for (std::size_t z{0}; z < static_cast<std::size_t>(wavePoints); ++z) {
-          Vector3 unitVec{(Vector3CrossProduct(Vx, BOARD[x][y][z]))};
-          float distance{Vector3Length(unitVec)};
-          float thetaX{Vector3Angle(unitVec, {1, 0, 0})};
-          float thetaY{Vector3Angle(unitVec, {0, 1, 0})};
-          float thetaZ{Vector3Angle(unitVec, {0, 0, 1})};
-          Matrix arrowRotationMatrix =
-              MatrixMultiply(MatrixMultiply(MatrixRotateY(thetaY * PI),
-                                            MatrixRotateX(thetaX * PI)),
-                             MatrixRotateZ(thetaZ * PI));
-          arrowModel.transform = arrowRotationMatrix;
-          Vector3 end = {
-              static_cast<float>(BOARD[x][y][z].x + cosf(thetaX) * length),
-              static_cast<float>(BOARD[x][y][z].y + cosf(thetaY) * length),
-              static_cast<float>(BOARD[x][y][z].z + cosf(thetaZ) * length)};
+    for (std::size_t x = 0; x < static_cast<std::size_t>(wavePoints); ++x) {
+      for (std::size_t y = 0; y < static_cast<std::size_t>(wavePoints); ++y) {
+        for (std::size_t z = 0; z < static_cast<std::size_t>(wavePoints); ++z) {
+          // Compute unit vector of the arrow
+          Vector3 unitVec =
+              Vector3Normalize(Vector3CrossProduct(Vx, BOARD[x][y][z]));
 
-          if (x == 8) {
-            DrawLine3D(BOARD[x][y][z], end, GREEN);
-            DrawModel(arrowModel, end, 1.0f, WHITE);
+          // Compute rotation to align +Y with the unit vector
+          Vector3 up = {0, 1, 0};
+          Vector3 axis = Vector3CrossProduct(up, unitVec);
+          float axisLength = Vector3Length(axis);
+          float arrowAngle = acosf(Vector3DotProduct(up, unitVec));
+
+          // Handle parallel vectors (edge cases)
+          if (axisLength < 0.0001f) {
+            if (unitVec.y < 0.0f) { // opposite direction
+              axis = (Vector3){1, 0, 0};
+              arrowAngle = PI;
+            } else { // same direction
+              axis = (Vector3){1, 0, 0};
+              arrowAngle = 0;
+            }
           }
-          // if (x == 16 && y % 2 == 0 && z % 2 == 0)
-          //   DrawLine3D(BOARD[x][y][z], end, GREEN);
-          // DrawLine3D(BOARD[x][y][z], unitVec, GREEN);
-          // if (x + 1 < wavePoints)
-          //   DrawLine3D(
-          //       BOARD[x][y][z],
-          //       {BOARD[x][y][z].x + 0.2f, BOARD[x][y][z].y,
-          //       BOARD[x][y][z].z}, GREEN);
+
+          // Build quaternion and convert to matrix
+          Quaternion q =
+              QuaternionFromAxisAngle(Vector3Normalize(axis), arrowAngle);
+          arrowModel.transform = QuaternionToMatrix(q);
+
+          // Compute arrow end position
+          Vector3 endArrow =
+              Vector3Add(BOARD[x][y][z], Vector3Scale(unitVec, length));
+
+          // Draw arrow only for x==8
+          if (x == 8 && y != 0) {
+            DrawLine3D(BOARD[x][y][z], endArrow, GREEN);
+            DrawModel(arrowModel, endArrow, 3.0f, WHITE);
+          }
         }
       }
     }
