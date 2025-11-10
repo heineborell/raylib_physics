@@ -129,7 +129,6 @@ int main() {
           if (axisLength < 0.0001f) {
             // when unitvec is nearly parallel or opposite to +Y
             if (unitVec.y < 0.0f) { // opposite
-              std::cout << axisLength << '\n';
               axis = (Vector3){1, 0, 0};
               arrowAngle = PI;
             } else { // same direction
@@ -173,6 +172,9 @@ int main() {
     EndDrawing();
   }
 
+  // Unload models data (GPU VRAM)
+  UnloadModel(cylinderModel);
+  UnloadModel(arrowModel);
   CloseWindow();
   return 0;
 }
