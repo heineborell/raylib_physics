@@ -1,4 +1,5 @@
 #include "config.h"
+#include "rlgl.h"
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
@@ -6,6 +7,41 @@
 #include <raymath.h>
 #include <sys/types.h>
 #include <vector>
+
+// I think this one is bloated can be written better
+void DrawDashedLine3D(Vector3 start, Vector3 end, float dashLength,
+                      float gapLength, Color color) {
+  Vector3 direction = {end.x - start.x, end.y - start.y, end.z - start.z};
+  float length = sqrt(direction.x * direction.x + direction.y * direction.y +
+                      direction.z * direction.z);
+  Vector3 unitDir = {direction.x / length, direction.y / length,
+                     direction.z / length};
+
+  float total = 0.0f;
+  bool drawDash = true;
+  Vector3 current = start;
+
+  while (total < length) {
+    float segment = drawDash ? dashLength : gapLength;
+    if (total + segment > length)
+      segment = length - total;
+
+    if (drawDash) {
+      Vector3 next = {current.x + unitDir.x * segment,
+                      current.y + unitDir.y * segment,
+                      current.z + unitDir.z * segment};
+      DrawLine3D(current, next, color);
+      current = next;
+    } else {
+      current.x += unitDir.x * segment;
+      current.y += unitDir.y * segment;
+      current.z += unitDir.z * segment;
+    }
+
+    total += segment;
+    drawDash = !drawDash;
+  }
+}
 
 int main() {
 
@@ -38,11 +74,13 @@ int main() {
     }
   }
 
+  // Define cylinder Mesh for the velocity vector. Not quite needed but whatever
   Mesh cylinderMesh = GenMeshCylinder(0.03f, 2.0f, 20);
   Model cylinderModel = LoadModelFromMesh(cylinderMesh);
   cylinderModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].color = MAROON;
 
-  Mesh arrow = GenMeshCone(0.03f, 0.1f, 10);
+  // Define cone mesh for the arrow Heads
+  Mesh arrow = GenMeshCone(0.03f, 0.1f, 5);
   Model arrowModel = LoadModelFromMesh(arrow);
   arrowModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].color = GREEN;
 
@@ -73,19 +111,25 @@ int main() {
     for (std::size_t x = 0; x < static_cast<std::size_t>(wavePoints); ++x) {
       for (std::size_t y = 0; y < static_cast<std::size_t>(wavePoints); ++y) {
         for (std::size_t z = 0; z < static_cast<std::size_t>(wavePoints); ++z) {
-          // Compute unit vector of the arrow
+
+          // Compute unit vector of the B field B=vXr
           Vector3 unitVec =
               Vector3Normalize(Vector3CrossProduct(Vx, BOARD[x][y][z]));
+          Vector3 unitR = Vector3Normalize(BOARD[x][y][z]);
 
-          // Compute rotation to align +Y with the unit vector
+          // This is for the arrow cylinder. First compute rotation to align +Y
+          // with B field at each point. Then compute quaternion for rotation.
+          // Finally transform
           Vector3 up = {0, 1, 0};
           Vector3 axis = Vector3CrossProduct(up, unitVec);
           float axisLength = Vector3Length(axis);
           float arrowAngle = acosf(Vector3DotProduct(up, unitVec));
 
-          // Handle parallel vectors (edge cases)
+          // Handle edge cases (parallel or anti-parallel vectors)
           if (axisLength < 0.0001f) {
-            if (unitVec.y < 0.0f) { // opposite direction
+            // when unitvec is nearly parallel or opposite to +Y
+            if (unitVec.y < 0.0f) { // opposite
+              std::cout << axisLength << '\n';
               axis = (Vector3){1, 0, 0};
               arrowAngle = PI;
             } else { // same direction
@@ -93,39 +137,33 @@ int main() {
               arrowAngle = 0;
             }
           }
-
-          // Build quaternion and convert to matrix
           Quaternion q =
               QuaternionFromAxisAngle(Vector3Normalize(axis), arrowAngle);
           arrowModel.transform = QuaternionToMatrix(q);
-
-          // Compute arrow end position
           Vector3 endArrow =
               Vector3Add(BOARD[x][y][z], Vector3Scale(unitVec, length));
 
-          // Draw arrow only for x==8
-          if (x == 8 && y != 0) {
+          // Finally  draw arrow only for x==8 as an example
+          if (x == 8) {
             DrawLine3D(BOARD[x][y][z], endArrow, GREEN);
             DrawModel(arrowModel, endArrow, 3.0f, WHITE);
+            if (IsKeyDown(KEY_G)) {
+              if (y % 5 == 0 && z % 5 == 0) {
+                DrawDashedLine3D(BOARD[x][y][z], {0, 0, 0}, 0.08, 0.1, BLUE);
+                DrawLine3D(
+                    BOARD[x][y][z],
+                    {BOARD[x][y][z].x + 1, BOARD[x][y][z].y, BOARD[x][y][z].z},
+                    MAROON);
+                DrawLine3D(Vector3Add(BOARD[x][y][z], unitR * length),
+                           BOARD[x][y][z], BLUE);
+              }
+            }
           }
         }
       }
     }
 
-    // DrawLine3D({0, 0, 0}, {1, 0, 0}, RED);
-    // DrawLine3D({0, 0, 0}, {0, 0, 1}, BLUE);
-
-    //
-    // for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y)
-    // {
-    //   for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints);
-    //   ++x) {
-    //     projectedBOARD[y][x] = {
-    //         projectedVector(BOARD[y][x].x, BOARD[y][x].y, xRange)};
-    //   }
-    // }
-
-    // Spaceship setup
+    // Draw charge and its velocity vector
     Matrix cylinderRotationMatrix = MatrixRotateZ(-0.5f * PI);
     cylinderModel.transform = cylinderRotationMatrix;
     DrawModel(cylinderModel, Vector3Zero(), 1.0f, WHITE);
