@@ -38,6 +38,14 @@ int main() {
     }
   }
 
+  Mesh cylinderMesh = GenMeshCylinder(0.03f, 2.0f, 20);
+  Model cylinderModel = LoadModelFromMesh(cylinderMesh);
+  cylinderModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].color = MAROON;
+
+  Mesh arrow = GenMeshCone(0.03f, 0.1f, 10);
+  Model arrowModel = LoadModelFromMesh(arrow);
+  arrowModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].color = MAROON;
+
   while (!WindowShouldClose()) {
     // Update
     //----------------------------------------------------------------------------------
@@ -54,7 +62,7 @@ int main() {
 
     step = xRange * 2 / wavePoints;
     length = step / 2.75;
-    // DrawGrid(xRange, step);
+    // DrawGrid(40, 1);
     // Draw charge and its velocity
     DrawSphere({0, 0, 0}, 0.1, RED);
     Vector3 center{0, 0, 0};
@@ -70,14 +78,22 @@ int main() {
           float thetaX{Vector3Angle(unitVec, {1, 0, 0})};
           float thetaY{Vector3Angle(unitVec, {0, 1, 0})};
           float thetaZ{Vector3Angle(unitVec, {0, 0, 1})};
+          Matrix arrowRotationMatrix =
+              MatrixMultiply(MatrixMultiply(MatrixRotateY(thetaY * PI),
+                                            MatrixRotateX(thetaX * PI)),
+                             MatrixRotateZ(thetaZ * PI));
+          arrowModel.transform = arrowRotationMatrix;
           Vector3 end = {
               static_cast<float>(BOARD[x][y][z].x + cosf(thetaX) * length),
               static_cast<float>(BOARD[x][y][z].y + cosf(thetaY) * length),
               static_cast<float>(BOARD[x][y][z].z + cosf(thetaZ) * length)};
-          if (x == 8)
+
+          if (x == 8) {
             DrawLine3D(BOARD[x][y][z], end, GREEN);
-          if (x == 16 && y % 2 == 0 && z % 2 == 0)
-            DrawLine3D(BOARD[x][y][z], end, GREEN);
+            DrawModel(arrowModel, end, 1.0f, WHITE);
+          }
+          // if (x == 16 && y % 2 == 0 && z % 2 == 0)
+          //   DrawLine3D(BOARD[x][y][z], end, GREEN);
           // DrawLine3D(BOARD[x][y][z], unitVec, GREEN);
           // if (x + 1 < wavePoints)
           //   DrawLine3D(
@@ -100,6 +116,11 @@ int main() {
     //         projectedVector(BOARD[y][x].x, BOARD[y][x].y, xRange)};
     //   }
     // }
+
+    // Spaceship setup
+    Matrix cylinderRotationMatrix = MatrixRotateZ(-0.5f * PI);
+    cylinderModel.transform = cylinderRotationMatrix;
+    DrawModel(cylinderModel, Vector3Zero(), 1.0f, WHITE);
 
     EndMode3D();
     DrawFPS(10, 10);
