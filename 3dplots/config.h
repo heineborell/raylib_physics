@@ -7,8 +7,8 @@
 
 using std::vector;
 
-inline constexpr int WIDTH{800};
-inline constexpr int HEIGHT{800};
+inline constexpr int WIDTH{1000};
+inline constexpr int HEIGHT{1000};
 inline constexpr int FPS{60};
 
 inline constexpr int PARTICLE_RADIUS{2};
@@ -16,7 +16,7 @@ inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
 inline constexpr int NUM_PARTICLES{4000};
 
-inline constexpr int wavePoints{10};
+inline constexpr int wavePoints{40};
 inline constexpr double zoomSpeed{1.1};
 inline constexpr double arrowAngle{3.14 / 7};
 inline const double arrowSin{std::sin(arrowAngle)};
