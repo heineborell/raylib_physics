@@ -8,7 +8,8 @@
 #include <sys/types.h>
 #include <vector>
 
-// I think this one is bloated can be written better
+// This one is bloated can be written better, especially with raylib vector
+// stuff
 void DrawDashedLine3D(Vector3 start, Vector3 end, float dashLength,
                       float gapLength, Color color) {
   Vector3 direction = {end.x - start.x, end.y - start.y, end.z - start.z};
@@ -118,8 +119,8 @@ int main() {
           Vector3 unitR = Vector3Normalize(BOARD[x][y][z]);
 
           // This is for the arrow cylinder. First compute rotation to align +Y
-          // with B field at each point. Then compute quaternion for rotation.
-          // Finally transform
+          // with B field at each point. Then compute quaternion for rotation
+          // and finally transform
           Vector3 up = {0, 1, 0};
           Vector3 axis = Vector3CrossProduct(up, unitVec);
           float axisLength = Vector3Length(axis);
