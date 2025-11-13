@@ -6,6 +6,7 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <sys/types.h>
+#include <thread>
 #include <vector>
 
 // This one is bloated can be written better, especially with raylib vector
@@ -44,6 +45,13 @@ void DrawDashedLine3D(Vector3 start, Vector3 end, float dashLength,
   }
 }
 
+void getBfield(std::size_t x, std::size_t y, std::size_t z, Field &f) {
+  f.Bfield[x][y][z] = {
+      static_cast<float>(Bxfield(BOARD[x][y][z], 2.0f, loopFunc)),
+      static_cast<float>(Byfield(BOARD[x][y][z], 2.0f, loopFunc)),
+      static_cast<float>(Bzfield(BOARD[x][y][z], 2.0f, loopFunc))};
+}
+
 int main() {
   double xRange{
       20.0}; // x will range from -4 to 4 but then changed by scrolling
@@ -60,18 +68,22 @@ int main() {
     }
   }
 
+  // Launch threads
+  std::vector<std::thread> threads;
+
   Field f;
   for (std::size_t x = 0; x < static_cast<std::size_t>(wavePoints); ++x) {
     for (std::size_t y = 0; y < static_cast<std::size_t>(wavePoints); ++y) {
       for (std::size_t z = 0; z < static_cast<std::size_t>(wavePoints); ++z) {
 
         std::cout << x << y << z << '\n';
-        f.Bfield[x][y][z] = {
-            static_cast<float>(Bxfield(BOARD[x][y][z], 2.0f, loopFunc)),
-            static_cast<float>(Byfield(BOARD[x][y][z], 2.0f, loopFunc)),
-            static_cast<float>(Bzfield(BOARD[x][y][z], 2.0f, loopFunc))};
+        threads.push_back(std::thread(getBfield, x, y, z, std::ref(f)));
       }
     }
+  }
+  // Join threads before program execution terminates
+  for (auto &th : threads) {
+    th.join();
   }
 
   InitWindow(HEIGHT, WIDTH, "Vector PLots");
@@ -131,66 +143,62 @@ int main() {
     for (std::size_t x = 0; x < static_cast<std::size_t>(wavePoints); ++x) {
       for (std::size_t y = 0; y < static_cast<std::size_t>(wavePoints); ++y) {
         for (std::size_t z = 0; z < static_cast<std::size_t>(wavePoints); ++z) {
-          if (IsKeyDown(KEY_G)) {
-            if (x == 8) {
-              DrawLine3D(BOARD[x][y][z],
-                         Vector3Add(BOARD[x][y][z],
-                                    Vector3Normalize(f.Bfield[x][y][z])),
-                         GREEN);
-            }
-          }
-
-          // Bfield(BOARD[x][y][z], 2.0f, loopFunc);
-
-          // // Compute unit vector of the B field B=vXr
-          // Vector3 unitVec =
-          //     Vector3Normalize(Vector3CrossProduct(Vx, BOARD[x][y][z]));
-          // Vector3 unitR = Vector3Normalize(BOARD[x][y][z]);
-          //
-          // // This is for the arrow cylinder. First compute rotation to align
-          // +Y
-          // // with B field at each point. Then compute quaternion for rotation
-          // // and finally transform
-          // Vector3 up = {0, 1, 0};
-          // Vector3 axis = Vector3CrossProduct(up, unitVec);
-          // float axisLength = Vector3Length(axis);
-          // float arrowAngle = acosf(Vector3DotProduct(up, unitVec));
-          //
-          // // Handle edge cases (parallel or anti-parallel vectors)
-          // if (axisLength < 0.0001f) {
-          //   // when unitvec is nearly parallel or opposite to +Y
-          //   if (unitVec.y < 0.0f) { // opposite
-          //     axis = (Vector3){1, 0, 0};
-          //     arrowAngle = PI;
-          //   } else { // same direction
-          //     axis = (Vector3){1, 0, 0};
-          //     arrowAngle = 0;
-          //   }
-          // }
-          // Quaternion q =
-          //     QuaternionFromAxisAngle(Vector3Normalize(axis), arrowAngle);
-          // arrowModel.transform = QuaternionToMatrix(q);
-          // Vector3 endArrow =
-          //     Vector3Add(BOARD[x][y][z], Vector3Scale(unitVec, length));
-
-          // Finally  draw arrow only for x==8 as an example
-          // if (x == 8) {
-          //   DrawLine3D(BOARD[x][y][z], endArrow, GREEN);
-          //   DrawModel(arrowModel, endArrow, 3.0f, WHITE);
-          //   if (IsKeyDown(KEY_G)) {
-          //     if (y % 5 == 0 && z % 5 == 0) {
-          //       DrawDashedLine3D(BOARD[x][y][z], {0, 0, 0}, 0.08, 0.1, BLUE);
-          //       DrawLine3D(
-          //           BOARD[x][y][z],
-          //           {BOARD[x][y][z].x + 1, BOARD[x][y][z].y,
-          //           BOARD[x][y][z].z}, MAROON);
-          //       DrawLine3D(Vector3Add(BOARD[x][y][z], unitR * length),
-          //                  BOARD[x][y][z], BLUE);
-          //     }
-          //   }
-          // }
+          DrawLine3D(
+              BOARD[x][y][z],
+              Vector3Add(BOARD[x][y][z], Vector3Normalize(f.Bfield[x][y][z])),
+              GREEN);
         }
       }
+
+      // Bfield(BOARD[x][y][z], 2.0f, loopFunc);
+
+      // // Compute unit vector of the B field B=vXr
+      // Vector3 unitVec =
+      //     Vector3Normalize(Vector3CrossProduct(Vx, BOARD[x][y][z]));
+      // Vector3 unitR = Vector3Normalize(BOARD[x][y][z]);
+      //
+      // // This is for the arrow cylinder. First compute rotation to align
+      // +Y
+      // // with B field at each point. Then compute quaternion for rotation
+      // // and finally transform
+      // Vector3 up = {0, 1, 0};
+      // Vector3 axis = Vector3CrossProduct(up, unitVec);
+      // float axisLength = Vector3Length(axis);
+      // float arrowAngle = acosf(Vector3DotProduct(up, unitVec));
+      //
+      // // Handle edge cases (parallel or anti-parallel vectors)
+      // if (axisLength < 0.0001f) {
+      //   // when unitvec is nearly parallel or opposite to +Y
+      //   if (unitVec.y < 0.0f) { // opposite
+      //     axis = (Vector3){1, 0, 0};
+      //     arrowAngle = PI;
+      //   } else { // same direction
+      //     axis = (Vector3){1, 0, 0};
+      //     arrowAngle = 0;
+      //   }
+      // }
+      // Quaternion q =
+      //     QuaternionFromAxisAngle(Vector3Normalize(axis), arrowAngle);
+      // arrowModel.transform = QuaternionToMatrix(q);
+      // Vector3 endArrow =
+      //     Vector3Add(BOARD[x][y][z], Vector3Scale(unitVec, length));
+
+      // Finally  draw arrow only for x==8 as an example
+      // if (x == 8) {
+      //   DrawLine3D(BOARD[x][y][z], endArrow, GREEN);
+      //   DrawModel(arrowModel, endArrow, 3.0f, WHITE);
+      //   if (IsKeyDown(KEY_G)) {
+      //     if (y % 5 == 0 && z % 5 == 0) {
+      //       DrawDashedLine3D(BOARD[x][y][z], {0, 0, 0}, 0.08, 0.1, BLUE);
+      //       DrawLine3D(
+      //           BOARD[x][y][z],
+      //           {BOARD[x][y][z].x + 1, BOARD[x][y][z].y,
+      //           BOARD[x][y][z].z}, MAROON);
+      //       DrawLine3D(Vector3Add(BOARD[x][y][z], unitR * length),
+      //                  BOARD[x][y][z], BLUE);
+      //     }
+      //   }
+      // }
     }
 
     // Draw loop wire

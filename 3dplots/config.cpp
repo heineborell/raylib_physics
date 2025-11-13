@@ -25,8 +25,7 @@ Vector3 projectedVector(Vector3 &screenVector, double xRange) {
 Vector3 loopFunc(Vector3 &r, float theta, float radius) {
   double rSquare{Vector3LengthSqr(r)};
   Vector3 start{radius * cos(theta), 0, radius * sin(theta)};
-  Vector3 dl{Vector3Scale(
-      Vector3Normalize(Vector3CrossProduct(start, {0, -1, 0})), 0.08)};
+  Vector3 dl{Vector3Normalize(Vector3CrossProduct(start, {0, -1, 0}))};
   Vector3 dlcrossr{Vector3CrossProduct(dl, r)};
   Vector3 final{Vector3Scale(dlcrossr, 1 / rSquare)};
   return final;
@@ -38,7 +37,7 @@ double Bxfield(Vector3 &r, float radius,
   auto f = [&](float theta) {
     return static_cast<double>(loopFunc(r, theta, radius).x);
   };
-  return boost::math::quadrature::gauss_kronrod<double, 15>::integrate(
+  return boost::math::quadrature::gauss_kronrod<double, 10>::integrate(
       f, 0, integral_lim);
 }
 
@@ -48,7 +47,7 @@ double Byfield(Vector3 &r, float radius,
   auto f = [&](float theta) {
     return static_cast<double>(loopFunc(r, theta, radius).y);
   };
-  return boost::math::quadrature::gauss_kronrod<double, 15>::integrate(
+  return boost::math::quadrature::gauss_kronrod<double, 10>::integrate(
       f, 0, integral_lim);
 }
 
@@ -58,6 +57,6 @@ double Bzfield(Vector3 &r, float radius,
   auto f = [&](float theta) {
     return static_cast<double>(loopFunc(r, theta, radius).z);
   };
-  return boost::math::quadrature::gauss_kronrod<double, 15>::integrate(
+  return boost::math::quadrature::gauss_kronrod<double, 10>::integrate(
       f, 0, integral_lim);
 }
