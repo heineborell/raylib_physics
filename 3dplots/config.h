@@ -16,7 +16,7 @@ inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
 inline constexpr int NUM_PARTICLES{4000};
 
-inline constexpr int wavePoints{20};
+inline constexpr int wavePoints{40};
 inline constexpr double zoomSpeed{1.1};
 inline constexpr double arrowAngle{3.14 / 7};
 inline const double arrowSin{std::sin(arrowAngle)};
@@ -26,6 +26,7 @@ inline const double arrowCos{std::cos(arrowAngle)};
 
 struct Field {
   vector<vector<vector<Vector3>>> Bfield;
+  std::vector<std::vector<std::vector<double>>> magnitudes;
 
   // Default constructor with zeros and wavePoints
   Field()
@@ -33,7 +34,11 @@ struct Field {
             wavePoints + 1,
             std::vector<std::vector<Vector3>>(
                 wavePoints + 1,
-                std::vector<Vector3>(wavePoints + 1, Vector3Zero())))) {}
+                std::vector<Vector3>(wavePoints + 1, Vector3Zero())))),
+        magnitudes(std::vector<std::vector<std::vector<double>>>(
+            wavePoints + 1,
+            std::vector<std::vector<double>>(
+                wavePoints + 1, std::vector<double>(wavePoints + 1, 0.0)))) {}
 };
 
 extern vector<vector<vector<Vector3>>> BOARD;

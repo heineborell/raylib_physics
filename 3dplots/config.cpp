@@ -64,7 +64,8 @@ double Bzfield(Vector3 &r, float radius,
 Vector3 getBfield(int x, int y, int z, Vector3 &Vx, double length) {
 
   // Compute unit vector of the B field B=vXr
-  Vector3 unitVec = Vector3Normalize(Vector3CrossProduct(Vx, BOARD[x][y][z]));
+  Vector3 unitVec = Vector3Normalize(Vector3CrossProduct(
+      Vx, {BOARD[x][y][z].x, BOARD[x][y][z].y - 3, BOARD[x][y][z].z}));
   Vector3 unitR = Vector3Normalize(BOARD[x][y][z]);
 
   Vector3 endArrow = Vector3Add(BOARD[x][y][z], Vector3Scale(unitVec, length));
@@ -77,7 +78,8 @@ void transformArrowHead(int x, int y, int z, Vector3 &Vx, Vector3 &endArrow,
   // This is for the arrow cylinder. First compute rotation to align +Y
   // with B field at each point. Then compute quaternion for rotation
   // and finally transform
-  Vector3 unitVec = Vector3Normalize(Vector3CrossProduct(Vx, BOARD[x][y][z]));
+  Vector3 unitVec = Vector3Normalize(Vector3CrossProduct(
+      Vx, {BOARD[x][y][z].x, BOARD[x][y][z].y - 3, BOARD[x][y][z].z}));
   Vector3 up = {0, 1, 0};
   Vector3 axis = Vector3CrossProduct(up, unitVec);
   float axisLength = Vector3Length(axis);

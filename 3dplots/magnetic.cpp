@@ -76,7 +76,7 @@ int main() {
   }
 
   // Define cylinder Mesh for the velocity vector. Not quite needed but whatever
-  Mesh cylinderMesh = GenMeshCylinder(0.03f, 2.0f, 20);
+  Mesh cylinderMesh = GenMeshCylinder(0.1f, static_cast<float>(2 * xRange), 20);
   Model cylinderModel = LoadModelFromMesh(cylinderMesh);
   cylinderModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].color = MAROON;
 
@@ -103,10 +103,10 @@ int main() {
     length = step / 2.75;
     // DrawGrid(40, 1);
     // Draw charge and its velocity
-    DrawSphere({0, 0, 0}, 0.1, RED);
+    // DrawSphere({0, 0, 0}, 0.1, RED);
     Vector3 center{0, 0, 0};
     Vector3 Vx{1, 0, 0};
-    DrawLine3D(center, Vx, RED);
+    // DrawLine3D(center, Vx, RED);
 
     // Note that in raylib the up coordinate is y
     for (std::size_t x = 0; x < static_cast<std::size_t>(wavePoints); ++x) {
@@ -138,7 +138,8 @@ int main() {
     // Draw charge and its velocity vector
     Matrix cylinderRotationMatrix = MatrixRotateZ(-0.5f * PI);
     cylinderModel.transform = cylinderRotationMatrix;
-    DrawModel(cylinderModel, Vector3Zero(), 1.0f, WHITE);
+    DrawModel(cylinderModel, {-static_cast<float>(xRange), 3, 0}, 1.0f, WHITE);
+    DrawModel(cylinderModel, {-static_cast<float>(xRange), -3, 0}, 1.0f, WHITE);
 
     EndMode3D();
     DrawFPS(10, 10);
