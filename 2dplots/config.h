@@ -17,9 +17,9 @@ inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
 inline constexpr int NUM_PARTICLES{4000};
 
-inline constexpr int wavePoints{30};
+inline constexpr int wavePoints{50};
 inline constexpr double zoomSpeed{1.1};
-inline constexpr double arrowAngle{3.14 / 7};
+inline constexpr double arrowAngle{PI / 7};
 inline const double arrowSin{std::sin(arrowAngle)};
 inline const double arrowCos{std::cos(arrowAngle)};
 

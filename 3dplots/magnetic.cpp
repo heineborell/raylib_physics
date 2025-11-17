@@ -113,52 +113,24 @@ int main() {
       for (std::size_t y = 0; y < static_cast<std::size_t>(wavePoints); ++y) {
         for (std::size_t z = 0; z < static_cast<std::size_t>(wavePoints); ++z) {
 
-          // Compute unit vector of the B field B=vXr
-          Vector3 unitVec =
-              Vector3Normalize(Vector3CrossProduct(Vx, BOARD[x][y][z]));
-          Vector3 unitR = Vector3Normalize(BOARD[x][y][z]);
-
-          // This is for the arrow cylinder. First compute rotation to align +Y
-          // with B field at each point. Then compute quaternion for rotation
-          // and finally transform
-          Vector3 up = {0, 1, 0};
-          Vector3 axis = Vector3CrossProduct(up, unitVec);
-          float axisLength = Vector3Length(axis);
-          float arrowAngle = acosf(Vector3DotProduct(up, unitVec));
-
-          // Handle edge cases (parallel or anti-parallel vectors)
-          if (axisLength < 0.0001f) {
-            // when unitvec is nearly parallel or opposite to +Y
-            if (unitVec.y < 0.0f) { // opposite
-              axis = (Vector3){1, 0, 0};
-              arrowAngle = PI;
-            } else { // same direction
-              axis = (Vector3){1, 0, 0};
-              arrowAngle = 0;
-            }
-          }
-          Quaternion q =
-              QuaternionFromAxisAngle(Vector3Normalize(axis), arrowAngle);
-          arrowModel.transform = QuaternionToMatrix(q);
-          Vector3 endArrow =
-              Vector3Add(BOARD[x][y][z], Vector3Scale(unitVec, length));
-
+          Vector3 endArrow{getBfield(x, y, z, Vx, length)};
           // Finally  draw arrow only for x==8 as an example
-          if (x == 8) {
+          if (x == 0) {
             DrawLine3D(BOARD[x][y][z], endArrow, GREEN);
+            transformArrowHead(x, y, z, Vx, endArrow, arrowModel);
             DrawModel(arrowModel, endArrow, 3.0f, WHITE);
-            if (IsKeyDown(KEY_G)) {
-              if (y % 5 == 0 && z % 5 == 0) {
-                DrawDashedLine3D(BOARD[x][y][z], {0, 0, 0}, 0.08, 0.1, BLUE);
-                DrawLine3D(
-                    BOARD[x][y][z],
-                    {BOARD[x][y][z].x + 1, BOARD[x][y][z].y, BOARD[x][y][z].z},
-                    MAROON);
-                DrawLine3D(Vector3Add(BOARD[x][y][z], unitR * length),
-                           BOARD[x][y][z], BLUE);
-              }
-            }
           }
+          // if (IsKeyDown(KEY_G)) {
+          //   if (y % 5 == 0 && z % 5 == 0) {
+          //     DrawDashedLine3D(BOARD[x][y][z], {0, 0, 0}, 0.08, 0.1, BLUE);
+          //     DrawLine3D(
+          //         BOARD[x][y][z],
+          //         {BOARD[x][y][z].x + 1, BOARD[x][y][z].y,
+          //         BOARD[x][y][z].z}, MAROON);
+          //     DrawLine3D(Vector3Add(BOARD[x][y][z], unitR * length),
+          //                BOARD[x][y][z], BLUE);
+          //   }
+          // }
         }
       }
     }

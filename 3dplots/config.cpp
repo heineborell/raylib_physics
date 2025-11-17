@@ -60,3 +60,40 @@ double Bzfield(Vector3 &r, float radius,
   return boost::math::quadrature::gauss_kronrod<double, 10>::integrate(
       f, 0, integral_lim);
 }
+
+Vector3 getBfield(int x, int y, int z, Vector3 &Vx, double length) {
+
+  // Compute unit vector of the B field B=vXr
+  Vector3 unitVec = Vector3Normalize(Vector3CrossProduct(Vx, BOARD[x][y][z]));
+  Vector3 unitR = Vector3Normalize(BOARD[x][y][z]);
+
+  Vector3 endArrow = Vector3Add(BOARD[x][y][z], Vector3Scale(unitVec, length));
+  return endArrow;
+}
+
+void transformArrowHead(int x, int y, int z, Vector3 &Vx, Vector3 &endArrow,
+                        Model &arrowModel) {
+
+  // This is for the arrow cylinder. First compute rotation to align +Y
+  // with B field at each point. Then compute quaternion for rotation
+  // and finally transform
+  Vector3 unitVec = Vector3Normalize(Vector3CrossProduct(Vx, BOARD[x][y][z]));
+  Vector3 up = {0, 1, 0};
+  Vector3 axis = Vector3CrossProduct(up, unitVec);
+  float axisLength = Vector3Length(axis);
+  float arrowAngle = acosf(Vector3DotProduct(up, unitVec));
+
+  // Handle edge cases (parallel or anti-parallel vectors)
+  if (axisLength < 0.0001f) {
+    // when unitvec is nearly parallel or opposite to +Y
+    if (unitVec.y < 0.0f) { // opposite
+      axis = (Vector3){1, 0, 0};
+      arrowAngle = PI;
+    } else { // same direction
+      axis = (Vector3){1, 0, 0};
+      arrowAngle = 0;
+    }
+  }
+  Quaternion q = QuaternionFromAxisAngle(Vector3Normalize(axis), arrowAngle);
+  arrowModel.transform = QuaternionToMatrix(q);
+}
