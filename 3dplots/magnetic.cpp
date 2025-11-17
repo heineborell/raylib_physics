@@ -114,8 +114,8 @@ int main() {
         for (std::size_t z = 0; z < static_cast<std::size_t>(wavePoints); ++z) {
 
           Vector3 endArrow{getBfield(x, y, z, Vx, length)};
-          // Finally  draw arrow only for x==8 as an example
-          if (x == 0) {
+          // Finally  draw arrow only for some x
+          if (BOARD[x][y][z].x == 0) {
             DrawLine3D(BOARD[x][y][z], endArrow, GREEN);
             transformArrowHead(x, y, z, Vx, endArrow, arrowModel);
             DrawModel(arrowModel, endArrow, 3.0f, WHITE);
