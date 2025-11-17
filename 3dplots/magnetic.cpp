@@ -8,42 +8,6 @@
 #include <sys/types.h>
 #include <vector>
 
-// This one is bloated can be written better, especially with raylib vector
-// stuff
-void DrawDashedLine3D(Vector3 start, Vector3 end, float dashLength,
-                      float gapLength, Color color) {
-  Vector3 direction = {end.x - start.x, end.y - start.y, end.z - start.z};
-  float length = sqrt(direction.x * direction.x + direction.y * direction.y +
-                      direction.z * direction.z);
-  Vector3 unitDir = {direction.x / length, direction.y / length,
-                     direction.z / length};
-
-  float total = 0.0f;
-  bool drawDash = true;
-  Vector3 current = start;
-
-  while (total < length) {
-    float segment = drawDash ? dashLength : gapLength;
-    if (total + segment > length)
-      segment = length - total;
-
-    if (drawDash) {
-      Vector3 next = {current.x + unitDir.x * segment,
-                      current.y + unitDir.y * segment,
-                      current.z + unitDir.z * segment};
-      DrawLine3D(current, next, color);
-      current = next;
-    } else {
-      current.x += unitDir.x * segment;
-      current.y += unitDir.y * segment;
-      current.z += unitDir.z * segment;
-    }
-
-    total += segment;
-    drawDash = !drawDash;
-  }
-}
-
 int main() {
 
   InitWindow(HEIGHT, WIDTH, "Vector PLots");
@@ -85,6 +49,37 @@ int main() {
   Model arrowModel = LoadModelFromMesh(arrow);
   arrowModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].color = GREEN;
 
+  step = xRange * 2 / wavePoints;
+  length = step / 2.75;
+  // DrawGrid(40, 1);
+  // Draw charge and its velocity
+  // DrawSphere({0, 0, 0}, 0.1, RED);
+  Vector3 center{0, 0, 0};
+  Vector3 Vx{1, 0, 0};
+  Vector3 minusVx{-1, 0, 0};
+
+  Field Bfield_1{};
+  Field Bfield_2{};
+
+  // Note that in raylib the up coordinate is y
+  for (std::size_t x = 0; x < static_cast<std::size_t>(wavePoints); ++x) {
+    for (std::size_t y = 0; y < static_cast<std::size_t>(wavePoints); ++y) {
+      for (std::size_t z = 0; z < static_cast<std::size_t>(wavePoints); ++z) {
+        Bfield_1.Bfield[x][y][z] = getBfield(x, y, z, minusVx, length, 3);
+      }
+    }
+  }
+  // Note that in raylib the up coordinate is y
+  for (std::size_t x = 0; x < static_cast<std::size_t>(wavePoints); ++x) {
+    for (std::size_t y = 0; y < static_cast<std::size_t>(wavePoints); ++y) {
+      for (std::size_t z = 0; z < static_cast<std::size_t>(wavePoints); ++z) {
+        Bfield_2.Bfield[x][y][z] = getBfield(x, y, z, Vx, length, -3);
+      }
+    }
+  }
+
+  Field resultantB{sumFields(Bfield_1, Bfield_2)};
+
   while (!WindowShouldClose()) {
     // Update
     //----------------------------------------------------------------------------------
@@ -99,38 +94,20 @@ int main() {
     BeginMode3D(camera);
     double time = GetTime();
 
-    step = xRange * 2 / wavePoints;
-    length = step / 2.75;
-    // DrawGrid(40, 1);
-    // Draw charge and its velocity
-    // DrawSphere({0, 0, 0}, 0.1, RED);
-    Vector3 center{0, 0, 0};
-    Vector3 Vx{1, 0, 0};
-    // DrawLine3D(center, Vx, RED);
-
     // Note that in raylib the up coordinate is y
     for (std::size_t x = 0; x < static_cast<std::size_t>(wavePoints); ++x) {
       for (std::size_t y = 0; y < static_cast<std::size_t>(wavePoints); ++y) {
         for (std::size_t z = 0; z < static_cast<std::size_t>(wavePoints); ++z) {
 
-          Vector3 endArrow{getBfield(x, y, z, Vx, length)};
+          Vector3 endArrow = Vector3Normalize(resultantB.Bfield[x][y][z]);
+          // Vector3 endArrow = Bfield_2.Bfield[x][y][z];
           // Finally  draw arrow only for some x
           if (BOARD[x][y][z].x == 0) {
-            DrawLine3D(BOARD[x][y][z], endArrow, GREEN);
-            transformArrowHead(x, y, z, Vx, endArrow, arrowModel);
-            DrawModel(arrowModel, endArrow, 3.0f, WHITE);
+            DrawLine3D(BOARD[x][y][z], Vector3Add(BOARD[x][y][z], endArrow),
+                       GREEN);
+            // transformArrowHead(x, y, z, Vx, endArrow, arrowModel, 3);
+            // DrawModel(arrowModel, endArrow, 3.0f, WHITE);
           }
-          // if (IsKeyDown(KEY_G)) {
-          //   if (y % 5 == 0 && z % 5 == 0) {
-          //     DrawDashedLine3D(BOARD[x][y][z], {0, 0, 0}, 0.08, 0.1, BLUE);
-          //     DrawLine3D(
-          //         BOARD[x][y][z],
-          //         {BOARD[x][y][z].x + 1, BOARD[x][y][z].y,
-          //         BOARD[x][y][z].z}, MAROON);
-          //     DrawLine3D(Vector3Add(BOARD[x][y][z], unitR * length),
-          //                BOARD[x][y][z], BLUE);
-          //   }
-          // }
         }
       }
     }

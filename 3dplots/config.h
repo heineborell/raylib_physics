@@ -22,8 +22,6 @@ inline constexpr double arrowAngle{3.14 / 7};
 inline const double arrowSin{std::sin(arrowAngle)};
 inline const double arrowCos{std::cos(arrowAngle)};
 
-// Board
-
 struct Field {
   vector<vector<vector<Vector3>>> Bfield;
   std::vector<std::vector<std::vector<double>>> magnitudes;
@@ -53,6 +51,8 @@ double Byfield(Vector3 &r, float radius,
                Vector3 (*loopFunc)(Vector3 &, float, float));
 double Bzfield(Vector3 &r, float radius,
                Vector3 (*loopFunc)(Vector3 &, float, float));
-Vector3 getBfield(int x, int y, int z, Vector3 &Vx, double length);
+Vector3 getBfield(int x, int y, int z, Vector3 &Vx, double length,
+                  float y_shift);
 void transformArrowHead(int x, int y, int z, Vector3 &Vx, Vector3 &endArrow,
-                        Model &arrowModel);
+                        Model &arrowModel, float y_shift);
+Field sumFields(Field &Bfield_1, Field &Bfield_2);

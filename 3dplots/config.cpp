@@ -61,25 +61,50 @@ double Bzfield(Vector3 &r, float radius,
       f, 0, integral_lim);
 }
 
-Vector3 getBfield(int x, int y, int z, Vector3 &Vx, double length) {
+Vector3 getBfield(int x, int y, int z, Vector3 &Vx, double length,
+                  float y_shift) {
 
   // Compute unit vector of the B field B=vXr
-  Vector3 unitVec = Vector3Normalize(Vector3CrossProduct(
-      Vx, {BOARD[x][y][z].x, BOARD[x][y][z].y - 3, BOARD[x][y][z].z}));
-  Vector3 unitR = Vector3Normalize(BOARD[x][y][z]);
+  Vector3 BVec = Vector3CrossProduct(
+      Vx, {BOARD[x][y][z].x, BOARD[x][y][z].y - y_shift, BOARD[x][y][z].z});
+  float distance{Vector3Length(BOARD[x][y][z])};
+  // Vector3 unitR = Vector3Normalize(BOARD[x][y][z]);
 
-  Vector3 endArrow = Vector3Add(BOARD[x][y][z], Vector3Scale(unitVec, length));
-  return endArrow;
+  return Vector3Normalize(BVec / pow(distance, 3));
 }
 
+Field sumFields(Field &Bfield_1, Field &Bfield_2) {
+
+  std::vector<std::vector<std::vector<Vector3>>> sumBfield(
+      wavePoints + 1,
+      std::vector<std::vector<Vector3>>(wavePoints + 1,
+                                        std::vector<Vector3>(wavePoints + 1)));
+
+  for (std::size_t x = 0; x < static_cast<std::size_t>(wavePoints); ++x) {
+    for (std::size_t y = 0; y < static_cast<std::size_t>(wavePoints); ++y) {
+      for (std::size_t z = 0; z < static_cast<std::size_t>(wavePoints); ++z) {
+
+        sumBfield[x][y][z].x =
+            Bfield_1.Bfield[x][y][z].x + Bfield_2.Bfield[x][y][z].x;
+        sumBfield[x][y][z].y =
+            Bfield_1.Bfield[x][y][z].y + Bfield_2.Bfield[x][y][z].y;
+        sumBfield[x][y][z].z =
+            Bfield_1.Bfield[x][y][z].z + Bfield_2.Bfield[x][y][z].z;
+      }
+    }
+  }
+  Field f;
+  f.Bfield = sumBfield;
+  return f;
+}
 void transformArrowHead(int x, int y, int z, Vector3 &Vx, Vector3 &endArrow,
-                        Model &arrowModel) {
+                        Model &arrowModel, float y_shift) {
 
   // This is for the arrow cylinder. First compute rotation to align +Y
   // with B field at each point. Then compute quaternion for rotation
   // and finally transform
   Vector3 unitVec = Vector3Normalize(Vector3CrossProduct(
-      Vx, {BOARD[x][y][z].x, BOARD[x][y][z].y - 3, BOARD[x][y][z].z}));
+      Vx, {BOARD[x][y][z].x, BOARD[x][y][z].y - y_shift, BOARD[x][y][z].z}));
   Vector3 up = {0, 1, 0};
   Vector3 axis = Vector3CrossProduct(up, unitVec);
   float axisLength = Vector3Length(axis);
