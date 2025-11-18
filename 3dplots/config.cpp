@@ -67,8 +67,8 @@ Vector3 getBfield(int x, int y, int z, Vector3 &Vx, double length,
   // Compute unit vector of the B field B=vXr
   Vector3 BVec = Vector3CrossProduct(
       Vx, {BOARD[x][y][z].x, BOARD[x][y][z].y - y_shift, BOARD[x][y][z].z});
-  float distance{Vector3Length(BOARD[x][y][z])};
-  // Vector3 unitR = Vector3Normalize(BOARD[x][y][z]);
+  float distance{Vector3Length(
+      {BOARD[x][y][z].x, BOARD[x][y][z].y - y_shift, BOARD[x][y][z].z})};
 
   return Vector3Normalize(BVec / pow(distance, 3));
 }
@@ -97,30 +97,28 @@ Field sumFields(Field &Bfield_1, Field &Bfield_2) {
   f.Bfield = sumBfield;
   return f;
 }
-void transformArrowHead(int x, int y, int z, Vector3 &Vx, Vector3 &endArrow,
-                        Model &arrowModel, float y_shift) {
+void transformArrowHead(int x, int y, int z, Vector3 &endArrow,
+                        Model &arrowModel) {
 
   // This is for the arrow cylinder. First compute rotation to align +Y
   // with B field at each point. Then compute quaternion for rotation
   // and finally transform
-  Vector3 unitVec = Vector3Normalize(Vector3CrossProduct(
-      Vx, {BOARD[x][y][z].x, BOARD[x][y][z].y - y_shift, BOARD[x][y][z].z}));
   Vector3 up = {0, 1, 0};
-  Vector3 axis = Vector3CrossProduct(up, unitVec);
+  Vector3 axis = Vector3CrossProduct(up, endArrow);
   float axisLength = Vector3Length(axis);
-  float arrowAngle = acosf(Vector3DotProduct(up, unitVec));
+  float arrowAngle = acosf(Vector3DotProduct(up, endArrow));
 
-  // Handle edge cases (parallel or anti-parallel vectors)
-  if (axisLength < 0.0001f) {
-    // when unitvec is nearly parallel or opposite to +Y
-    if (unitVec.y < 0.0f) { // opposite
-      axis = (Vector3){1, 0, 0};
-      arrowAngle = PI;
-    } else { // same direction
-      axis = (Vector3){1, 0, 0};
-      arrowAngle = 0;
-    }
-  }
+  // // Handle edge cases (parallel or anti-parallel vectors)
+  // if (axisLength < 0.0001f) {
+  //   // when unitvec is nearly parallel or opposite to +Y
+  //   if (endArrow.y < 0.0f) { // opposite
+  //     axis = (Vector3){1, 0, 0};
+  //     arrowAngle = PI;
+  //   } else { // same direction
+  //     axis = (Vector3){1, 0, 0};
+  //     arrowAngle = 0;
+  //   }
+  // }
   Quaternion q = QuaternionFromAxisAngle(Vector3Normalize(axis), arrowAngle);
   arrowModel.transform = QuaternionToMatrix(q);
 }

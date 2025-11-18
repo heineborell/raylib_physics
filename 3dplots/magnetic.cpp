@@ -14,7 +14,7 @@ int main() {
   SetTargetFPS(FPS);
 
   double xRange{
-      20.0}; // x will range from -4 to 4 but then changed by scrolling
+      30.0}; // x will range from -4 to 4 but then changed by scrolling
   double step{xRange * 2 / wavePoints}; // step size for plotting
   double length{step / 2};              // length of the vectors we draw
 
@@ -99,13 +99,26 @@ int main() {
       for (std::size_t y = 0; y < static_cast<std::size_t>(wavePoints); ++y) {
         for (std::size_t z = 0; z < static_cast<std::size_t>(wavePoints); ++z) {
 
-          Vector3 endArrow = Vector3Normalize(resultantB.Bfield[x][y][z]);
-          // Vector3 endArrow = Bfield_2.Bfield[x][y][z];
+          Vector3 endArrow_r = (resultantB.Bfield[x][y][z]);
+          Vector3 endArrow_1 = (Bfield_1.Bfield[x][y][z]);
+          Vector3 endArrow_2 = (Bfield_2.Bfield[x][y][z]);
           // Finally  draw arrow only for some x
           if (BOARD[x][y][z].x == 0) {
-            DrawLine3D(BOARD[x][y][z], Vector3Add(BOARD[x][y][z], endArrow),
-                       GREEN);
-            // transformArrowHead(x, y, z, Vx, endArrow, arrowModel, 3);
+            if (IsKeyDown(KEY_G)) {
+              DrawLine3D(
+                  BOARD[x][y][z],
+                  Vector3Add(BOARD[x][y][z], Vector3Scale(endArrow_1, 0.4)),
+                  YELLOW);
+              DrawLine3D(
+                  BOARD[x][y][z],
+                  Vector3Add(BOARD[x][y][z], Vector3Scale(endArrow_2, 0.4)),
+                  MAROON);
+            }
+            DrawLine3D(
+                BOARD[x][y][z],
+                Vector3Add(BOARD[x][y][z], Vector3Scale(endArrow_r, 0.4)),
+                GREEN);
+            // transformArrowHead(x, y, z, endArrow, arrowModel);
             // DrawModel(arrowModel, endArrow, 3.0f, WHITE);
           }
         }
