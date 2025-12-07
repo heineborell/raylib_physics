@@ -13,21 +13,15 @@ int main() {
   InitWindow(HEIGHT, WIDTH, "Vector PLots");
   SetTargetFPS(FPS);
 
-  double xRange{
-      10.0}; // x will range from -4 to 4 but then changed by scrolling
+  double xRange{4.0}; // x will range from -4 to 4 but then changed by scrolling
   double step{xRange * 2 / wavePoints}; // step size for plotting
   double length{step / 2};              // length of the vectors we draw
-  std::vector<Vector2> test_points{{400, 400}};
 
   std::vector<rgbValues> viridisColors = {
-      {0, 0, 255, 255},   // blue
-      {0, 64, 255, 255},  // blueish
-      {0, 128, 255, 255}, // sky blue
-      {0, 200, 200, 255}, // cyan
-      {0, 255, 0, 255},   // green
-      {255, 255, 0, 255}, // yellow
-      {255, 128, 0, 255}, // orange
-      {255, 0, 0, 255}    // red
+      {53, 42, 135, 255},   // dark blue
+      {19, 123, 190, 255},  // blue
+      {120, 190, 125, 255}, // green
+      {250, 250, 110, 255}  // yellow
   };
 
   while (!WindowShouldClose()) {
@@ -69,17 +63,15 @@ int main() {
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
 
-    Field resultant{};
     for (Vector2 point : points) {
       Vector2 screen_point{pullbackVector(point, xRange)};
-      Field eField{getEfield(screen_point, 1)};
-      resultant = sumFields(resultant, eField);
+      getPotential(screen_point, 1);
     }
-
-    drawEfield(resultant, viridisColors, length, xRange);
+    std::cout << potential[3][3] << '\n';
+    std::cout << potential[29][3] << '\n';
+    // drawPotential(viridisColors, xRange);
 
     drawCharges();
-    ClearBackground(BLACK);
 
     EndDrawing();
   }

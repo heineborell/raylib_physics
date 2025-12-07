@@ -17,24 +17,15 @@ int main() {
       10.0}; // x will range from -4 to 4 but then changed by scrolling
   double step{xRange * 2 / wavePoints}; // step size for plotting
   double length{step / 2};              // length of the vectors we draw
-  std::vector<Vector2> test_points{{400, 400}};
 
   std::vector<rgbValues> viridisColors = {
-      {0, 0, 255, 255},   // blue
-      {0, 64, 255, 255},  // blueish
-      {0, 128, 255, 255}, // sky blue
-      {0, 200, 200, 255}, // cyan
-      {0, 255, 0, 255},   // green
-      {255, 255, 0, 255}, // yellow
-      {255, 128, 0, 255}, // orange
-      {255, 0, 0, 255}    // red
+      {53, 42, 135, 255},   // dark blue
+      {19, 123, 190, 255},  // blue
+      {120, 190, 125, 255}, // green
+      {250, 250, 110, 255}  // yellow
   };
 
   while (!WindowShouldClose()) {
-
-    BeginDrawing();
-    ClearBackground(BLACK);
-    DrawFPS(10, 10);
 
     if (IsKeyDown(KEY_UP))
       xRange /= zoomSpeed; // zoom in
@@ -51,8 +42,10 @@ int main() {
     // start points set by variable step size
     for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
       for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
-        BOARD[y][x] = {static_cast<float>(-xRange + x * step),
-                       static_cast<float>(-xRange + y * step)};
+        int xx{static_cast<int>(x)};
+        int yy{static_cast<int>(y)};
+        BOARD[y][x] = {static_cast<float>(-xRange + xx * step),
+                       static_cast<float>(-xRange + yy * step)};
       }
     }
 
@@ -62,24 +55,21 @@ int main() {
             projectedVector(BOARD[y][x].x, BOARD[y][x].y, xRange)};
       }
     }
+    BeginDrawing();
+    ClearBackground(BLACK);
+    DrawFPS(10, 10);
+
+    for (std::size_t y{0}; y < static_cast<std::size_t>(wavePoints); ++y) {
+      for (std::size_t x{0}; x < static_cast<std::size_t>(wavePoints); ++x) {
+        DrawCircle(projectedBOARD[y][x].x, projectedBOARD[y][x].y, 1, MAROON);
+      }
+    }
     // Draw axes
     DrawLine(WIDTH / 2, 0, WIDTH / 2, HEIGHT, GRAY);
     DrawLine(0, HEIGHT / 2, WIDTH, HEIGHT / 2, GRAY);
 
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
-
-    Field resultant{};
-    for (Vector2 point : points) {
-      Vector2 screen_point{pullbackVector(point, xRange)};
-      Field eField{getEfield(screen_point, 1)};
-      resultant = sumFields(resultant, eField);
-    }
-
-    drawEfield(resultant, viridisColors, length, xRange);
-
-    drawCharges();
-    ClearBackground(BLACK);
 
     EndDrawing();
   }
