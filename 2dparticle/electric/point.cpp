@@ -31,6 +31,7 @@ int main() {
   while (!WindowShouldClose()) {
 
     BeginDrawing();
+    ClearBackground(BLACK);
     DrawFPS(10, 10);
 
     if (IsKeyDown(KEY_UP))
@@ -86,8 +87,6 @@ int main() {
       p.update();
       p.show();
     }
-
-    ClearBackground(BLACK);
 
     EndDrawing();
   }
