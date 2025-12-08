@@ -16,7 +16,6 @@ int main() {
   double xRange{4.0}; // x will range from -4 to 4 but then changed by scrolling
   double step{xRange * 2 / wavePoints}; // step size for plotting
   double length{step / 2};              // length of the vectors we draw
-  Particle test_particle{{0, 0}, {0, 0}, 1, 5};
 
   std::vector<rgbValues> viridisColors = {
       {0, 0, 255, 255},   // blue
@@ -79,22 +78,21 @@ int main() {
     drawCharges();
     // Particle stuff
     addParticle(xRange);
-    // std::cout << particles.size() << '\n';
-    for (Particle particle : particles) {
+    std::cout << particles.size() << '\n';
+    for (Particle p : particles) {
       Vector2 force{
-          resultant
-              .Efield[static_cast<int>((particle.m_pos.y + xRange) / step)]
-                     [static_cast<int>((particle.m_pos.x + xRange) / step)]};
+          resultant.Efield[static_cast<int>((p.m_pos.y + xRange) / step)]
+                          [static_cast<int>((p.m_pos.x + xRange) / step)]};
       // std::cout << particle.m_pos.x << "  " << particle.m_pos.y <<
       // '\n';
-      // std::cout << force.x << "  " << force.y << '\n';
+      std::cout << force.x << "  " << force.y << '\n';
       // std::cout << static_cast<int>((test_particle.m_pos.y + xRange) / step)
       //           << "  "
       //           << static_cast<int>((test_particle.m_pos.x + xRange) / step)
       //           << '\n';
-      particle.applyForce(force, step);
-      particle.update();
-      particle.show();
+      p.applyForce(force, step);
+      p.update();
+      p.show();
     }
 
     ClearBackground(BLACK);
