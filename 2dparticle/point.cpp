@@ -67,7 +67,7 @@ int main() {
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
 
     Field resultant{};
-    for (Vector2 point : points) {
+    for (Vector2 &point : points) {
       Vector2 screen_point{pullbackVector(point, xRange)};
       Field eField{getEfield(screen_point, 1)};
       resultant = sumFields(resultant, eField);
@@ -78,18 +78,10 @@ int main() {
     drawCharges();
     // Particle stuff
     addParticle(xRange);
-    std::cout << particles.size() << '\n';
-    for (Particle p : particles) {
+    for (Particle &p : particles) {
       Vector2 force{
           resultant.Efield[static_cast<int>((p.m_pos.y + xRange) / step)]
                           [static_cast<int>((p.m_pos.x + xRange) / step)]};
-      // std::cout << particle.m_pos.x << "  " << particle.m_pos.y <<
-      // '\n';
-      std::cout << force.x << "  " << force.y << '\n';
-      // std::cout << static_cast<int>((test_particle.m_pos.y + xRange) / step)
-      //           << "  "
-      //           << static_cast<int>((test_particle.m_pos.x + xRange) / step)
-      //           << '\n';
       p.applyForce(force, step);
       p.update();
       p.show();
