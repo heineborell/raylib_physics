@@ -272,11 +272,11 @@ void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
             end.y - sinf(angle + arrowAngle) * (length / 3), xRange)};
 
         // // Map x and y values to screen coordinates
-        efield.Efield[y][x] = {projectedVector(end.x, end.y, xRange)};
+        Vector2 Eprojected{projectedVector(end.x, end.y, xRange)};
 
-        DrawLineEx(efield.Efield[y][x], rightWing, 2, c);
-        DrawLineEx(efield.Efield[y][x], leftWing, 2, c);
-        DrawLineEx(projectedBOARD[y][x], efield.Efield[y][x], 2, c);
+        DrawLineEx(Eprojected, rightWing, 2, c);
+        DrawLineEx(Eprojected, leftWing, 2, c);
+        DrawLineEx(projectedBOARD[y][x], Eprojected, 2, c);
       }
     }
   }
@@ -311,7 +311,7 @@ Vector2 projectedVector(double x, double y, double xRange) {
   return projected;
 }
 
-// Projecting to screen coordinates
+// Projecting from screen coordinates
 Vector2 pullbackVector(Vector2 &screen, double xRange) {
   Vector2 pullback = {
       static_cast<float>(((2 * screen.x - WIDTH) * xRange) / WIDTH),

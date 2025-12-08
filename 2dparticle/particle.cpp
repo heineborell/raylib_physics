@@ -13,13 +13,13 @@ void Particle::update() {
   m_pos = Vector2Add(m_pos, m_vel);
 
   if (m_pos.x > 4.0f)
-    m_pos.x = 0.0f;
+    m_pos.x = -4.0f;
   if (m_pos.x < -4.0f)
-    m_pos.x = 0.0f;
+    m_pos.x = 4.0f;
   if (m_pos.y > 4.0f)
-    m_pos.y = 0.0f;
+    m_pos.y = -4.0f;
   if (m_pos.y < -4.0f)
-    m_pos.y = 0.0f;
+    m_pos.y = 4.0f;
 }
 
 void Particle::applyForce(Vector2 force, float step) {
