@@ -1,5 +1,6 @@
 #pragma once
 #include "RealVector.h"
+#include "particle.h"
 #include "raylib.h"
 #include "raymath.h"
 #include <cmath>
@@ -17,7 +18,7 @@ inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
 inline constexpr int NUM_PARTICLES{4000};
 
-inline constexpr int wavePoints{60};
+inline constexpr int wavePoints{40};
 inline constexpr double zoomSpeed{1.1};
 inline constexpr double arrowAngle{PI / 7};
 inline const double arrowSin{std::sin(arrowAngle)};

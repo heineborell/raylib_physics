@@ -32,3 +32,13 @@ void Particle::show() {
   Vector2 projected{projectedVector(m_pos.x, m_pos.y, 4.0f)};
   DrawCircle(projected.x, projected.y, PARTICLE_RADIUS, GREEN);
 }
+
+std::vector<Particle> particles{};
+void addParticle(double xRange) {
+  if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+    Vector2 mouse{GetMousePosition()};
+    particles.push_back({{pullbackVector(mouse, xRange)}, {0, 0}, 1, 5});
+  }
+  if (IsKeyPressed(KEY_R))
+    particles.clear();
+}

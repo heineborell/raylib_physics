@@ -78,20 +78,24 @@ int main() {
 
     drawCharges();
     // Particle stuff
-    Vector2 force{
-        resultant
-            .Efield[static_cast<int>((test_particle.m_pos.y + xRange) / step)]
-                   [static_cast<int>((test_particle.m_pos.x + xRange) / step)]};
-    // std::cout << test_particle.m_pos.x << "  " << test_particle.m_pos.y <<
-    // '\n';
-    // std::cout << force.x << "  " << force.y << '\n';
-    std::cout << static_cast<int>((test_particle.m_pos.y + xRange) / step)
-              << "  "
-              << static_cast<int>((test_particle.m_pos.x + xRange) / step)
-              << '\n';
-    test_particle.applyForce(force, step);
-    test_particle.update();
-    test_particle.show();
+    addParticle(xRange);
+    // std::cout << particles.size() << '\n';
+    for (Particle particle : particles) {
+      Vector2 force{
+          resultant
+              .Efield[static_cast<int>((particle.m_pos.y + xRange) / step)]
+                     [static_cast<int>((particle.m_pos.x + xRange) / step)]};
+      // std::cout << particle.m_pos.x << "  " << particle.m_pos.y <<
+      // '\n';
+      // std::cout << force.x << "  " << force.y << '\n';
+      // std::cout << static_cast<int>((test_particle.m_pos.y + xRange) / step)
+      //           << "  "
+      //           << static_cast<int>((test_particle.m_pos.x + xRange) / step)
+      //           << '\n';
+      particle.applyForce(force, step);
+      particle.update();
+      particle.show();
+    }
 
     ClearBackground(BLACK);
 

@@ -17,3 +17,6 @@ struct Particle {
   void update();
   void show();
 };
+
+extern std::vector<Particle> particles;
+void addParticle(double xRange);

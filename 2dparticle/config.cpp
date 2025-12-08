@@ -1,4 +1,5 @@
 #include "config.h"
+#include "particle.h"
 #include "raymath.h"
 #include <algorithm>
 #include <boost/math/quadrature/gauss_kronrod.hpp>
@@ -256,8 +257,8 @@ void drawEfield(Field &efield, std::vector<rgbValues> &colors, double length,
         Vector2 end = {
             static_cast<float>(BOARD[y][x].x),
             static_cast<float>(
-                BOARD[y][x].y)}; // this if statement checks if the x=y=0 so no
-                                 // electric field dont draw anything
+                BOARD[y][x].y)}; // this if statement checks if the x=y=0 so
+                                 // no electric field dont draw anything
       } else {
         double angle{atan2(efield.Efield[y][x].y, efield.Efield[y][x].x)};
         Vector2 end = {
