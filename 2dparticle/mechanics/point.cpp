@@ -37,7 +37,7 @@ int main() {
     pointp.update(dt, xRange);
     pointp.show();
     pointp.showTrace(BLUE);
-    pointp.showVel();
+    pointp.showVel(0.35, xRange, RED);
     // std::cout << pointp.m_pos.x << "  " << pointp.m_pos.y << '\n';
     // std::cout << pointp.m_vel.x << "  " << pointp.m_vel.y << '\n';
 

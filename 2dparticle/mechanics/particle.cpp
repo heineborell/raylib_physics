@@ -33,19 +33,35 @@ void Particle::applyAcc(Vector2 accelaration, float dt) {
 }
 
 void Particle::show() {
-  Vector2 projected{projectedVector(m_pos.x, m_pos.y, 4.0f)};
+  Vector2 projected{projectedVector(m_pos, 4.0f)};
   DrawCircle(projected.x, projected.y, PARTICLE_RADIUS, GREEN);
 }
 
 void Particle::showTrace(Color col) {
   trace.push_back(m_pos);
   for (Vector2 point : trace) {
-    Vector2 projected{projectedVector(point.x, point.y, 4.0f)};
+    Vector2 projected{projectedVector(point, 4.0f)};
     DrawCircle(projected.x, projected.y, 1, col);
   }
 }
 
-void Particle::showVel() { DrawLineEx(m_pos, m_vel, 1.0, RED); }
+void Particle::showVel(double length, double xRange, Color c) {
+  double angle{atan2(m_vel.y, m_vel.x)};
+  Vector2 end = {static_cast<float>(m_pos.x + cosf(angle) * length),
+                 static_cast<float>(m_pos.y + sinf(angle) * length)};
+  //
+  Vector2 leftWing = {
+      projectedVector(end.x - cosf(angle - arrowAngle) * (length / 3),
+                      end.y - sinf(angle - arrowAngle) * (length / 3), xRange)};
+  Vector2 rightWing = {
+      projectedVector(end.x - cosf(angle + arrowAngle) * (length / 3),
+                      end.y - sinf(angle + arrowAngle) * (length / 3), xRange)};
+
+  Vector2 vprojected{projectedVector(end, xRange)};
+  DrawLineEx(vprojected, rightWing, 2, c);
+  DrawLineEx(vprojected, leftWing, 2, c);
+  DrawLineEx(projectedVector(m_pos, 4), vprojected, 2, c);
+}
 
 std::vector<Particle> particles{};
 void addParticle(double xRange) {

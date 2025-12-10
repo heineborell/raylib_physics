@@ -90,5 +90,6 @@ rgbValues getColorValue(double value, double minVal, double maxVal,
                         const std::vector<rgbValues> &colors);
 Magnitudes getMaxLength(std::vector<std::vector<double>> &array);
 Vector2 projectedVector(double x, double y, double xRange);
+Vector2 projectedVector(Vector2 vec, double xRange);
 Vector2 pullbackVector(Vector2 &screen, double xRange);
 Vector2 Rotate(Vector2 v, double angle);

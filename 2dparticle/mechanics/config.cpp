@@ -303,6 +303,15 @@ void drawPotential(std::vector<rgbValues> &colors, double xRange) {
 }
 
 // Projecting to screen coordinates
+Vector2 projectedVector(Vector2 vec, double xRange) {
+  float width{static_cast<float>(WIDTH)};
+  float height{static_cast<float>(HEIGHT)};
+  Vector2 projected = {
+      static_cast<float>(width / 2 + vec.x * (width / (2 * xRange))),
+      static_cast<float>(height / 2 - vec.y * (height / (2 * xRange)))};
+  return projected;
+}
+
 Vector2 projectedVector(double x, double y, double xRange) {
   float width{static_cast<float>(WIDTH)};
   float height{static_cast<float>(HEIGHT)};
