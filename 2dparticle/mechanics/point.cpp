@@ -36,9 +36,10 @@ int main() {
     pointp.applyAcc(accelaration, dt);
     pointp.update(dt, xRange);
     pointp.show();
-    pointp.showTrace();
+    pointp.showTrace(BLUE);
+    pointp.showVel();
     // std::cout << pointp.m_pos.x << "  " << pointp.m_pos.y << '\n';
-    std::cout << pointp.m_vel.x << "  " << pointp.m_vel.y << '\n';
+    // std::cout << pointp.m_vel.x << "  " << pointp.m_vel.y << '\n';
 
     EndDrawing();
   }

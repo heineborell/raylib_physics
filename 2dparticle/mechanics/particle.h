@@ -16,7 +16,8 @@ struct Particle {
   void applyForce(Vector2 force, float step);
   void applyAcc(Vector2 accelaration, float dt);
   void update(float dt, float xRange);
-  void showTrace();
+  void showTrace(Color col);
+  void showVel();
   void show();
 };
 

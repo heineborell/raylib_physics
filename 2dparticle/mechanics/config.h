@@ -8,8 +8,8 @@
 
 using std::vector;
 
-inline constexpr int WIDTH{1000};
-inline constexpr int HEIGHT{1000};
+inline constexpr int WIDTH{900};
+inline constexpr int HEIGHT{900};
 inline constexpr int FPS{60};
 
 inline constexpr int PARTICLE_RADIUS{4};

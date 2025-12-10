@@ -37,13 +37,15 @@ void Particle::show() {
   DrawCircle(projected.x, projected.y, PARTICLE_RADIUS, GREEN);
 }
 
-void Particle::showTrace() {
+void Particle::showTrace(Color col) {
   trace.push_back(m_pos);
   for (Vector2 point : trace) {
     Vector2 projected{projectedVector(point.x, point.y, 4.0f)};
-    DrawCircle(projected.x, projected.y, 1, RED);
+    DrawCircle(projected.x, projected.y, 1, col);
   }
 }
+
+void Particle::showVel() { DrawLineEx(m_pos, m_vel, 1.0, RED); }
 
 std::vector<Particle> particles{};
 void addParticle(double xRange) {
