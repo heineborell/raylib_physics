@@ -46,21 +46,11 @@ void Particle::showTrace(Color col) {
 }
 
 void Particle::showVel(double length, double xRange, Color c) {
-  double angle{atan2(m_vel.y, m_vel.x)};
-  Vector2 end = {static_cast<float>(m_pos.x + cosf(angle) * length),
-                 static_cast<float>(m_pos.y + sinf(angle) * length)};
-  //
-  Vector2 leftWing = {
-      projectedVector(end.x - cosf(angle - arrowAngle) * (length / 3),
-                      end.y - sinf(angle - arrowAngle) * (length / 3), xRange)};
-  Vector2 rightWing = {
-      projectedVector(end.x - cosf(angle + arrowAngle) * (length / 3),
-                      end.y - sinf(angle + arrowAngle) * (length / 3), xRange)};
-
-  Vector2 vprojected{projectedVector(end, xRange)};
-  DrawLineEx(vprojected, rightWing, 2, c);
-  DrawLineEx(vprojected, leftWing, 2, c);
-  DrawLineEx(projectedVector(m_pos, 4), vprojected, 2, c);
+  Vector2 x_vel{m_vel.x, 0};
+  Vector2 y_vel{0, m_vel.y};
+  drawVector(x_vel, m_pos, length, xRange, YELLOW); // draw resultant
+  drawVector(y_vel, m_pos, length, xRange, YELLOW); // draw resultant
+  drawVector(m_vel, m_pos, length, xRange, c);      // draw resultant
 }
 
 std::vector<Particle> particles{};
