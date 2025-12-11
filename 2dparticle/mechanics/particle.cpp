@@ -48,9 +48,13 @@ void Particle::showTrace(Color col) {
 void Particle::showVel(double length, double xRange, Color c) {
   Vector2 x_vel{m_vel.x, 0};
   Vector2 y_vel{0, m_vel.y};
-  drawVector(x_vel, m_pos, length, xRange, YELLOW); // draw resultant
-  drawVector(y_vel, m_pos, length, xRange, YELLOW); // draw resultant
-  drawVector(m_vel, m_pos, length, xRange, c);      // draw resultant
+  float ratio{Vector2Length(x_vel) / Vector2Length(y_vel)};
+  float sum{Vector2Length(x_vel) + Vector2Length(y_vel)};
+  drawVector(x_vel, m_pos, length / (1 + 1 / ratio), xRange,
+             YELLOW); // draw x resultant
+  drawVector(y_vel, m_pos, length / (ratio + 1), xRange,
+             YELLOW);                          // draw y resultant
+  drawVector(m_vel, m_pos, length, xRange, c); // draw resultant
 }
 
 std::vector<Particle> particles{};
