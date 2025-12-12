@@ -1,4 +1,5 @@
 #pragma once
+#include <mutex>
 #include <raylib.h>
 #include <vector>
 using std::vector;
@@ -15,7 +16,10 @@ struct Particle {
 
   void applyForce(Vector2 force, float step);
   void applyAcc(Vector2 accelaration, float dt);
-  void update(float dt, float xRange);
+  void updatePos(float dt, float xRange);
+  void updatePar(const Vector2 &accelaration, const float &dt,
+                 const float &xRange);
+  void getTrace();
   void showTrace(Color col);
   void showVel(double length, double xRange, Color c, const Vector2 &start_vel);
   void show();

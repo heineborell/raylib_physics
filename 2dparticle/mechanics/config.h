@@ -21,6 +21,7 @@ inline constexpr double zoomSpeed{1.1};
 inline constexpr double arrowAngle{PI / 7};
 inline const double arrowSin{std::sin(arrowAngle)};
 inline const double arrowCos{std::cos(arrowAngle)};
+extern bool isRunning;
 
 Vector2 projectedVector(double x, double y, double xRange);
 Vector2 projectedVector(Vector2 vec, double xRange);

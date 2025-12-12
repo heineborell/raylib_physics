@@ -3,12 +3,13 @@
 #include <iostream>
 #include <raylib.h>
 #include <raymath.h>
+#include <thread>
 
 Particle::Particle() {};
 Particle::Particle(Vector2 pos, Vector2 vel, float min_speed, float max_speed)
     : m_pos{pos}, m_vel(vel), m_min_speed(min_speed), m_max_speed(max_speed) {}
 
-void Particle::update(float dt, float xRange) {
+void Particle::updatePos(float dt, float xRange) {
   m_pos = Vector2Add(m_pos, Vector2Scale(m_vel, dt));
 
   // wrap around
@@ -37,11 +38,14 @@ void Particle::show() {
   DrawCircle(projected.x, projected.y, PARTICLE_RADIUS, GREEN);
 }
 
+void Particle::getTrace() {
+  Vector2 projected{projectedVector(m_pos, 4.0f)};
+  trace.push_back(projected);
+}
+
 void Particle::showTrace(Color col) {
-  trace.push_back(m_pos);
   for (Vector2 point : trace) {
-    Vector2 projected{projectedVector(point, 4.0f)};
-    DrawCircle(projected.x, projected.y, 1, col);
+    DrawCircle(point.x, point.y, 1, col);
   }
 }
 
@@ -57,6 +61,17 @@ void Particle::showVel(double length, double xRange, Color c,
   drawVector(y_vel, m_pos, abs(m_vel.y / (start_vel.y / length)), xRange,
              YELLOW);                          // draw y resultant
   drawVector(m_vel, m_pos, length, xRange, c); // draw resultant
+}
+
+void Particle::updatePar(const Vector2 &accelaration, const float &dt,
+                         const float &xRange) {
+  while (isRunning) {
+    std::cout << std::this_thread::get_id() << '\n';
+    Particle::applyAcc(accelaration, dt);
+    Particle::updatePos(dt, xRange);
+    Particle::getTrace();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  }
 }
 
 std::vector<Particle> particles{};
