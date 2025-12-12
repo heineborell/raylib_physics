@@ -45,14 +45,16 @@ void Particle::showTrace(Color col) {
   }
 }
 
-void Particle::showVel(double length, double xRange, Color c) {
+void Particle::showVel(double length, double xRange, Color c,
+                       const Vector2 &start_vel) {
   Vector2 x_vel{m_vel.x, 0};
   Vector2 y_vel{0, m_vel.y};
   float ratio{Vector2Length(x_vel) / Vector2Length(y_vel)};
   float sum{Vector2Length(x_vel) + Vector2Length(y_vel)};
-  drawVector(x_vel, m_pos, length / (1 + 1 / ratio), xRange,
-             YELLOW); // draw x resultant
-  drawVector(y_vel, m_pos, length / (ratio + 1), xRange,
+  drawVector(x_vel, m_pos, abs(m_vel.x / (start_vel.x / length)), xRange,
+             YELLOW); // draw x resultant, scaling with start velocity and
+                      // length so that it doesn't explode on screen
+  drawVector(y_vel, m_pos, abs(m_vel.y / (start_vel.y / length)), xRange,
              YELLOW);                          // draw y resultant
   drawVector(m_vel, m_pos, length, xRange, c); // draw resultant
 }

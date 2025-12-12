@@ -14,8 +14,6 @@ int main() {
   SetTargetFPS(FPS);
 
   double xRange{4.0}; // x will range from -4 to 4 but then changed by scrolling
-  double step{xRange * 2 / wavePoints}; // step size for plotting
-  double length{step / 2};              // length of the vectors we draw
   Particle pointp{{0, 0}, {4, 4}, 1, 5};
   Vector2 accelaration{0, -9.8};
 
@@ -24,7 +22,7 @@ int main() {
     BeginDrawing();
     ClearBackground(BLACK);
     DrawFPS(10, 10);
-    float dt{GetFrameTime() / 3};
+    float dt{GetFrameTime() / 5};
 
     // Draw axes
     DrawLine(WIDTH / 2, 0, WIDTH / 2, HEIGHT, GRAY);
@@ -32,10 +30,11 @@ int main() {
 
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
+    DrawRectangleLines(10, 10, 80, 80, GRAY);
 
     pointp.applyAcc(accelaration, dt);
     pointp.update(dt, xRange);
-    pointp.showVel(0.35, xRange, RED);
+    pointp.showVel(0.35, xRange, RED, {4, 4});
     pointp.show();
     pointp.showTrace(BLUE);
     // std::cout << pointp.m_pos.x << "  " << pointp.m_pos.y << '\n';
