@@ -61,17 +61,17 @@ double Bzfield(Vector3 &r, float radius,
       f, 0, integral_lim);
 }
 
-Vector3 getBfield(int x, int y, int z, Vector3 &Vx, double length,
-                  float y_shift) {
-
-  // Compute unit vector of the B field B=vXr
-  Vector3 BVec = Vector3CrossProduct(
-      Vx, {BOARD[x][y][z].x, BOARD[x][y][z].y - y_shift, BOARD[x][y][z].z});
-  float distance{Vector3Length(
-      {BOARD[x][y][z].x, BOARD[x][y][z].y - y_shift, BOARD[x][y][z].z})};
-
-  return Vector3Normalize(BVec / pow(distance, 3));
-}
+// Vector3 getBfield(int x, int y, int z, Vector3 &Vx, double length,
+//                   float y_shift) {
+//
+//   // Compute unit vector of the B field B=vXr
+//   Vector3 BVec = Vector3CrossProduct(
+//       Vx, {BOARD[x][y][z].x, BOARD[x][y][z].y - y_shift, BOARD[x][y][z].z});
+//   float distance{Vector3Length(
+//       {BOARD[x][y][z].x, BOARD[x][y][z].y - y_shift, BOARD[x][y][z].z})};
+//
+//   return Vector3Normalize(BVec / pow(distance, 3));
+// }
 
 Field sumFields(Field &Bfield_1, Field &Bfield_2) {
 

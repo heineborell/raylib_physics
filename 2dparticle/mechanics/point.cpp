@@ -37,8 +37,6 @@ int main() {
     pointp.showVel(0.35, xRange, RED, {4, 4});
     pointp.show();
     pointp.showTrace(BLUE);
-    // std::cout << pointp.m_pos.x << "  " << pointp.m_pos.y << '\n';
-    // std::cout << pointp.m_vel.x << "  " << pointp.m_vel.y << '\n';
 
     EndDrawing();
   }
