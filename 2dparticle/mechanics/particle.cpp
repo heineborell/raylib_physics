@@ -9,7 +9,7 @@ Particle::Particle() {};
 Particle::Particle(Vector2 pos, Vector2 vel, float min_speed, float max_speed)
     : m_pos{pos}, m_vel(vel), m_min_speed(min_speed), m_max_speed(max_speed) {}
 
-void Particle::updatePos(float dt, float xRange) {
+void Particle::updatePos(float &dt, float xRange) {
   m_pos = Vector2Add(m_pos, Vector2Scale(m_vel, dt));
 
   // wrap around
@@ -23,13 +23,13 @@ void Particle::updatePos(float dt, float xRange) {
     m_pos.y = xRange;
 }
 
-void Particle::applyForce(Vector2 force, float step) {
+void Particle::applyForce(Vector2 &force) {
   m_vel = Vector2Add(m_vel, force);
   m_vel = Vector2ClampValue(m_vel, 0.0, 0.03);
   // m_vel = m_vel.limit(m_min_speed, m_max_speed);
 }
 
-void Particle::applyAcc(Vector2 accelaration, float dt) {
+void Particle::applyAcc(Vector2 &accelaration, float &dt) {
   m_vel = Vector2Add(m_vel, Vector2Scale(accelaration, dt));
 }
 
@@ -63,15 +63,11 @@ void Particle::showVel(double length, double xRange, Color c,
   drawVector(m_vel, m_pos, length, xRange, c); // draw resultant
 }
 
-void Particle::updatePar(const Vector2 &accelaration, const float &dt,
+void Particle::updatePar(Vector2 &accelaration, float &dt,
                          const float &xRange) {
-  while (isRunning) {
-    std::cout << std::this_thread::get_id() << '\n';
-    Particle::applyAcc(accelaration, dt);
-    Particle::updatePos(dt, xRange);
-    Particle::getTrace();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  }
+  Particle::applyAcc(accelaration, dt);
+  Particle::updatePos(dt, xRange);
+  Particle::getTrace();
 }
 
 std::vector<Particle> particles{};
