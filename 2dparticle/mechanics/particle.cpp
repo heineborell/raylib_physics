@@ -6,8 +6,7 @@
 #include <thread>
 
 Particle::Particle() {};
-Particle::Particle(Vector2 pos, Vector2 vel, float min_speed, float max_speed)
-    : m_pos{pos}, m_vel(vel), m_min_speed(min_speed), m_max_speed(max_speed) {}
+Particle::Particle(Vector2 pos, Vector2 vel) : m_pos{pos}, m_vel(vel) {}
 
 void Particle::updatePos(float &dt, float xRange) {
   m_pos = Vector2Add(m_pos, Vector2Scale(m_vel, dt));
@@ -26,7 +25,6 @@ void Particle::updatePos(float &dt, float xRange) {
 void Particle::applyForce(Vector2 &force) {
   m_vel = Vector2Add(m_vel, force);
   m_vel = Vector2ClampValue(m_vel, 0.0, 0.03);
-  // m_vel = m_vel.limit(m_min_speed, m_max_speed);
 }
 
 void Particle::applyAcc(Vector2 &accelaration, float &dt) {
@@ -70,12 +68,12 @@ void Particle::updatePar(Vector2 &accelaration, float &dt,
   Particle::getTrace();
 }
 
-std::vector<Particle> particles{};
-void addParticle(double xRange) {
-  if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-    Vector2 mouse{GetMousePosition()};
-    particles.push_back({{pullbackVector(mouse, xRange)}, {0, 0}, 1, 5});
-  }
-  if (IsKeyPressed(KEY_R))
-    particles.clear();
-}
+// std::vector<Particle> particles{};
+// void addParticle(double xRange) {
+//   if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+//     Vector2 mouse{GetMousePosition()};
+//     particles.push_back({{pullbackVector(mouse, xRange)}, {0, 0}, 1, 5});
+//   }
+//   if (IsKeyPressed(KEY_R))
+//     particles.clear();
+// }

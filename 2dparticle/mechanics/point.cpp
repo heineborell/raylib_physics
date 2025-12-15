@@ -1,3 +1,4 @@
+#include "Random.h"
 #include "config.h"
 #include "particle.h"
 #include <chrono>
@@ -15,7 +16,8 @@ bool isRunning = true;
 std::mutex gLock;
 std::condition_variable gConditionVariable;
 
-void updater(Particle &point, Vector2 &accelaration, float &dt, double xRange) {
+void updater(std::vector<Particle> &pparticles, Vector2 &accelaration,
+             float &dt, double xRange) {
   using clock = std::chrono::steady_clock;
   auto next = clock::now();
   while (isRunning) {
@@ -23,19 +25,21 @@ void updater(Particle &point, Vector2 &accelaration, float &dt, double xRange) {
     {
       std::unique_lock<std::mutex> lock(gLock);
       // Do our work, because we have the lock
-      //
-      point.updatePar(accelaration, dt, xRange);
+      for (Particle &point : pparticles)
+        point.updatePar(accelaration, dt, xRange);
     }
     std::this_thread::sleep_until(next);
   }
 }
 //
-void plotter(Particle &point, double xRange) {
+void plotter(std::vector<Particle> &pparticles, double xRange) {
   std::unique_lock<std::mutex> lock(gLock);
 
-  point.showVel(0.35, xRange, RED, {4, 4});
-  point.show();
-  point.showTrace(BLUE);
+  for (Particle &point : pparticles) {
+    point.showVel(0.35, xRange, RED, {4, 4});
+    point.show();
+    point.showTrace(BLUE);
+  }
 }
 
 int main() {
@@ -43,12 +47,22 @@ int main() {
   InitWindow(HEIGHT, WIDTH, "Particle trajectory plot");
   // SetTargetFPS(FPS);
 
-  double xRange{4.0}; // x will range from -4 to 4 but then changed by scrolling
-  Particle pointp{{0, 0}, {4, 4}, 1, 5};
+  double xRange{4.0};
+
+  // create particles with random initial positions and velocities
+  std::vector<Particle> pparticles;
+  for (int i{0}; i < 5; ++i) {
+    Vector2 initialPosition{static_cast<float>(Random::get(0, 4)),
+                            static_cast<float>(Random::get(0, 4))};
+    Vector2 initialVelocity{static_cast<float>(Random::get(0, 4)),
+                            static_cast<float>(Random::get(0, 4))};
+    pparticles.push_back(Particle{initialPosition, initialVelocity});
+  }
   Vector2 accelaration{0, -9.8};
   float dt{1.0f / 60.0f};
-  std::thread updateThread(updater, std::ref(pointp), std::ref(accelaration),
-                           std::ref(dt), xRange);
+
+  std::thread updateThread(updater, std::ref(pparticles),
+                           std::ref(accelaration), std::ref(dt), xRange);
 
   while (isRunning) {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
@@ -65,7 +79,7 @@ int main() {
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
     DrawRectangleLines(10, 10, 80, 80, GRAY);
-    plotter(pointp, xRange);
+    plotter(pparticles, xRange);
 
     EndDrawing();
   }
