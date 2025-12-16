@@ -15,7 +15,7 @@ struct Particle {
   void applyForce(Vector2 &force);
   void applyAcc(Vector2 &accelaration, float &dt);
   void updatePos(float &dt, float xRange);
-  void momentumConservation(std::vector<Particle> &pparticles);
+  void momentumConservation(std::vector<Particle> &particleArray);
   void updatePar(Vector2 &accelaration, float &dt, const float &xRange,
                  std::vector<Particle> &pparticle);
   void getTrace();

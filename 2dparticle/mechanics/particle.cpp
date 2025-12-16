@@ -67,8 +67,8 @@ void Particle::showVel(double length, double xRange, Color c,
 void Particle::updatePar(Vector2 &accelaration, float &dt, const float &xRange,
                          std::vector<Particle> &pparticle) {
   Particle::applyAcc(accelaration, dt);
-  Particle::momentumConservation(pparticle);
   Particle::updatePos(dt, xRange);
+  Particle::momentumConservation(pparticle);
   Particle::getTrace();
 }
 
@@ -90,7 +90,7 @@ void updater(std::vector<Particle> &pparticles, Vector2 &accelaration,
   using clock = std::chrono::steady_clock;
   auto next = clock::now(); // take a note of current time
   while (isRunning) {
-    next += std::chrono::milliseconds(30); // increment your time by delta t
+    next += std::chrono::milliseconds(16); // increment your time by delta t
     {
       std::unique_lock<std::mutex> lock(gLock);
       // Do our work, because we have the lock
@@ -113,11 +113,12 @@ void plotter(std::vector<Particle> &pparticles, double xRange) {
     // point.showTrace(BLUE);
   }
 }
-void Particle::momentumConservation(std::vector<Particle> &pparticles) {
-  for (Particle m2 : pparticles) {
-    if (Vector2Equals(m_pos, m2.m_pos) && this != &m2) {
+void Particle::momentumConservation(std::vector<Particle> &particleArray) {
+  for (Particle &m2 : particleArray) {
+    if (this >= &m2)
+      continue;
+    if (Vector2Distance(m_pos, m2.m_pos) < 0.1) {
       Vector2 normal{Vector2Normalize(m_pos - m2.m_pos)};
-      std::cout << "collision!" << '\n';
       Vector2 velocityDifference{m_vel - m2.m_vel};
       m_vel = m_vel - Vector2Scale(normal, Vector2DotProduct(velocityDifference,
                                                              normal));

@@ -18,11 +18,11 @@ int main() {
 
   // create particles with random initial positions and velocities
   std::vector<Particle> pparticles;
-  for (int i{0}; i < 3; ++i) {
+  for (int i{0}; i < 500; ++i) {
     Vector2 initialPosition{static_cast<float>(Random::get(0, 4)),
                             static_cast<float>(Random::get(0, 4))};
-    Vector2 initialVelocity{static_cast<float>(Random::get(-2, 4)),
-                            static_cast<float>(Random::get(-2, 4))};
+    Vector2 initialVelocity{static_cast<float>(Random::get(-10, 10)),
+                            static_cast<float>(Random::get(-10, 10))};
     pparticles.push_back(Particle{initialPosition, initialVelocity});
   }
   Vector2 accelaration{0, 0};
