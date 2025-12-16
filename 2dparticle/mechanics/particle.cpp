@@ -117,7 +117,7 @@ void Particle::momentumConservation(std::vector<Particle> &particleArray) {
   for (Particle &m2 : particleArray) {
     if (this >= &m2)
       continue;
-    if (Vector2Distance(m_pos, m2.m_pos) < 0.1) {
+    if (Vector2Distance(m_pos, m2.m_pos) < 0.06) {
       Vector2 normal{Vector2Normalize(m_pos - m2.m_pos)};
       Vector2 velocityDifference{m_vel - m2.m_vel};
       m_vel = m_vel - Vector2Scale(normal, Vector2DotProduct(velocityDifference,
