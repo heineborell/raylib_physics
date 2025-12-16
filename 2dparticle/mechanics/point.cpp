@@ -2,45 +2,12 @@
 #include "config.h"
 #include "particle.h"
 #include <chrono>
-#include <condition_variable>
-#include <cstddef>
-#include <cstdlib>
 #include <iostream>
 #include <raylib.h>
 #include <raymath.h>
 #include <sys/types.h>
 #include <thread>
 #include <vector>
-
-bool isRunning = true;
-std::mutex gLock;
-std::condition_variable gConditionVariable;
-
-void updater(std::vector<Particle> &pparticles, Vector2 &accelaration,
-             float &dt, double xRange) {
-  using clock = std::chrono::steady_clock;
-  auto next = clock::now();
-  while (isRunning) {
-    next += std::chrono::milliseconds(30);
-    {
-      std::unique_lock<std::mutex> lock(gLock);
-      // Do our work, because we have the lock
-      for (Particle &point : pparticles)
-        point.updatePar(accelaration, dt, xRange);
-    }
-    std::this_thread::sleep_until(next);
-  }
-}
-//
-void plotter(std::vector<Particle> &pparticles, double xRange) {
-  std::unique_lock<std::mutex> lock(gLock);
-
-  for (Particle &point : pparticles) {
-    point.showVel(0.35, xRange, RED, {4, 4});
-    point.show();
-    point.showTrace(BLUE);
-  }
-}
 
 int main() {
 
@@ -51,14 +18,14 @@ int main() {
 
   // create particles with random initial positions and velocities
   std::vector<Particle> pparticles;
-  for (int i{0}; i < 5; ++i) {
+  for (int i{0}; i < 3; ++i) {
     Vector2 initialPosition{static_cast<float>(Random::get(0, 4)),
                             static_cast<float>(Random::get(0, 4))};
-    Vector2 initialVelocity{static_cast<float>(Random::get(0, 4)),
-                            static_cast<float>(Random::get(0, 4))};
+    Vector2 initialVelocity{static_cast<float>(Random::get(-2, 4)),
+                            static_cast<float>(Random::get(-2, 4))};
     pparticles.push_back(Particle{initialPosition, initialVelocity});
   }
-  Vector2 accelaration{0, -9.8};
+  Vector2 accelaration{0, 0};
   float dt{1.0f / 60.0f};
 
   std::thread updateThread(updater, std::ref(pparticles),
@@ -78,8 +45,9 @@ int main() {
 
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
-    DrawRectangleLines(10, 10, 80, 80, GRAY);
     plotter(pparticles, xRange);
+    // DrawRectangleLines(10, 30, 220, 220, GRAY);
+    // DrawRectangle(10, 30, 220, 220, BLACK);
 
     EndDrawing();
   }

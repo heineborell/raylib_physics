@@ -5,27 +5,30 @@
 #include <raymath.h>
 #include <thread>
 
+bool isRunning = true;
+std::mutex gLock;
+
 Particle::Particle() {};
 Particle::Particle(Vector2 pos, Vector2 vel) : m_pos{pos}, m_vel(vel) {}
 
 void Particle::updatePos(float &dt, float xRange) {
   m_pos = Vector2Add(m_pos, Vector2Scale(m_vel, dt));
 
-  // wrap around
+  // wall collisions
   if (m_pos.x > xRange)
-    m_pos.x = -xRange;
+    m_vel.x = -m_vel.x;
   if (m_pos.x < -xRange)
-    m_pos.x = xRange;
+    m_vel.x = -m_vel.x;
   if (m_pos.y > xRange)
-    m_pos.y = -xRange;
+    m_vel.y = -m_vel.y;
   if (m_pos.y < -xRange)
-    m_pos.y = xRange;
+    m_vel.y = -m_vel.y;
 }
 
-void Particle::applyForce(Vector2 &force) {
-  m_vel = Vector2Add(m_vel, force);
-  m_vel = Vector2ClampValue(m_vel, 0.0, 0.03);
-}
+// void Particle::applyForce(Vector2 &force) {
+//   m_vel = Vector2Add(m_vel, force);
+//   m_vel = Vector2ClampValue(m_vel, 0.0, 0.03);
+// }
 
 void Particle::applyAcc(Vector2 &accelaration, float &dt) {
   m_vel = Vector2Add(m_vel, Vector2Scale(accelaration, dt));
@@ -61,9 +64,10 @@ void Particle::showVel(double length, double xRange, Color c,
   drawVector(m_vel, m_pos, length, xRange, c); // draw resultant
 }
 
-void Particle::updatePar(Vector2 &accelaration, float &dt,
-                         const float &xRange) {
+void Particle::updatePar(Vector2 &accelaration, float &dt, const float &xRange,
+                         std::vector<Particle> &pparticle) {
   Particle::applyAcc(accelaration, dt);
+  Particle::momentumConservation(pparticle);
   Particle::updatePos(dt, xRange);
   Particle::getTrace();
 }
@@ -77,3 +81,49 @@ void Particle::updatePar(Vector2 &accelaration, float &dt,
 //   if (IsKeyPressed(KEY_R))
 //     particles.clear();
 // }
+//
+//
+// below is updater and plotter
+//
+void updater(std::vector<Particle> &pparticles, Vector2 &accelaration,
+             float &dt, double xRange) {
+  using clock = std::chrono::steady_clock;
+  auto next = clock::now(); // take a note of current time
+  while (isRunning) {
+    next += std::chrono::milliseconds(30); // increment your time by delta t
+    {
+      std::unique_lock<std::mutex> lock(gLock);
+      // Do our work, because we have the lock
+      for (Particle &point : pparticles)
+        point.updatePar(accelaration, dt, xRange, pparticles);
+    }
+    std::this_thread::sleep_until(
+        next); // sleep this thread until noted time+delta t, so good thing is
+               // if this your computation is longer than the delta t this
+               // immediately continues
+  }
+}
+//
+void plotter(std::vector<Particle> &pparticles, double xRange) {
+  std::unique_lock<std::mutex> lock(gLock);
+
+  for (Particle &point : pparticles) {
+    // point.showVel(0.35, xRange, RED, {4, 4});
+    point.show();
+    // point.showTrace(BLUE);
+  }
+}
+void Particle::momentumConservation(std::vector<Particle> &pparticles) {
+  for (Particle m2 : pparticles) {
+    if (Vector2Equals(m_pos, m2.m_pos) && this != &m2) {
+      Vector2 normal{Vector2Normalize(m_pos - m2.m_pos)};
+      std::cout << "collision!" << '\n';
+      Vector2 velocityDifference{m_vel - m2.m_vel};
+      m_vel = m_vel - Vector2Scale(normal, Vector2DotProduct(velocityDifference,
+                                                             normal));
+      m2.m_vel =
+          m2.m_vel +
+          Vector2Scale(normal, Vector2DotProduct(velocityDifference, normal));
+    }
+  }
+}
