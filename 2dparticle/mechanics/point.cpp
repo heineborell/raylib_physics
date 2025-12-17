@@ -1,10 +1,13 @@
 #include "Random.h"
 #include "config.h"
 #include "particle.h"
+#include <GL/gl.h>
 #include <chrono>
+#include <cmath>
 #include <iostream>
 #include <raylib.h>
 #include <raymath.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <thread>
 #include <vector>
@@ -15,23 +18,26 @@ int main() {
   // SetTargetFPS(FPS);
 
   double xRange{4.0};
+  printf("Renderer: %s\n", glGetString(GL_RENDERER));
+  printf("Vendor:   %s\n", glGetString(GL_VENDOR));
 
   // create particles with random initial positions and velocities
   std::vector<Particle> pparticles;
+  float speed{4.0f};
 
   for (int i{0}; i < NUM_PARTICLES; ++i) {
-    // Vector2 initialPosition{static_cast<float>(Random::get(0, 4)),
-    //                         static_cast<float>(Random::get(0, 4))};
-    // Vector2 initialVelocity{static_cast<float>(Random::get(-10, 10)),
-    //                         static_cast<float>(Random::get(-10, 10))};
     if (i < NUM_PARTICLES / 2) {
+      int angle{Random::get(1, 20)};
       Vector2 initialPosition{3, static_cast<float>(Random::get(-4, 4))};
-      Vector2 initialVelocity{-3, static_cast<float>(Random::get(-4, 4))};
+      Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
+                              speed * std::sin(PI / (2 * angle))};
       pparticles.push_back(Particle{initialPosition, initialVelocity});
     }
     if (i > NUM_PARTICLES / 2) {
+      int angle{Random::get(1, 20)};
       Vector2 initialPosition{-3, static_cast<float>(Random::get(-4, 4))};
-      Vector2 initialVelocity{3, static_cast<float>(Random::get(-4, 4))};
+      Vector2 initialVelocity{speed * std::cos(PI / (2 * angle)),
+                              speed * std::sin(PI / (2 * angle))};
       pparticles.push_back(Particle{initialPosition, initialVelocity});
     }
   }
