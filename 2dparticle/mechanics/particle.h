@@ -4,7 +4,8 @@
 #include <vector>
 using std::vector;
 
-struct Particle {
+class Particle {
+public:
   Vector2 m_pos{};
   Vector2 m_vel{};
   std::vector<Vector2> trace{};
@@ -16,12 +17,19 @@ struct Particle {
   void applyAcc(Vector2 &accelaration, float &dt);
   void updatePos(float &dt, float xRange);
   void momentumConservation(std::vector<Particle> &particleArray);
+  void addToSpeeds(std::size_t i);
+  static void printSpeeds();
+  void binIndex();
   void updatePar(Vector2 &accelaration, float &dt, const float &xRange,
                  std::vector<Particle> &pparticle);
   void getTrace();
   void showTrace(Color col);
   void showVel(double length, double xRange, Color c, const Vector2 &start_vel);
   void show();
+
+private:
+  static std::vector<float> speeds;
+  static std::vector<int> bins;
 };
 
 extern std::vector<Particle> particles;

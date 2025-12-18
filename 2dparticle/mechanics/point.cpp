@@ -32,8 +32,7 @@ int main() {
       Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
                               speed * std::sin(PI / (2 * angle))};
       pparticles.push_back(Particle{initialPosition, initialVelocity});
-    }
-    if (i > NUM_PARTICLES / 2) {
+    } else {
       int angle{Random::get(1, 20)};
       Vector2 initialPosition{-3, static_cast<float>(Random::get(-4, 4))};
       Vector2 initialVelocity{speed * std::cos(PI / (2 * angle)),
@@ -41,8 +40,10 @@ int main() {
       pparticles.push_back(Particle{initialPosition, initialVelocity});
     }
   }
+
   Vector2 accelaration{0, 0};
   float dt{1.0f / 60.0f};
+  std::cout << pparticles.size() << '\n';
 
   std::thread updateThread(updater, std::ref(pparticles),
                            std::ref(accelaration), std::ref(dt), xRange);
@@ -62,8 +63,8 @@ int main() {
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
     plotter(pparticles, xRange);
-    // DrawRectangleLines(10, 30, 220, 220, GRAY);
-    // DrawRectangle(10, 30, 220, 220, BLACK);
+    DrawRectangleLines(10, 30, 220, 220, GRAY);
+    DrawRectangle(10, 30, 220, 220, BLACK);
 
     EndDrawing();
   }

@@ -1,5 +1,7 @@
 #include "particle.h"
 #include "config.h"
+#include <algorithm>
+#include <cstddef>
 #include <iostream>
 #include <raylib.h>
 #include <raymath.h>
@@ -7,6 +9,8 @@
 
 bool isRunning = true;
 std::mutex gLock;
+std::vector<float> Particle::speeds(NUM_PARTICLES, 0.0f);
+std::vector<int> Particle::bins(BINS, 0);
 
 Particle::Particle() {};
 Particle::Particle(Vector2 pos, Vector2 vel) : m_pos{pos}, m_vel(vel) {}
@@ -69,7 +73,30 @@ void Particle::updatePar(Vector2 &accelaration, float &dt, const float &xRange,
   Particle::applyAcc(accelaration, dt);
   Particle::updatePos(dt, xRange);
   Particle::momentumConservation(pparticle);
-  Particle::getTrace();
+  // Particle::getTrace();
+}
+
+void Particle::addToSpeeds(std::size_t i) {
+  speeds[i] = (Vector2Length(m_vel));
+}
+
+void Particle::printSpeeds() {
+  for (auto i : bins)
+    std::cout << i << '\n';
+  std::cout << "----------------" << '\n';
+}
+
+void Particle::binIndex() {
+  float minVal{*std::min_element(speeds.begin(), speeds.end())};
+  float maxVal{*std::max_element(speeds.begin(), speeds.end())};
+  double binWidth = (maxVal - minVal) / BINS;
+  std::fill(bins.begin(), bins.end(), 0);
+
+  for (float &speed : speeds) {
+    int binNo = static_cast<int>((speed - minVal) / binWidth);
+    bins[static_cast<std::size_t>(std::min(binNo, BINS - 1))] +=
+        1; // here std::min is just to keep the maximum values inside a bin ;
+  }
 }
 
 // std::vector<Particle> particles{};
@@ -94,8 +121,14 @@ void updater(std::vector<Particle> &pparticles, Vector2 &accelaration,
     {
       std::unique_lock<std::mutex> lock(gLock);
       // Do our work, because we have the lock
-      for (Particle &point : pparticles)
-        point.updatePar(accelaration, dt, xRange, pparticles);
+      for (std::size_t i{0}; i < NUM_PARTICLES; ++i) {
+        pparticles[i].updatePar(accelaration, dt, xRange, pparticles);
+        pparticles[i].addToSpeeds(i);
+        if (i == NUM_PARTICLES - 1) {
+          pparticles[i].binIndex();
+          pparticles[i].printSpeeds();
+        }
+      }
     }
     std::this_thread::sleep_until(
         next); // sleep this thread until noted time+delta t, so good thing is
