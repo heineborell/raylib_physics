@@ -3,9 +3,11 @@
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
+#include <numeric>
 #include <raylib.h>
 #include <raymath.h>
 #include <thread>
+#include <vector>
 
 bool isRunning = true;
 std::mutex gLock;
@@ -99,6 +101,8 @@ void Particle::binIndex() {
   }
 }
 
+std::vector<int> &Particle::getBins() { return bins; }
+
 // std::vector<Particle> particles{};
 // void addParticle(double xRange) {
 //   if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
@@ -124,9 +128,10 @@ void updater(std::vector<Particle> &pparticles, Vector2 &accelaration,
       for (std::size_t i{0}; i < NUM_PARTICLES; ++i) {
         pparticles[i].updatePar(accelaration, dt, xRange, pparticles);
         pparticles[i].addToSpeeds(i);
-        if (i == NUM_PARTICLES - 1) {
+        if (i == NUM_PARTICLES - 1) { //  the last particle update calculate
+                                      //  min, max speeds and bin them
           pparticles[i].binIndex();
-          pparticles[i].printSpeeds();
+          // pparticles[i].printSpeeds();
         }
       }
     }
@@ -140,10 +145,19 @@ void updater(std::vector<Particle> &pparticles, Vector2 &accelaration,
 void plotter(std::vector<Particle> &pparticles, double xRange) {
   std::unique_lock<std::mutex> lock(gLock);
 
-  for (Particle &point : pparticles) {
-    // point.showVel(0.35, xRange, RED, {4, 4});
-    point.show();
-    // point.showTrace(BLUE);
+  for (std::size_t i{0}; i < NUM_PARTICLES; ++i) {
+    // pparticles[i].showVel(0.35, xRange, RED, {4, 4});
+    pparticles[i].show();
+    if (i == NUM_PARTICLES - 1) {
+      for (int j{0}; j < BINS; ++j) {
+        DrawRectangle(10 + j * WIDTH / (3.5 * BINS), 30, WIDTH / (5 * BINS),
+                      (pparticles[i].getBins().data()[j] /
+                       static_cast<float>(NUM_PARTICLES)) *
+                          (HEIGHT / 2),
+                      BLUE);
+      }
+    }
+    // pparticles[i].showTrace(BLUE);
   }
 }
 void Particle::momentumConservation(std::vector<Particle> &particleArray) {

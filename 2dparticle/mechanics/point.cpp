@@ -43,7 +43,7 @@ int main() {
 
   Vector2 accelaration{0, 0};
   float dt{1.0f / 60.0f};
-  std::cout << pparticles.size() << '\n';
+  std::cout << WIDTH / (2 * BINS) + 5 << '\n';
 
   std::thread updateThread(updater, std::ref(pparticles),
                            std::ref(accelaration), std::ref(dt), xRange);
@@ -63,8 +63,8 @@ int main() {
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
     plotter(pparticles, xRange);
-    DrawRectangleLines(10, 30, 220, 220, GRAY);
-    DrawRectangle(10, 30, 220, 220, BLACK);
+    // DrawRectangle(10, 30, HEIGHT / 4, WIDTH / 4, BLACK);
+    //
 
     EndDrawing();
   }

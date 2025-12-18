@@ -20,6 +20,7 @@ public:
   void addToSpeeds(std::size_t i);
   static void printSpeeds();
   void binIndex();
+  std::vector<int> &getBins();
   void updatePar(Vector2 &accelaration, float &dt, const float &xRange,
                  std::vector<Particle> &pparticle);
   void getTrace();
