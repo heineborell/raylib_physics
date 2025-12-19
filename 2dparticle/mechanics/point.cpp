@@ -63,7 +63,9 @@ int main() {
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
     plotter(pparticles, xRange);
-    // DrawRectangle(10, 30, HEIGHT / 4, WIDTH / 4, BLACK);
+    // DrawRectanglePro(Rectangle{10, HEIGHT - 30, HEIGHT / 4, WIDTH / 4}, {0,
+    // 0},
+    //                  270, MAROON);
     //
 
     EndDrawing();

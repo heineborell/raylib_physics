@@ -150,11 +150,14 @@ void plotter(std::vector<Particle> &pparticles, double xRange) {
     pparticles[i].show();
     if (i == NUM_PARTICLES - 1) {
       for (int j{0}; j < BINS; ++j) {
-        DrawRectangle(10 + j * WIDTH / (3.5 * BINS), 30, WIDTH / (5 * BINS),
-                      (pparticles[i].getBins().data()[j] /
-                       static_cast<float>(NUM_PARTICLES)) *
-                          (HEIGHT / 2),
-                      BLUE);
+        // DrawRectanglePro(Rectangle{10, HEIGHT - 30, HEIGHT / 4, WIDTH / 4},
+        //                  {0, 0}, 270, MAROON);
+        DrawRectanglePro(Rectangle{10 + j * WIDTH / (3.5f * BINS), HEIGHT - 30,
+                                   WIDTH / (5 * BINS),
+                                   (pparticles[i].getBins().data()[j] /
+                                    static_cast<float>(NUM_PARTICLES)) *
+                                       (HEIGHT / 2)},
+                         {0, 0}, 180, BLUE);
       }
     }
     // pparticles[i].showTrace(BLUE);
