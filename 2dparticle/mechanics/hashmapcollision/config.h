@@ -15,7 +15,7 @@ inline constexpr int FPS{60};
 inline constexpr int PARTICLE_RADIUS{2};
 inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
-inline constexpr int NUM_PARTICLES{2200};
+inline constexpr int NUM_PARTICLES{1500};
 inline constexpr int BINS{20};
 
 inline constexpr double zoomSpeed{1.1};
@@ -27,6 +27,5 @@ extern bool isRunning;
 Vector2 projectedVector(double x, double y, double xRange);
 Vector2 projectedVector(Vector2 vec, double xRange);
 Vector2 pullbackVector(Vector2 &screen, double xRange);
-Vector2 Rotate(Vector2 v, double angle);
 void drawVector(Vector2 &m_vel, Vector2 &m_pos, double length, double xRange,
                 Color c);
