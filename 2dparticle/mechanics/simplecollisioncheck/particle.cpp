@@ -30,11 +30,6 @@ void Particle::updatePos(float &dt, float xRange) {
     m_vel.y = -m_vel.y;
 }
 
-// void Particle::applyForce(Vector2 &force) {
-//   m_vel = Vector2Add(m_vel, force);
-//   m_vel = Vector2ClampValue(m_vel, 0.0, 0.03);
-// }
-
 void Particle::applyAcc(Vector2 &accelaration, float &dt) {
   m_vel = Vector2Add(m_vel, Vector2Scale(accelaration, dt));
 }
@@ -102,19 +97,6 @@ void Particle::binIndex() {
 
 std::vector<int> &Particle::getBins() { return bins; }
 
-// std::vector<Particle> particles{};
-// void addParticle(double xRange) {
-//   if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-//     Vector2 mouse{GetMousePosition()};
-//     particles.push_back({{pullbackVector(mouse, xRange)}, {0, 0}, 1, 5});
-//   }
-//   if (IsKeyPressed(KEY_R))
-//     particles.clear();
-// }
-//
-//
-// below is updater and plotter
-//
 void updater(std::vector<Particle> &pparticles, Vector2 &accelaration,
              float &dt, double xRange) {
   using clock = std::chrono::steady_clock;
