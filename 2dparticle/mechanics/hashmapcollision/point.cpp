@@ -47,9 +47,10 @@ int main() {
   std::thread updateThread(updater, std::ref(pparticles),
                            std::ref(accelaration), std::ref(dt), xRange);
 
-  clientDict testClient{{1, 1}, {0.1, 0.1}, {{0, 1}, {1, 0}}};
-  SpatialHashGrid grid{{4, 4}, {0.01f, 0.01f}, {{7322779837, testClient}}};
-  grid.newClient({1, 2}, {2, 5});
+  clientDict testClient{0, {1, 1}, {0.1, 0.1}, {{0, 1}, {1, 0}}};
+  SpatialHashGrid grid{{2 * xRange, 2 * xRange}, 0.1f, {}};
+  grid.newClient(1, {0, 0}, {1, 1});
+  std::cout << "the number of grid squares " << grid.m_size << '\n';
 
   while (isRunning) {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
