@@ -1,8 +1,8 @@
 #include "Random.h"
 #include "config.h"
+#include "hashgrid.h"
 #include "particle.h"
 #include <GL/gl.h>
-#include <chrono>
 #include <cmath>
 #include <iostream>
 #include <raylib.h>
@@ -43,10 +43,13 @@ int main() {
 
   Vector2 accelaration{0, 0};
   float dt{1.0f / 60.0f};
-  std::cout << WIDTH / (2 * BINS) + 5 << '\n';
 
   std::thread updateThread(updater, std::ref(pparticles),
                            std::ref(accelaration), std::ref(dt), xRange);
+
+  clientDict testClient{{1, 1}, {0.1, 0.1}, {{0, 1}, {1, 0}}};
+  SpatialHashGrid grid{{4, 4}, {0.01f, 0.01f}, {{7322779837, testClient}}};
+  grid.newClient({1, 2}, {2, 5});
 
   while (isRunning) {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
@@ -62,7 +65,7 @@ int main() {
 
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
-    plotter(pparticles, xRange);
+    // plotter(pparticles, xRange);
 
     EndDrawing();
   }

@@ -64,7 +64,7 @@ void checkCollisions_y(Sprite &sprite, std::vector<Sprite> &tiles) {
 
 void checkCollisions_x(Sprite &sprite, std::vector<Sprite> &tiles) {
   for (const auto &tile : tiles) {
-    // if player rect untersect tiles rect
+    // if player rect intersect tiles rect
     if (CheckCollisionRecs(sprite.destRect, tile.destRect)) {
       // reverse the overlap
       // sprite on bottom

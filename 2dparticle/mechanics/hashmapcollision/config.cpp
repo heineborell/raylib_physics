@@ -1,7 +1,4 @@
 #include "config.h"
-#include "particle.h"
-#include "raymath.h"
-#include <algorithm>
 #include <boost/math/quadrature/gauss_kronrod.hpp>
 #include <boost/math/quadrature/trapezoidal.hpp>
 #include <raylib.h>

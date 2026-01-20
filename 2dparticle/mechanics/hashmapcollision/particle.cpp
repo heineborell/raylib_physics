@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
-#include <numeric>
 #include <raylib.h>
 #include <raymath.h>
 #include <thread>
