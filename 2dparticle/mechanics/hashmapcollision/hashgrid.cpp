@@ -35,12 +35,11 @@ void SpatialHashGrid::insert(clientDict &client) {
                                   // item but if no key then cell.end() returned
       if (it == m_cells.end()) {
         std::cout << key << " is not in the list." << '\n';
-        m_cells[key] = std::set<clientDict>();
+        m_cells[key] = std::unordered_set<clientDict, clientHash>();
       }
-      // m_cells[key].insert(client);
+      m_cells[key].insert(client);
     }
   }
-  std::cout << m_cells.size() << " size of mcells" << '\n';
 };
 
 std::pair<int, int> SpatialHashGrid::getCellIndex(const float &x,
