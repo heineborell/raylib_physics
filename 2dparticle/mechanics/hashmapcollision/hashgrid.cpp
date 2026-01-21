@@ -1,4 +1,5 @@
 #include "hashgrid.h"
+#include <algorithm>
 #include <cstddef>
 #include <iostream>
 #include <raylib.h>
@@ -29,25 +30,37 @@ void SpatialHashGrid::insert(clientDict &client) {
 
   for (int x{i1.first}; x <= i2.first; ++x) {
     for (int y{i1.second}; y <= i2.second; ++y) {
-      std::size_t key{hashXy(x, y, m_size)};
+      std::size_t key{hashXy(x, y, m_dimensions.first * m_dimensions.second)};
       std::cout << key << '\n';
       auto it{m_cells.find(key)}; // note that find returns an iterator to the
                                   // item but if no key then cell.end() returned
       if (it == m_cells.end()) {
         std::cout << key << " is not in the list." << '\n';
-        m_cells[key] = std::unordered_set<clientDict, clientHash>();
+        m_cells[key] =
+            std::unordered_set<clientDict,
+                               clientHash>(); // as clientDict is a user defined
+                                              // you need to define hash to
+                                              // compare
       }
       m_cells[key].insert(client);
+      std::cout << "client with " << key << " inserted." << '\n';
     }
   }
 };
 
 std::pair<int, int> SpatialHashGrid::getCellIndex(const float &x,
                                                   const float &y) {
-  return {3, 5};
+  float x_pos{std::clamp(
+      ((x - m_bounds[0][0]) / (m_bounds[1][0] - m_bounds[0][0])), 0.0f, 1.0f)};
+  float y_pos{std::clamp(
+      ((y - m_bounds[0][1]) / (m_bounds[1][1] - m_bounds[0][1])), 0.0f, 1.0f)};
+
+  int xIndex{static_cast<int>(std::floor(x * (m_dimensions.first - 1)))};
+  int yIndex{static_cast<int>(std::floor(y * (m_dimensions.second - 1)))};
+  return {xIndex, yIndex};
 };
 
-std::size_t SpatialHashGrid::hashXy(int x, int y, std::size_t n) {
+std::size_t SpatialHashGrid::hashXy(int x, int y, int n) {
   const std::size_t p1 = 73856093;
   const std::size_t p2 = 83492791;
 

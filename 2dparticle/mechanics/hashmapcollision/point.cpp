@@ -17,40 +17,39 @@ int main() {
   InitWindow(HEIGHT, WIDTH, "Particle trajectory plot");
   // SetTargetFPS(FPS);
 
-  double xRange{4.0};
+  float xRange{4.0};
   printf("Renderer: %s\n", glGetString(GL_RENDERER));
   printf("Vendor:   %s\n", glGetString(GL_VENDOR));
 
-  // create particles with random initial positions and velocities
-  std::vector<Particle> pparticles;
-  float speed{4.0f};
-
-  for (int i{0}; i < NUM_PARTICLES; ++i) {
-    if (i < NUM_PARTICLES / 2) {
-      int angle{Random::get(1, 20)};
-      Vector2 initialPosition{3, static_cast<float>(Random::get(-4, 4))};
-      Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
-                              speed * std::sin(PI / (2 * angle))};
-      pparticles.push_back(Particle{initialPosition, initialVelocity});
-    } else {
-      int angle{Random::get(1, 20)};
-      Vector2 initialPosition{-3, static_cast<float>(Random::get(-4, 4))};
-      Vector2 initialVelocity{speed * std::cos(PI / (2 * angle)),
-                              speed * std::sin(PI / (2 * angle))};
-      pparticles.push_back(Particle{initialPosition, initialVelocity});
-    }
-  }
-
-  Vector2 accelaration{0, 0};
-  float dt{1.0f / 60.0f};
-
-  std::thread updateThread(updater, std::ref(pparticles),
-                           std::ref(accelaration), std::ref(dt), xRange);
-
+  // // create particles with random initial positions and velocities
+  // std::vector<Particle> pparticles;
+  // float speed{4.0f};
+  //
+  // for (int i{0}; i < NUM_PARTICLES; ++i) {
+  //   if (i < NUM_PARTICLES / 2) {
+  //     int angle{Random::get(1, 20)};
+  //     Vector2 initialPosition{3, static_cast<float>(Random::get(-4, 4))};
+  //     Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
+  //                             speed * std::sin(PI / (2 * angle))};
+  //     pparticles.push_back(Particle{initialPosition, initialVelocity});
+  //   } else {
+  //     int angle{Random::get(1, 20)};
+  //     Vector2 initialPosition{-3, static_cast<float>(Random::get(-4, 4))};
+  //     Vector2 initialVelocity{speed * std::cos(PI / (2 * angle)),
+  //                             speed * std::sin(PI / (2 * angle))};
+  //     pparticles.push_back(Particle{initialPosition, initialVelocity});
+  //   }
+  // }
+  //
+  // Vector2 accelaration{0, 0};
+  // float dt{1.0f / 60.0f};
+  //
+  // std::thread updateThread(updater, std::ref(pparticles),
+  //                          std::ref(accelaration), std::ref(dt), xRange);
+  //
   clientDict testClient{0, {1, 1}, {0.1, 0.1}, {{0, 1}, {1, 0}}};
-  SpatialHashGrid grid{{2 * xRange, 2 * xRange}, 0.1f, {}};
+  SpatialHashGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {1, 1}, {}};
   grid.newClient(1, {0, 0}, {1, 1});
-  std::cout << "the number of grid squares " << grid.m_size << '\n';
 
   while (isRunning) {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
@@ -71,8 +70,8 @@ int main() {
     EndDrawing();
   }
 
-  std::cout << "Thread no " << updateThread.get_id() << " closed!" << '\n';
-  updateThread.join();
+  // std::cout << "Thread no " << updateThread.get_id() << " closed!" << '\n';
+  // updateThread.join();
   isRunning = false;
   CloseWindow();
   return 0;
