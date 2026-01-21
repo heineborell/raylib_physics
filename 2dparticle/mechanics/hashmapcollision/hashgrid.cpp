@@ -35,7 +35,7 @@ void SpatialHashGrid::insert(clientDict &client) {
       auto it{m_cells.find(key)}; // note that find returns an iterator to the
                                   // item but if no key then cell.end() returned
       if (it == m_cells.end()) {
-        std::cout << key << " is not in the list." << '\n';
+        // std::cout << key << " is not in the list." << '\n';
         m_cells[key] =
             std::unordered_set<clientDict,
                                clientHash>(); // as clientDict is a user defined
@@ -43,7 +43,16 @@ void SpatialHashGrid::insert(clientDict &client) {
                                               // compare
       }
       m_cells[key].insert(client);
-      std::cout << "client with " << key << " inserted." << '\n';
+      std::cout << "client with key " << key << " and indices " << x << y
+                << " is inserted." << '\n';
+      // std::cout << "number of boxes of the region " << m_dimensions.first
+      //           << '\n';
+      // std::cout << "client with key " << key << " and i1 indices "
+      //           << client.indices.first.first << client.indices.first.second
+      //           << " i2 indices " << client.indices.second.first
+      //           << client.indices.second.second
+      //
+      //           << " is inserted." << '\n';
     }
   }
 };
@@ -55,8 +64,8 @@ std::pair<int, int> SpatialHashGrid::getCellIndex(const float &x,
   float y_pos{std::clamp(
       ((y - m_bounds[0][1]) / (m_bounds[1][1] - m_bounds[0][1])), 0.0f, 1.0f)};
 
-  int xIndex{static_cast<int>(std::floor(x * (m_dimensions.first - 1)))};
-  int yIndex{static_cast<int>(std::floor(y * (m_dimensions.second - 1)))};
+  int xIndex{static_cast<int>((x_pos * (m_dimensions.first - 1)))};
+  int yIndex{static_cast<int>((y_pos * (m_dimensions.second - 1)))};
   return {xIndex, yIndex};
 };
 

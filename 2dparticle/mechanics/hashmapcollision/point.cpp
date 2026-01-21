@@ -48,8 +48,8 @@ int main() {
   //                          std::ref(accelaration), std::ref(dt), xRange);
   //
   clientDict testClient{0, {1, 1}, {0.1, 0.1}, {{0, 1}, {1, 0}}};
-  SpatialHashGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {1, 1}, {}};
-  grid.newClient(1, {0, 0}, {1, 1});
+  SpatialHashGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {8, 8}, {}};
+  grid.newClient(1, {-0.1, 0.1}, {1.0f, 1.0f});
 
   while (isRunning) {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
