@@ -18,24 +18,16 @@ struct clientDict {
   bool operator==(const clientDict &other) const { return id == other.id; }
 };
 
-struct clientHash {
-  std::size_t operator()(const clientDict &u) const {
-    return std::hash<int>{}(u.id);
-  }
-};
-
-class SpatialHashGrid {
+class SpatialGrid {
 public:
   std::vector<std::vector<float>> m_bounds; // size of the world
   std::pair<int, int>
       m_dimensions; // the basically will control how many cells we have
-  std::unordered_map<std::size_t, std::unordered_set<clientDict, clientHash>>
-      m_cells; // a dictionary with string keys and client values
+  std::vector<std::vector<clientDict>> m_cells;
 
-  SpatialHashGrid(
-      std::vector<std::vector<float>> bounds, std::pair<int, int> dimensions,
-      const std::unordered_map<
-          std::size_t, std::unordered_set<clientDict, clientHash>> &cells)
+  SpatialGrid(std::vector<std::vector<float>> bounds,
+              std::pair<int, int> dimensions,
+              const std::vector<std::vector<clientDict>> &cells)
       : m_bounds{bounds}, m_dimensions(dimensions), m_cells{cells} {
     std::cout << "hashgrid initialized!" << '\n';
   };

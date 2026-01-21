@@ -1,7 +1,7 @@
 #include "Random.h"
 #include "config.h"
-#include "hashgrid.h"
 #include "particle.h"
+#include "uniformgrid.h"
 #include <GL/gl.h>
 #include <cmath>
 #include <complex>
@@ -50,19 +50,12 @@ int main() {
   //                          std::ref(accelaration), std::ref(dt), xRange);
   //
   clientDict testClient{0, {1, 1}, {0.1, 0.1}, {{0, 1}, {1, 0}}};
-  SpatialHashGrid grid{
+  SpatialGrid grid{
       {{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}, {}};
   grid.newClient(1, {-0.1, 0.1}, {1.0f, 1.0f});
 
   Vector2 projectedBoundsLower{projectedVector({-xRange, -xRange}, xRange)};
   Vector2 projectedBoundsUpper{projectedVector({xRange, xRange}, xRange)};
-  // projectedVector({2 * xRange / NCELLS, 2 * xRange / NCELLS}, xRange)};
-  for (auto &[key, clientset] : grid.m_cells) {
-    for (auto &number : clientset) {
-      std::cout << number.indices.second.first << number.indices.second.second
-                << '\n';
-    }
-  }
 
   while (isRunning) {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())

@@ -30,7 +30,7 @@ void SpatialHashGrid::insert(clientDict &client) {
 
   for (int x{i1.first}; x <= i2.first; ++x) {
     for (int y{i1.second}; y <= i2.second; ++y) {
-      std::size_t key{hashXy(x, y, m_dimensions.first * m_dimensions.second)};
+      std::size_t key{hashXy(x, y)};
       std::cout << key << '\n';
       auto it{m_cells.find(key)}; // note that find returns an iterator to the
                                   // item but if no key then cell.end() returned
