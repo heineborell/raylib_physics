@@ -20,6 +20,8 @@ int main() {
   // SetTargetFPS(FPS);
 
   float xRange{4.0};
+  float scaleX{WIDTH / (2 * xRange)};
+  float scaleY{HEIGHT / (2 * xRange)}; // or xRange if square
   printf("Renderer: %s\n", glGetString(GL_RENDERER));
   printf("Vendor:   %s\n", glGetString(GL_VENDOR));
 
@@ -50,12 +52,15 @@ int main() {
   //                          std::ref(accelaration), std::ref(dt), xRange);
   //
   clientDict testClient{0, {1, 1}, {0.1, 0.1}, {{0, 1}, {1, 0}}};
-  SpatialGrid grid{
-      {{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}, {}};
-  grid.newClient(1, {-0.1, 0.1}, {1.0f, 1.0f});
+  SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
+  // grid.newClient(1, {-0.1, 0.1}, {1.0f, 1.0f});
+  grid.newClient(2, {2.3f, 2.3f}, {0.03f, 0.03f});
 
   Vector2 projectedBoundsLower{projectedVector({-xRange, -xRange}, xRange)};
   Vector2 projectedBoundsUpper{projectedVector({xRange, xRange}, xRange)};
+  Vector2 projectedTestpos{projectedVector(0.0f, 0.0f, xRange)};
+
+  std::cout << "size of the grid " << grid.m_cells.size() << '\n';
 
   while (isRunning) {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
@@ -73,8 +78,19 @@ int main() {
       DrawLine(x, projectedBoundsLower.y, x, projectedBoundsUpper.y, GRAY);
     }
     // Draw rectangles
-    DrawRectangle(1 * WIDTH / NCELLS, 3 * HEIGHT / NCELLS, HEIGHT / NCELLS,
-                  WIDTH / NCELLS, GREEN);
+    DrawRectangle(projectedTestpos.x - 1.0 * scaleX * 0.5f,
+                  projectedTestpos.y - 1.0 * scaleY * 0.5f, 1.0 * scaleX,
+                  1.0 * scaleY, RED);
+    for (int i{0}; i <= grid.m_cells.size(); ++i) {
+      if (grid.m_cells[i].size() > 0) {
+        // std::cout << grid.m_cells[i][0] << '\n';
+        // std::cout << i / NCELLS << i % NCELLS << '\n';
+        DrawRectangle((i % NCELLS) * (WIDTH / NCELLS),
+                      (i / NCELLS) * (HEIGHT / NCELLS), HEIGHT / NCELLS,
+                      WIDTH / NCELLS, GREEN);
+      }
+      // std::cout << key.size() << '\n';
+    }
 
     // plotter(pparticles, xRange);
 

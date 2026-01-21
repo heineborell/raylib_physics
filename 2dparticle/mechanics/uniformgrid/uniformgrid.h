@@ -23,13 +23,14 @@ public:
   std::vector<std::vector<float>> m_bounds; // size of the world
   std::pair<int, int>
       m_dimensions; // the basically will control how many cells we have
-  std::vector<std::vector<clientDict>> m_cells;
+  std::vector<std::vector<clientDict *>> m_cells;
 
   SpatialGrid(std::vector<std::vector<float>> bounds,
-              std::pair<int, int> dimensions,
-              const std::vector<std::vector<clientDict>> &cells)
-      : m_bounds{bounds}, m_dimensions(dimensions), m_cells{cells} {
-    std::cout << "hashgrid initialized!" << '\n';
+              std::pair<int, int> dimensions)
+      : m_bounds{bounds}, m_dimensions(dimensions),
+        m_cells{
+            static_cast<std::size_t>(dimensions.first * dimensions.second)} {
+    std::cout << "grid initialized!" << '\n';
   };
   clientDict newClient(const int id, const Vector2 &position,
                        const Vector2 &dimensions);

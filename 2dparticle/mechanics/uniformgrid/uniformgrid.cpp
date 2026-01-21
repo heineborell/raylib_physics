@@ -21,16 +21,18 @@ void SpatialGrid::insert(clientDict &client) {
 
   std::pair<int, int> i1{getCellIndex(
       client.position.x - client.dimensions.x / 2,
-      client.position.y - client.dimensions.y / 2)}; // left lower corner index
+      -client.position.y - client.dimensions.y / 2)}; // left lower corner index
 
-  std::pair<int, int> i2{getCellIndex(
-      client.position.x + client.dimensions.x / 2,
-      client.position.y + client.dimensions.y / 2)}; // right upper corner index
+  std::pair<int, int> i2{
+      getCellIndex(client.position.x + client.dimensions.x / 2,
+                   -client.position.y +
+                       client.dimensions.y / 2)}; // right upper corner index
   client.indices = {i1, i2};
 
-  for (int x{i1.first}; x <= i2.first; ++x) {
-    for (int y{i1.second}; y <= i2.second; ++y) {
-      std::cout << x << '\n';
+  for (int y{i1.second}; y <= i2.second; ++y) {
+    for (int x{i1.first}; x <= i2.first; ++x) {
+      std::cout << y << x << '\n';
+      m_cells.data()[y * m_dimensions.first + x].push_back(&client);
     }
     // std::cout << "client with key " << key << " and indices " << x << y
     //           << " is inserted." << '\n';
@@ -43,9 +45,7 @@ void SpatialGrid::insert(clientDict &client) {
     //
     //           << " is inserted." << '\n';
   }
-}
-
-;
+};
 
 std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
   float x_pos{std::clamp(
