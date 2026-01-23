@@ -21,15 +21,17 @@ void SpatialGrid::insert(clientDict &client) {
 
   std::pair<int, int> i1{getCellIndex(
       client.position.x - client.dimensions.x / 2,
-      -client.position.y - client.dimensions.y / 2)}; // left lower corner index
+      client.position.y - client.dimensions.y / 2)}; // left lower corner index
 
-  std::pair<int, int> i2{
-      getCellIndex(client.position.x + client.dimensions.x / 2,
-                   -client.position.y +
-                       client.dimensions.y / 2)}; // right upper corner index
+  std::pair<int, int> i2{getCellIndex(
+      client.position.x + client.dimensions.x / 2,
+      client.position.y + client.dimensions.y / 2)}; // right upper corner index
   client.indices = {i1, i2};
 
-  for (int y{i1.second}; y <= i2.second; ++y) {
+  // this for loop  is weird as the boxes for y is startring on top we have to
+  // change the places of i2 and i1 because of the box coordinate system.
+  // According to world coordinates i1 is still lower left and i2 is upper right
+  for (int y{i2.second}; y <= i1.second; ++y) {
     for (int x{i1.first}; x <= i2.first; ++x) {
       std::cout << y << x << '\n';
       m_cells.data()[y * m_dimensions.first + x].push_back(&client);
@@ -51,9 +53,11 @@ std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
   float x_pos{std::clamp(
       ((x - m_bounds[0][0]) / (m_bounds[1][0] - m_bounds[0][0])), 0.0f, 1.0f)};
   float y_pos{std::clamp(
-      ((y - m_bounds[0][1]) / (m_bounds[1][1] - m_bounds[0][1])), 0.0f, 1.0f)};
+      ((m_bounds[1][1] - y) / (m_bounds[1][1] - m_bounds[0][1])), 0.0f, 1.0f)};
 
-  int xIndex{static_cast<int>((x_pos * (m_dimensions.first - 1)))};
-  int yIndex{static_cast<int>((y_pos * (m_dimensions.second - 1)))};
+  std::cout << x_pos << " x and y componenets " << y_pos << '\n';
+  int xIndex{static_cast<int>((x_pos * (m_dimensions.first)))};
+  int yIndex{static_cast<int>((y_pos * (m_dimensions.second)))};
+  std::cout << "y index " << yIndex << '\n';
   return {xIndex, yIndex};
 };

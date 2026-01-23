@@ -11,7 +11,7 @@ using std::vector;
 inline constexpr int WIDTH{900};
 inline constexpr int HEIGHT{900};
 inline constexpr int FPS{60};
-inline constexpr int NCELLS{8};
+inline constexpr int NCELLS{100};
 
 inline constexpr int PARTICLE_RADIUS{2};
 inline constexpr int PARTICLE_MAX_SPEED{2};

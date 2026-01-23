@@ -53,13 +53,14 @@ int main() {
   //
   clientDict testClient{0, {1, 1}, {0.1, 0.1}, {{0, 1}, {1, 0}}};
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
-  // grid.newClient(1, {-0.1, 0.1}, {1.0f, 1.0f});
-  grid.newClient(2, {2.3f, 2.3f}, {0.03f, 0.03f});
+  // grid.newClient(1, {0.0, 0.0}, {1.0f, 1.0f});
+  grid.newClient(2, {2.0f, 2.0f}, {1.0f, 1.0f});
 
   Vector2 projectedBoundsLower{projectedVector({-xRange, -xRange}, xRange)};
   Vector2 projectedBoundsUpper{projectedVector({xRange, xRange}, xRange)};
-  Vector2 projectedTestpos{projectedVector(0.0f, 0.0f, xRange)};
+  Vector2 projectedTestpos{projectedVector(2.0f, 2.0f, xRange)};
 
+  SetTargetFPS(60);
   std::cout << "size of the grid " << grid.m_cells.size() << '\n';
 
   while (isRunning) {
@@ -85,9 +86,19 @@ int main() {
       if (grid.m_cells[i].size() > 0) {
         // std::cout << grid.m_cells[i][0] << '\n';
         // std::cout << i / NCELLS << i % NCELLS << '\n';
-        DrawRectangle((i % NCELLS) * (WIDTH / NCELLS),
-                      (i / NCELLS) * (HEIGHT / NCELLS), HEIGHT / NCELLS,
-                      WIDTH / NCELLS, GREEN);
+        float cellW = WIDTH / (float)NCELLS;
+        float cellH = HEIGHT / (float)NCELLS;
+        int x = i % NCELLS;
+        int y = i / NCELLS;
+
+        DrawRectangle(x * cellW, y * cellH, cellW, cellH, {0, 228, 48, 100});
+        // DrawRectangle(
+        //     (i % NCELLS + 0.5f) * (WIDTH / NCELLS) - (WIDTH / NCELLS) * 0.5f,
+        //     (i / NCELLS + 0.5f) * (HEIGHT / NCELLS) - (HEIGHT / NCELLS) *
+        //     0.5f, WIDTH / NCELLS, HEIGHT / NCELLS, GREEN);
+        // DrawRectangle((i % NCELLS) * (WIDTH / NCELLS),
+        //               (i / NCELLS) * (HEIGHT / NCELLS), HEIGHT / NCELLS,
+        //               WIDTH / NCELLS, MAROON);
       }
       // std::cout << key.size() << '\n';
     }
