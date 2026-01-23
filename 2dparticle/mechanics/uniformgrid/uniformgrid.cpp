@@ -13,8 +13,8 @@ void SpatialGrid::newClient(const Vector2 &position, const Vector2 &dimensions,
                             // last element reference
 }
 
-void SpatialGrid::insert(clientDict &client) {
-
+std::pair<std::pair<int, int>, std::pair<int, int>>
+SpatialGrid::getCellIndices(clientDict &client) {
   std::pair<int, int> i1{
       getCellIndex(client.m_position.x - client.m_dimensions.x / 2,
                    client.m_position.y -
@@ -24,13 +24,20 @@ void SpatialGrid::insert(clientDict &client) {
       getCellIndex(client.m_position.x + client.m_dimensions.x / 2,
                    client.m_position.y +
                        client.m_dimensions.y / 2)}; // right upper corner index
-  client.m_indices = {i1, i2};
 
+  return {i1, i2};
+}
+
+void SpatialGrid::insert(clientDict &client) {
+
+  client.m_indices = getCellIndices(client);
   // this for loop  is weird as the boxes for y is starting on top we have to
   // change the places of i2 and i1 because of the box coordinate system.
   // According to world coordinates i1 is still lower left and i2 is upper right
-  for (int y{i2.second}; y <= i1.second; ++y) {
-    for (int x{i1.first}; x <= i2.first; ++x) {
+  for (int y{client.m_indices.second.second};
+       y <= client.m_indices.first.second; ++y) {
+    for (int x{client.m_indices.first.first};
+         x <= client.m_indices.second.first; ++x) {
       m_cells.data()[y * m_dimensions.first + x].push_back(&client);
     }
   }
@@ -49,6 +56,7 @@ std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
 void SpatialGrid::update(float dt) {
   updatePos(dt);
   wallCollision();
+  updateCells();
 }
 
 void SpatialGrid::updatePos(float dt) {
@@ -56,7 +64,6 @@ void SpatialGrid::updatePos(float dt) {
   for (auto &client : m_clients)
     client.m_position =
         Vector2Add(client.m_position, Vector2Scale(client.m_velocity, dt));
-  // update position in cell coordinates
 }
 
 void SpatialGrid::wallCollision() {
@@ -71,4 +78,17 @@ void SpatialGrid::wallCollision() {
     if (client.m_position.y - client.m_dimensions.y / 2 < m_bounds[0][1])
       client.m_velocity.y = -client.m_velocity.y;
   }
+}
+void SpatialGrid::updateCells() {
+  for (auto &client : m_clients) {
+    std::cout << &client << '\n';
+    for (int y{client.m_indices.second.second};
+         y <= client.m_indices.first.second; ++y) {
+      for (int x{client.m_indices.first.first};
+           x <= client.m_indices.second.first; ++x) {
+        // std::erase(m_cells[y * m_dimensions.first + x], &client);
+      }
+    }
+  }
+  std::cout << "--------------" << '\n';
 }

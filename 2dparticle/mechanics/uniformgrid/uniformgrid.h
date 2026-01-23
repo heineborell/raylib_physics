@@ -54,11 +54,15 @@ public:
   };
   void newClient(const Vector2 &position, const Vector2 &dimensions,
                  const Vector2 &velocity);
+
   void update(float dt);
   void updatePos(float dt);
   void wallCollision();
+  void updateCells();
 
 private:
   void insert(clientDict &client);
   std::pair<int, int> getCellIndex(const float &x, const float &y);
+  std::pair<std::pair<int, int>, std::pair<int, int>>
+  getCellIndices(clientDict &client);
 };
