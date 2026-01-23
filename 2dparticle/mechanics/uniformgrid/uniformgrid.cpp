@@ -30,18 +30,20 @@ SpatialGrid::getCellIndices(clientDict &client) {
 
 void SpatialGrid::insert(clientDict &client) {
 
-  client.m_indices = getCellIndices(client);
+  std::pair<std::pair<int, int>, std::pair<int, int>> indices{
+      getCellIndices(client)};
   // this for loop  is weird as the boxes for y is starting on top we have to
   // change the places of i2 and i1 because of the box coordinate system.
   // According to world coordinates i1 is still lower left and i2 is upper right
-  for (int y{client.m_indices.second.second};
-       y <= client.m_indices.first.second; ++y) {
-    for (int x{client.m_indices.first.first};
-         x <= client.m_indices.second.first; ++x) {
-      m_cells.data()[y * m_dimensions.first + x].push_back(&client);
+  for (int y{indices.second.second}; y <= indices.first.second; ++y) {
+    for (int x{indices.first.first}; x <= indices.second.first; ++x) {
+      int cellNo{y * m_dimensions.first + x};
+      m_cells.data()[cellNo].push_back(&client);
+      client.m_cellInfo.emplace_back(cellNo,
+                                     static_cast<int>(m_cells[cellNo].size()));
     }
   }
-};
+}
 
 std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
   float x_pos{std::clamp(
@@ -52,7 +54,8 @@ std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
   int xIndex{static_cast<int>((x_pos * (m_dimensions.first)))};
   int yIndex{static_cast<int>((y_pos * (m_dimensions.second)))};
   return {xIndex, yIndex};
-};
+}
+
 void SpatialGrid::update(float dt) {
   updatePos(dt);
   wallCollision();
@@ -79,16 +82,30 @@ void SpatialGrid::wallCollision() {
       client.m_velocity.y = -client.m_velocity.y;
   }
 }
+
 void SpatialGrid::updateCells() {
   for (auto &client : m_clients) {
-    std::cout << &client << '\n';
-    for (int y{client.m_indices.second.second};
-         y <= client.m_indices.first.second; ++y) {
-      for (int x{client.m_indices.first.first};
-           x <= client.m_indices.second.first; ++x) {
-        // std::erase(m_cells[y * m_dimensions.first + x], &client);
+    for (auto &clientInfo : client.m_cellInfo) {
+      std::cout << m_cells[clientInfo.cellNumber].size() << '\n';
+      if (m_cells[clientInfo.cellNumber].size() != 0) {
+        clientDict *moved{
+            m_cells[clientInfo.cellNumber]
+                .back()}; // save the pointer of last element then change it
+                          // with the one you want to remove (so you removed!),
+                          // finally popback the end so that you kill the
+                          // double.
+        m_cells[clientInfo.cellNumber][clientInfo.indexInCell] = moved;
+        m_cells[clientInfo.cellNumber].pop_back();
       }
     }
   }
-  std::cout << "--------------" << '\n';
 }
+
+// std::cout << clientInfo.cellNumber << " <--cell index,client index--> "
+//           << clientInfo.indexInCell << '\n';
+// void SpatialGrid::removeClient(clientDict &client,
+//                                std::vector<clientDict *> cell) {
+//   clientDict *moved = cell.back(); // D
+//   cell[client. = moved;
+//   cell.pop_back();
+// }

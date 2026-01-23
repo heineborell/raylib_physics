@@ -9,12 +9,20 @@
 #include <utility>
 #include <vector>
 
+struct cellEntry {
+  int cellNumber;
+  int indexInCell;
+  cellEntry(int p_cellNumber, int p_indexInCell)
+      : cellNumber(p_cellNumber), indexInCell(p_indexInCell) {}
+};
+
 class clientDict {
 public:
   Vector2 m_position{};   // x, y
   Vector2 m_dimensions{}; // width, height
   Vector2 m_velocity{};
-  std::pair<std::pair<int, int>, std::pair<int, int>> m_indices{};
+  std::vector<cellEntry> m_cellInfo;
+  // std::pair<std::pair<int, int>, std::pair<int, int>> m_indices{};
 
   // Compare ONLY the id
   // bool operator==(const clientDict &other) const { return id == other.id; }
@@ -62,6 +70,7 @@ public:
 
 private:
   void insert(clientDict &client);
+  void removeClient(clientDict &client);
   std::pair<int, int> getCellIndex(const float &x, const float &y);
   std::pair<std::pair<int, int>, std::pair<int, int>>
   getCellIndices(clientDict &client);

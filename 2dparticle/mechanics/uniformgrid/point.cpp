@@ -53,9 +53,9 @@ int main() {
   //
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
   // grid.newClient(1, {0.0, 0.0}, {1.0f, 1.0f});
-  grid.newClient({2.0f, 2.0f}, {1.0f, 1.0f}, {0, 2});
-  grid.newClient({-2.0f, -2.0f}, {1.0f, 1.0f}, {0, 2});
-  grid.newClient({-2.0f, 2.0f}, {1.0f, 1.0f}, {1, 2});
+  // grid.newClient({2.0f, 2.0f}, {1.0f, 1.0f}, {0, 2});
+  // grid.newClient({-2.0f, -2.0f}, {1.0f, 1.0f}, {0, 2});
+  // grid.newClient({-2.0f, 2.0f}, {1.0f, 1.0f}, {1, 2});
   grid.newClient({2.0f, -2.0f}, {1.0f, 1.0f}, {0, 2});
   grid.newClient({2.3f, -2.0f}, {1.0f, 1.0f}, {1.3, 2});
   grid.newClient({0.3f, -3.0f}, {0.3f, 0.3f}, {0, 2});
