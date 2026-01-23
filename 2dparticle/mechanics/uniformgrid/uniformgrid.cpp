@@ -6,46 +6,33 @@
 #include <raymath.h>
 #include <utility>
 
-clientDict SpatialGrid::newClient(const int id, const Vector2 &position,
-                                  const Vector2 &dimensions) {
-  clientDict client{
-      id, position, dimensions, {}}; // position of the client, dimensions of
-                                     // the client, indices of the client
-
-  this->insert(client); // actually you dont need this here but for the sake
-                        // of being explicit i just write it
-  return client;
+void SpatialGrid::newClient(const Vector2 &position, const Vector2 &dimensions,
+                            const Vector2 &velocity) {
+  m_clients.emplace_back(position, dimensions, velocity);
+  insert(m_clients.back()); // insert client to cell list back basically give
+                            // last element reference
 }
 
 void SpatialGrid::insert(clientDict &client) {
 
-  std::pair<int, int> i1{getCellIndex(
-      client.position.x - client.dimensions.x / 2,
-      client.position.y - client.dimensions.y / 2)}; // left lower corner index
+  std::pair<int, int> i1{
+      getCellIndex(client.m_position.x - client.m_dimensions.x / 2,
+                   client.m_position.y -
+                       client.m_dimensions.y / 2)}; // left lower corner index
 
-  std::pair<int, int> i2{getCellIndex(
-      client.position.x + client.dimensions.x / 2,
-      client.position.y + client.dimensions.y / 2)}; // right upper corner index
-  client.indices = {i1, i2};
+  std::pair<int, int> i2{
+      getCellIndex(client.m_position.x + client.m_dimensions.x / 2,
+                   client.m_position.y +
+                       client.m_dimensions.y / 2)}; // right upper corner index
+  client.m_indices = {i1, i2};
 
-  // this for loop  is weird as the boxes for y is startring on top we have to
+  // this for loop  is weird as the boxes for y is starting on top we have to
   // change the places of i2 and i1 because of the box coordinate system.
   // According to world coordinates i1 is still lower left and i2 is upper right
   for (int y{i2.second}; y <= i1.second; ++y) {
     for (int x{i1.first}; x <= i2.first; ++x) {
-      std::cout << y << x << '\n';
       m_cells.data()[y * m_dimensions.first + x].push_back(&client);
     }
-    // std::cout << "client with key " << key << " and indices " << x << y
-    //           << " is inserted." << '\n';
-    // std::cout << "number of boxes of the region " << m_dimensions.first
-    //           << '\n';
-    // std::cout << "client with key " << key << " and i1 indices "
-    //           << client.indices.first.first << client.indices.first.second
-    //           << " i2 indices " << client.indices.second.first
-    //           << client.indices.second.second
-    //
-    //           << " is inserted." << '\n';
   }
 };
 
@@ -55,9 +42,34 @@ std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
   float y_pos{std::clamp(
       ((m_bounds[1][1] - y) / (m_bounds[1][1] - m_bounds[0][1])), 0.0f, 1.0f)};
 
-  std::cout << x_pos << " x and y componenets " << y_pos << '\n';
   int xIndex{static_cast<int>((x_pos * (m_dimensions.first)))};
   int yIndex{static_cast<int>((y_pos * (m_dimensions.second)))};
-  std::cout << "y index " << yIndex << '\n';
   return {xIndex, yIndex};
 };
+void SpatialGrid::update(float dt) {
+  updatePos(dt);
+  wallCollision();
+}
+
+void SpatialGrid::updatePos(float dt) {
+  // update position in real world coordinates
+  for (auto &client : m_clients)
+    client.m_position =
+        Vector2Add(client.m_position, Vector2Scale(client.m_velocity, dt));
+  // update position in cell coordinates
+}
+
+void SpatialGrid::wallCollision() {
+  // wall collisions
+  for (auto &client : m_clients) {
+    std::cout << client.m_position.y << '\n';
+    if (client.m_position.x > m_bounds[1][1])
+      client.m_velocity.x = -client.m_velocity.x;
+    if (client.m_position.x < m_bounds[0][0])
+      client.m_velocity.x = -client.m_velocity.x;
+    if (client.m_position.y > m_bounds[1][1])
+      client.m_velocity.y = -client.m_velocity.y;
+    if (client.m_position.y < m_bounds[0][1])
+      client.m_velocity.y = -client.m_velocity.y;
+  }
+}

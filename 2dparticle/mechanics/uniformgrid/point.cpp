@@ -45,57 +45,69 @@ int main() {
   //   }
   // }
   //
-  // Vector2 accelaration{0, 0};
-  // float dt{1.0f / 60.0f};
+  Vector2 accelaration{0, 0};
+  float dt{1.0f / 60.0f};
   //
   // std::thread updateThread(updater, std::ref(pparticles),
   //                          std::ref(accelaration), std::ref(dt), xRange);
   //
-  clientDict testClient{0, {1, 1}, {0.1, 0.1}, {{0, 1}, {1, 0}}};
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
   // grid.newClient(1, {0.0, 0.0}, {1.0f, 1.0f});
-  grid.newClient(2, {2.0f, 2.0f}, {1.0f, 1.0f});
+  grid.newClient({2.0f, 2.0f}, {1.0f, 1.0f}, {0, 2});
+  grid.newClient({-2.0f, -2.0f}, {1.0f, 1.0f}, {0, 2});
+  grid.newClient({-2.0f, 2.0f}, {1.0f, 1.0f}, {1, 2});
+  grid.newClient({2.0f, -2.0f}, {1.0f, 1.0f}, {0, 2});
+  grid.newClient({2.3f, -2.0f}, {1.0f, 1.0f}, {1.3, 2});
+  grid.newClient({0.3f, -3.0f}, {1.0f, 1.0f}, {0, 2});
 
   Vector2 projectedBoundsLower{projectedVector({-xRange, -xRange}, xRange)};
   Vector2 projectedBoundsUpper{projectedVector({xRange, xRange}, xRange)};
-  Vector2 projectedTestpos{projectedVector(2.0f, 2.0f, xRange)};
-
-  SetTargetFPS(60);
+  SetTargetFPS(80);
   std::cout << "size of the grid " << grid.m_cells.size() << '\n';
 
   while (isRunning) {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
       isRunning = false;
+    grid.update(dt);
 
     BeginDrawing();
     ClearBackground(BLACK);
-    DrawFPS(10, 10);
 
     // Draw gridlines
-    for (int y{0}; y <= HEIGHT; y = y + HEIGHT / NCELLS) {
-      DrawLine(projectedBoundsLower.x, y, projectedBoundsUpper.x, y, GRAY);
+    // for (int y{0}; y <= HEIGHT; y = y + HEIGHT / NCELLS) {
+    //   DrawLine(projectedBoundsLower.x, y, projectedBoundsUpper.x, y, GRAY);
+    // }
+    // for (int x{0}; x <= WIDTH; x = x + WIDTH / NCELLS) {
+    //   DrawLine(x, projectedBoundsLower.y, x, projectedBoundsUpper.y, GRAY);
+    // }
+
+    // Draw clients
+    for (auto &client : grid.m_clients) {
+      // std::cout << client << '\n';
+      Vector2 projectedClientpos{projectedVector(client.m_position, xRange)};
+      DrawCircle(projectedClientpos.x, projectedClientpos.y,
+                 client.m_dimensions.x * scaleX * 0.5f, RED);
     }
-    for (int x{0}; x <= WIDTH; x = x + WIDTH / NCELLS) {
-      DrawLine(x, projectedBoundsLower.y, x, projectedBoundsUpper.y, GRAY);
-    }
-    // Draw rectangles
-    DrawRectangle(projectedTestpos.x - 1.0 * scaleX * 0.5f,
-                  projectedTestpos.y - 1.0 * scaleY * 0.5f, 1.0 * scaleX,
-                  1.0 * scaleY, RED);
+    // DrawRectangle(projectedClientpos.x - 1.0 * scaleX * 0.5f,
+    //               projectedClientpos.y - 1.0 * scaleY * 0.5f, 1.0 * scaleX,
+    //               1.0 * scaleY, RED);
+    // Draw hitbox rectangles
     for (int i{0}; i <= grid.m_cells.size(); ++i) {
       if (grid.m_cells[i].size() > 0) {
-        // std::cout << grid.m_cells[i][0] << '\n';
-        // std::cout << i / NCELLS << i % NCELLS << '\n';
-        float cellW = WIDTH / (float)NCELLS;
-        float cellH = HEIGHT / (float)NCELLS;
-        int x = i % NCELLS;
-        int y = i / NCELLS;
+        for (auto &client : grid.m_cells[i]) {
+          // std::cout << grid.m_cells[i][0] << '\n';
+          // std::cout << i / NCELLS << i % NCELLS << '\n';
+          float cellW = WIDTH / (float)NCELLS;
+          float cellH = HEIGHT / (float)NCELLS;
+          int x = i % NCELLS;
+          int y = i / NCELLS;
 
-        DrawRectangle(x * cellW, y * cellH, cellW, cellH, {0, 228, 48, 100});
+          DrawRectangle(x * cellW, y * cellH, cellW, cellH, {0, 228, 48, 100});
+        }
         // DrawRectangle(
-        //     (i % NCELLS + 0.5f) * (WIDTH / NCELLS) - (WIDTH / NCELLS) * 0.5f,
-        //     (i / NCELLS + 0.5f) * (HEIGHT / NCELLS) - (HEIGHT / NCELLS) *
-        //     0.5f, WIDTH / NCELLS, HEIGHT / NCELLS, GREEN);
+        //     (i % NCELLS + 0.5f) * (WIDTH / NCELLS) - (WIDTH / NCELLS) *
+        //     0.5f, (i / NCELLS + 0.5f) * (HEIGHT / NCELLS) - (HEIGHT /
+        //     NCELLS) * 0.5f, WIDTH / NCELLS, HEIGHT / NCELLS, GREEN);
         // DrawRectangle((i % NCELLS) * (WIDTH / NCELLS),
         //               (i / NCELLS) * (HEIGHT / NCELLS), HEIGHT / NCELLS,
         //               WIDTH / NCELLS, MAROON);
@@ -105,6 +117,7 @@ int main() {
 
     // plotter(pparticles, xRange);
 
+    DrawFPS(10, 10);
     EndDrawing();
   }
 
