@@ -62,14 +62,13 @@ void SpatialGrid::updatePos(float dt) {
 void SpatialGrid::wallCollision() {
   // wall collisions
   for (auto &client : m_clients) {
-    std::cout << client.m_position.y << '\n';
-    if (client.m_position.x > m_bounds[1][1])
+    if (client.m_position.x + client.m_dimensions.x / 2 > m_bounds[1][1])
       client.m_velocity.x = -client.m_velocity.x;
-    if (client.m_position.x < m_bounds[0][0])
+    if (client.m_position.x - client.m_dimensions.x / 2 < m_bounds[0][0])
       client.m_velocity.x = -client.m_velocity.x;
-    if (client.m_position.y > m_bounds[1][1])
+    if (client.m_position.y + client.m_dimensions.y / 2 > m_bounds[1][1])
       client.m_velocity.y = -client.m_velocity.y;
-    if (client.m_position.y < m_bounds[0][1])
+    if (client.m_position.y - client.m_dimensions.y / 2 < m_bounds[0][1])
       client.m_velocity.y = -client.m_velocity.y;
   }
 }

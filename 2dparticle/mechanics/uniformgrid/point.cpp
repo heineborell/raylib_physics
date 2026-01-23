@@ -58,7 +58,7 @@ int main() {
   grid.newClient({-2.0f, 2.0f}, {1.0f, 1.0f}, {1, 2});
   grid.newClient({2.0f, -2.0f}, {1.0f, 1.0f}, {0, 2});
   grid.newClient({2.3f, -2.0f}, {1.0f, 1.0f}, {1.3, 2});
-  grid.newClient({0.3f, -3.0f}, {1.0f, 1.0f}, {0, 2});
+  grid.newClient({0.3f, -3.0f}, {0.3f, 0.3f}, {0, 2});
 
   Vector2 projectedBoundsLower{projectedVector({-xRange, -xRange}, xRange)};
   Vector2 projectedBoundsUpper{projectedVector({xRange, xRange}, xRange)};
