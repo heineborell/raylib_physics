@@ -86,7 +86,7 @@ void SpatialGrid::wallCollision() {
 void SpatialGrid::updateCells() {
   for (auto &client : m_clients) {
     for (auto &clientInfo : client.m_cellInfo) {
-      std::cout << m_cells[clientInfo.cellNumber].size() << '\n';
+      // remove client indices m_cells
       if (m_cells[clientInfo.cellNumber].size() != 0) {
         clientDict *moved{
             m_cells[clientInfo.cellNumber]
@@ -98,14 +98,19 @@ void SpatialGrid::updateCells() {
         m_cells[clientInfo.cellNumber].pop_back();
       }
     }
+    client.m_cellInfo.clear();
+    insert(client);
   }
 }
-
-// std::cout << clientInfo.cellNumber << " <--cell index,client index--> "
-//           << clientInfo.indexInCell << '\n';
-// void SpatialGrid::removeClient(clientDict &client,
-//                                std::vector<clientDict *> cell) {
-//   clientDict *moved = cell.back(); // D
-//   cell[client. = moved;
-//   cell.pop_back();
-// }
+void SpatialGrid::DrawGridlines() {
+  Vector2 projectedBoundsLower{
+      projectedVector({m_bounds[0][0], m_bounds[0][1]}, m_bounds[1][1])};
+  Vector2 projectedBoundsUpper{
+      projectedVector({m_bounds[1][0], m_bounds[1][1]}, m_bounds[1][1])};
+  for (int y{0}; y <= HEIGHT; y = y + HEIGHT / NCELLS) {
+    DrawLine(projectedBoundsLower.x, y, projectedBoundsUpper.x, y, GRAY);
+  }
+  for (int x{0}; x <= WIDTH; x = x + WIDTH / NCELLS) {
+    DrawLine(x, projectedBoundsLower.y, x, projectedBoundsUpper.y, GRAY);
+  }
+}

@@ -52,34 +52,27 @@ int main() {
   //                          std::ref(accelaration), std::ref(dt), xRange);
   //
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
-  // grid.newClient(1, {0.0, 0.0}, {1.0f, 1.0f});
-  // grid.newClient({2.0f, 2.0f}, {1.0f, 1.0f}, {0, 2});
-  // grid.newClient({-2.0f, -2.0f}, {1.0f, 1.0f}, {0, 2});
-  // grid.newClient({-2.0f, 2.0f}, {1.0f, 1.0f}, {1, 2});
-  grid.newClient({2.0f, -2.0f}, {1.0f, 1.0f}, {0, 2});
-  grid.newClient({2.3f, -2.0f}, {1.0f, 1.0f}, {1.3, 2});
-  grid.newClient({0.3f, -3.0f}, {0.3f, 0.3f}, {0, 2});
+  for (int i{0}; i <= 1000; ++i) {
 
-  Vector2 projectedBoundsLower{projectedVector({-xRange, -xRange}, xRange)};
-  Vector2 projectedBoundsUpper{projectedVector({xRange, xRange}, xRange)};
+    int angle{Random::get(1, 20)};
+    float speed{4.0f};
+    Vector2 initialPosition{0.0f, static_cast<float>(Random::get(-3, 3))};
+    Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
+                            speed * std::sin(PI / (2 * angle))};
+    Vector2 dimensions{0.1f, 0.1f};
+    grid.newClient(initialPosition, dimensions, initialVelocity);
+  }
+
   SetTargetFPS(80);
   std::cout << "size of the grid " << grid.m_cells.size() << '\n';
 
   while (isRunning) {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
       isRunning = false;
-    grid.update(dt);
 
+    grid.update(dt);
     BeginDrawing();
     ClearBackground(BLACK);
-
-    // Draw gridlines
-    // for (int y{0}; y <= HEIGHT; y = y + HEIGHT / NCELLS) {
-    //   DrawLine(projectedBoundsLower.x, y, projectedBoundsUpper.x, y, GRAY);
-    // }
-    // for (int x{0}; x <= WIDTH; x = x + WIDTH / NCELLS) {
-    //   DrawLine(x, projectedBoundsLower.y, x, projectedBoundsUpper.y, GRAY);
-    // }
 
     // Draw clients
     for (auto &client : grid.m_clients) {
@@ -95,8 +88,6 @@ int main() {
     for (int i{0}; i <= grid.m_cells.size(); ++i) {
       if (grid.m_cells[i].size() > 0) {
         for (auto &client : grid.m_cells[i]) {
-          // std::cout << grid.m_cells[i][0] << '\n';
-          // std::cout << i / NCELLS << i % NCELLS << '\n';
           float cellW = WIDTH / (float)NCELLS;
           float cellH = HEIGHT / (float)NCELLS;
           int x = i % NCELLS;
@@ -104,18 +95,17 @@ int main() {
 
           DrawRectangle(x * cellW, y * cellH, cellW, cellH, {0, 228, 48, 100});
         }
-        // DrawRectangle(
-        //     (i % NCELLS + 0.5f) * (WIDTH / NCELLS) - (WIDTH / NCELLS) *
-        //     0.5f, (i / NCELLS + 0.5f) * (HEIGHT / NCELLS) - (HEIGHT /
-        //     NCELLS) * 0.5f, WIDTH / NCELLS, HEIGHT / NCELLS, GREEN);
-        // DrawRectangle((i % NCELLS) * (WIDTH / NCELLS),
-        //               (i / NCELLS) * (HEIGHT / NCELLS), HEIGHT / NCELLS,
-        //               WIDTH / NCELLS, MAROON);
       }
-      // std::cout << key.size() << '\n';
     }
 
     // plotter(pparticles, xRange);
+    // std::size_t totalSize{0};
+    // for (auto &cell : grid.m_cells) {
+    //   std::size_t length{cell.size()};
+    //   totalSize += length;
+    // }
+    // std::cout << totalSize << " size of total hitboxes " << '\n';
+    // std::cout << grid.m_clients.size() << '\n';
 
     DrawFPS(10, 10);
     EndDrawing();
