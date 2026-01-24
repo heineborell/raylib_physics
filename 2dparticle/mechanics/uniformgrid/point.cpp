@@ -52,7 +52,7 @@ int main() {
   //                          std::ref(accelaration), std::ref(dt), xRange);
   //
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
-  for (int i{0}; i <= 1000; ++i) {
+  for (int i{0}; i <= 30000; ++i) {
 
     int angle{Random::get(1, 20)};
     float speed{4.0f};
@@ -93,7 +93,8 @@ int main() {
           int x = i % NCELLS;
           int y = i / NCELLS;
 
-          DrawRectangle(x * cellW, y * cellH, cellW, cellH, {0, 228, 48, 100});
+          // DrawRectangle(x * cellW, y * cellH, cellW, cellH, {0, 228, 48,
+          // 100});
         }
       }
     }
