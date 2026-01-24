@@ -14,6 +14,16 @@
 #include <thread>
 #include <vector>
 
+void DrawTexturedCircle(Texture2D tex, Vector2 pos, float radius) {
+  Rectangle src = {0, 0, (float)tex.width, (float)tex.height};
+
+  Rectangle dst = {pos.x, pos.y, radius * 2.0f, radius * 2.0f};
+
+  Vector2 origin = {radius, radius};
+
+  DrawTexturePro(tex, src, dst, origin, 0.0f, WHITE);
+}
+
 int main() {
 
   InitWindow(HEIGHT, WIDTH, "Particle trajectory plot");
@@ -52,7 +62,7 @@ int main() {
   //                          std::ref(accelaration), std::ref(dt), xRange);
   //
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
-  for (int i{0}; i <= 30000; ++i) {
+  for (int i{0}; i <= 40000; ++i) {
 
     int angle{Random::get(1, 20)};
     float speed{4.0f};
@@ -65,6 +75,7 @@ int main() {
 
   SetTargetFPS(80);
   std::cout << "size of the grid " << grid.m_cells.size() << '\n';
+  Texture2D circleTex = LoadTexture("../../../assets/face.png");
 
   while (isRunning) {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
@@ -78,8 +89,11 @@ int main() {
     for (auto &client : grid.m_clients) {
       // std::cout << client << '\n';
       Vector2 projectedClientpos{projectedVector(client.m_position, xRange)};
-      DrawCircle(projectedClientpos.x, projectedClientpos.y,
-                 client.m_dimensions.x * scaleX * 0.5f, RED);
+      DrawTexturedCircle(circleTex, projectedClientpos,
+                         client.m_dimensions.x * scaleX * 0.5f);
+      //            client.m_dimensions.x * scaleX * 0.5f, RED);
+      // DrawCircle(projectedClientpos.x, projectedClientpos.y,
+      //            client.m_dimensions.x * scaleX * 0.5f, RED);
     }
     // DrawRectangle(projectedClientpos.x - 1.0 * scaleX * 0.5f,
     //               projectedClientpos.y - 1.0 * scaleY * 0.5f, 1.0 * scaleX,
