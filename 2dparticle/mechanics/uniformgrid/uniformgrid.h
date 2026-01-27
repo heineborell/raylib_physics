@@ -56,8 +56,8 @@ public:
   SpatialGrid(std::vector<std::vector<float>> bounds,
               std::pair<int, int> dimensions)
       : m_bounds{bounds}, m_dimensions(dimensions),
-        m_cells{static_cast<std::size_t>(dimensions.first * dimensions.second +
-                                         2 * dimensions.first)} {
+        m_cells{static_cast<std::size_t>((dimensions.first + 3) *
+                                         (dimensions.second + 3))} {
     std::cout << "grid initialized!" << '\n';
   };
   void DrawGridlines();

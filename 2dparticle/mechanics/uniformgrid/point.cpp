@@ -62,14 +62,14 @@ int main() {
   //                          std::ref(accelaration), std::ref(dt), xRange);
   //
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
-  for (int i{0}; i <= 20; ++i) {
+  for (int i{0}; i <= 300; ++i) {
 
     int angle{Random::get(1, 20)};
-    float speed{0.20f};
+    float speed{3.0f};
     Vector2 initialPosition{0.0f, static_cast<float>(Random::get(-1, 1))};
     Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
                             speed * std::sin(PI / (2 * angle))};
-    Vector2 dimensions{1.0f, 1.0f};
+    Vector2 dimensions{0.10f, 0.10f};
     grid.newClient(initialPosition, dimensions, initialVelocity);
   }
 
@@ -100,13 +100,14 @@ int main() {
     //               projectedClientpos.y - 1.0 * scaleY * 0.5f, 1.0 * scaleX,
     //               1.0 * scaleY, RED);
     // Draw hitbox rectangles
-    for (int i{0}; i <= grid.m_cells.size(); ++i) {
+    for (int i{0}; i < grid.m_cells.size(); ++i) {
       if (grid.m_cells[i].size() > 0) {
         for (auto &client : grid.m_cells[i]) {
           float cellW = WIDTH / (float)NCELLS;
           float cellH = HEIGHT / (float)NCELLS;
-          int x = i % NCELLS;
-          int y = i / NCELLS;
+          int x = i % (NCELLS);
+          int y = i / (NCELLS);
+          std::cout << x << "----" << y << '\n';
 
           // DrawRectangle(x * cellW, y * cellH, cellW, cellH, {0, 228, 48,
           // 100});
