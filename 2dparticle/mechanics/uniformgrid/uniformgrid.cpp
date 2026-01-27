@@ -25,6 +25,8 @@ SpatialGrid::getCellIndices(clientDict &client) {
                    client.m_position.y +
                        client.m_dimensions.y / 2)}; // right upper corner index
 
+  std::cout << i1.first << "-----" << i1.second << '\n';
+  std::cout << i2.first << "-----" << i2.second << '\n';
   return {i1, i2};
 }
 

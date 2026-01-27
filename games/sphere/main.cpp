@@ -64,7 +64,7 @@ void checkCollisions_y(Sprite &sprite, std::vector<Sprite> &tiles) {
 
 void checkCollisions_x(Sprite &sprite, std::vector<Sprite> &tiles) {
   for (const auto &tile : tiles) {
-    // if player rect intersect tiles rect
+    // if player rect untersect tiles rect
     if (CheckCollisionRecs(sprite.destRect, tile.destRect)) {
       // reverse the overlap
       // sprite on bottom
@@ -102,9 +102,7 @@ int main() {
 
   InitWindow(screenWidth, screenHeight, "awesome game");
 
-  Texture2D playerIdle{
-      LoadTexture("../sphere/assets/herochar "
-                  "sprites(new)/herochar_idle_anim_strip_4.png")};
+  Texture2D playerIdle{LoadTexture("../../assets/test_1.png")};
   SetTargetFPS(FPS);
   Sprite player{playerIdle, {10, 32, 32, 32}};
 

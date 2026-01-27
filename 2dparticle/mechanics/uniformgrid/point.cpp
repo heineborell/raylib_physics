@@ -62,18 +62,19 @@ int main() {
   //                          std::ref(accelaration), std::ref(dt), xRange);
   //
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
-  for (int i{0}; i <= 40000; ++i) {
+  for (int i{0}; i <= 20; ++i) {
 
     int angle{Random::get(1, 20)};
-    float speed{4.0f};
-    Vector2 initialPosition{0.0f, static_cast<float>(Random::get(-3, 3))};
+    float speed{0.20f};
+    Vector2 initialPosition{0.0f, static_cast<float>(Random::get(-1, 1))};
     Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
                             speed * std::sin(PI / (2 * angle))};
-    Vector2 dimensions{0.1f, 0.1f};
+    Vector2 dimensions{1.0f, 1.0f};
     grid.newClient(initialPosition, dimensions, initialVelocity);
   }
 
-  SetTargetFPS(80);
+  SetTargetFPS(60);
+  std::cout << "size of each cell " << 2 * xRange / NCELLS << '\n';
   std::cout << "size of the grid " << grid.m_cells.size() << '\n';
   Texture2D circleTex = LoadTexture("../../../assets/face.png");
 
@@ -128,6 +129,7 @@ int main() {
 
   // std::cout << "Thread no " << updateThread.get_id() << " closed!" << '\n';
   // updateThread.join();
+  UnloadTexture(circleTex);
   isRunning = false;
   CloseWindow();
   return 0;

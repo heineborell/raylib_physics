@@ -27,6 +27,7 @@ public:
   void showTrace(Color col);
   void showVel(double length, double xRange, Color c, const Vector2 &start_vel);
   void show();
+  void show(Texture2D &texture);
 
 private:
   static std::vector<float> speeds;
@@ -36,5 +37,7 @@ private:
 extern std::vector<Particle> particles;
 void addParticle(double xRange);
 void plotter(std::vector<Particle> &pparticles, double xRange);
+void plotter(std::vector<Particle> &pparticles, double xRange,
+             std::vector<Texture2D> &texture);
 void updater(std::vector<Particle> &pparticles, Vector2 &accelaration,
              float &dt, double xRange);

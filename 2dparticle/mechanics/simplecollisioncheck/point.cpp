@@ -15,7 +15,7 @@
 int main() {
 
   InitWindow(HEIGHT, WIDTH, "Boltzmann Distribution");
-  // SetTargetFPS(FPS);
+  SetTargetFPS(FPS);
 
   double xRange{4.0};
   printf("Renderer: %s\n", glGetString(GL_RENDERER));
@@ -44,6 +44,8 @@ int main() {
   Vector2 accelaration{0, 0};
   float dt{1.0f / 60.0f};
   std::cout << WIDTH / (2 * BINS) + 5 << '\n';
+  std::vector<Texture2D> circleTex{LoadTexture("../../../assets/test_1.png"),
+                                   LoadTexture("../../../assets/test_2.png")};
 
   std::thread updateThread(updater, std::ref(pparticles),
                            std::ref(accelaration), std::ref(dt), xRange);
@@ -62,12 +64,13 @@ int main() {
 
     DrawText("Y", WIDTH / 2 + 5, 5, 20, GRAY);
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
-    plotter(pparticles, xRange);
+    plotter(pparticles, xRange, circleTex);
 
     EndDrawing();
   }
 
   std::cout << "Thread no " << updateThread.get_id() << " closed!" << '\n';
+  UnloadTexture(circleTex[0]);
   updateThread.join();
   isRunning = false;
   CloseWindow();

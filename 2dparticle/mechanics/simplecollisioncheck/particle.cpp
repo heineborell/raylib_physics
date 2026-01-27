@@ -13,6 +13,16 @@ std::mutex gLock;
 std::vector<float> Particle::speeds(NUM_PARTICLES, 0.0f);
 std::vector<int> Particle::bins(BINS, 0);
 
+void DrawTexturedCircle(Texture2D tex, Vector2 pos, float radius) {
+  Rectangle src = {0, 0, (float)tex.width, (float)tex.height};
+
+  Rectangle dst = {pos.x, pos.y, radius * 2.0f, radius * 2.0f};
+
+  Vector2 origin = {radius, radius};
+
+  DrawTexturePro(tex, src, dst, origin, 0.0f, WHITE);
+}
+
 Particle::Particle() {};
 Particle::Particle(Vector2 pos, Vector2 vel) : m_pos{pos}, m_vel(vel) {}
 
@@ -39,6 +49,10 @@ void Particle::show() {
   DrawCircle(projected.x, projected.y, PARTICLE_RADIUS, GREEN);
 }
 
+void Particle::show(Texture2D &texture) {
+  Vector2 projected{projectedVector(m_pos, 4.0f)};
+  DrawTexturedCircle(texture, projected, PARTICLE_RADIUS);
+}
 void Particle::getTrace() {
   Vector2 projected{projectedVector(m_pos, 4.0f)};
   trace.push_back(projected);
@@ -123,6 +137,32 @@ void updater(std::vector<Particle> &pparticles, Vector2 &accelaration,
   }
 }
 //
+void plotter(std::vector<Particle> &pparticles, double xRange,
+             std::vector<Texture2D> &texture) {
+  std::unique_lock<std::mutex> lock(gLock);
+
+  for (std::size_t i{0}; i < NUM_PARTICLES; ++i) {
+    // pparticles[i].showVel(0.35, xRange, RED, {4, 4});
+    if (i < NUM_PARTICLES / 2)
+      pparticles[i].show(texture[0]);
+    else
+      pparticles[i].show(texture[1]);
+    if (i == NUM_PARTICLES - 1) {
+      for (int j{0}; j < BINS; ++j) {
+        // DrawRectanglePro(Rectangle{10, HEIGHT - 30, HEIGHT / 4, WIDTH / 4},
+        //                  {0, 0}, 270, MAROON);
+        DrawRectanglePro(Rectangle{10 + j * WIDTH / (3.5f * BINS), HEIGHT - 30,
+                                   WIDTH / (5 * BINS),
+                                   (pparticles[i].getBins().data()[j] /
+                                    static_cast<float>(NUM_PARTICLES)) *
+                                       (HEIGHT / 2)},
+                         {0, 0}, 180, BLUE);
+      }
+    }
+    // pparticles[i].showTrace(BLUE);
+  }
+}
+
 void plotter(std::vector<Particle> &pparticles, double xRange) {
   std::unique_lock<std::mutex> lock(gLock);
 
@@ -148,7 +188,7 @@ void Particle::momentumConservation(std::vector<Particle> &particleArray) {
   for (Particle &m2 : particleArray) {
     if (this >= &m2)
       continue;
-    if (Vector2Distance(m_pos, m2.m_pos) < 0.04) {
+    if (Vector2Distance(m_pos, m2.m_pos) < 0.1) {
       Vector2 normal{Vector2Normalize(m_pos - m2.m_pos)};
       Vector2 velocityDifference{m_vel - m2.m_vel};
       m_vel = m_vel - Vector2Scale(normal, Vector2DotProduct(velocityDifference,
