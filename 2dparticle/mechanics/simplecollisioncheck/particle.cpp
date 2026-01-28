@@ -144,9 +144,9 @@ void plotter(std::vector<Particle> &pparticles, double xRange,
   for (std::size_t i{0}; i < NUM_PARTICLES; ++i) {
     // pparticles[i].showVel(0.35, xRange, RED, {4, 4});
     if (i < NUM_PARTICLES / 2)
-      pparticles[i].show(texture[0]);
+      pparticles[i].show(texture[2]);
     else
-      pparticles[i].show(texture[1]);
+      pparticles[i].show(texture[2]);
     if (i == NUM_PARTICLES - 1) {
       for (int j{0}; j < BINS; ++j) {
         // DrawRectanglePro(Rectangle{10, HEIGHT - 30, HEIGHT / 4, WIDTH / 4},
@@ -188,7 +188,7 @@ void Particle::momentumConservation(std::vector<Particle> &particleArray) {
   for (Particle &m2 : particleArray) {
     if (this >= &m2)
       continue;
-    if (Vector2Distance(m_pos, m2.m_pos) < 0.1) {
+    if (Vector2Distance(m_pos, m2.m_pos) < 0.04) {
       Vector2 normal{Vector2Normalize(m_pos - m2.m_pos)};
       Vector2 velocityDifference{m_vel - m2.m_vel};
       m_vel = m_vel - Vector2Scale(normal, Vector2DotProduct(velocityDifference,

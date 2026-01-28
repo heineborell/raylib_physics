@@ -28,7 +28,8 @@ int main() {
   for (int i{0}; i < NUM_PARTICLES; ++i) {
     if (i < NUM_PARTICLES / 2) {
       int angle{Random::get(1, 20)};
-      Vector2 initialPosition{3, static_cast<float>(Random::get(-4, 4))};
+      Vector2 initialPosition{static_cast<float>(Random::get(-4, 4)),
+                              static_cast<float>(Random::get(-4, 4))};
       Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
                               speed * std::sin(PI / (2 * angle))};
       pparticles.push_back(Particle{initialPosition, initialVelocity});
@@ -45,7 +46,8 @@ int main() {
   float dt{1.0f / 60.0f};
   std::cout << WIDTH / (2 * BINS) + 5 << '\n';
   std::vector<Texture2D> circleTex{LoadTexture("../../../assets/test_1.png"),
-                                   LoadTexture("../../../assets/test_2.png")};
+                                   LoadTexture("../../../assets/test_2.png"),
+                                   LoadTexture("../../../assets/face.png")};
 
   std::thread updateThread(updater, std::ref(pparticles),
                            std::ref(accelaration), std::ref(dt), xRange);
