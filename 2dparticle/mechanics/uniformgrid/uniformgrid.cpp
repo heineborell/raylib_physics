@@ -63,7 +63,16 @@ void SpatialGrid::update(float dt) {
   updatePos(dt);
   wallCollision();
   updateCells();
-  findNearby(this->m_clients[0]);
+  for (auto &client : this->m_clients) {
+    findNearby(client);
+    for (auto &other : client.m_nearby) {
+      if (collide(client, other))
+        // momentumConservation(client, other);
+        resolveCollision(client, *other);
+      else
+        continue;
+    }
+  }
 }
 
 void SpatialGrid::updatePos(float dt) {
@@ -91,16 +100,34 @@ void SpatialGrid::findNearby(clientDict &client) {
 }
 
 void SpatialGrid::wallCollision() {
-  // wall collisions
-  for (auto &client : m_clients) {
-    if (client.m_position.x + client.m_dimensions.x / 2 > m_bounds[1][1])
-      client.m_velocity.x = -client.m_velocity.x;
-    if (client.m_position.x - client.m_dimensions.x / 2 < m_bounds[0][0])
-      client.m_velocity.x = -client.m_velocity.x;
-    if (client.m_position.y + client.m_dimensions.y / 2 > m_bounds[1][1])
-      client.m_velocity.y = -client.m_velocity.y;
-    if (client.m_position.y - client.m_dimensions.y / 2 < m_bounds[0][1])
-      client.m_velocity.y = -client.m_velocity.y;
+  constexpr float restitution{1.0f};
+  for (auto &c : m_clients) {
+    float halfW = c.m_dimensions.x * 0.5f;
+    float halfH = c.m_dimensions.y * 0.5f;
+
+    // left
+    if (c.m_position.x - halfW < m_bounds[0][0]) {
+      c.m_position.x = m_bounds[0][0] + halfW;
+      c.m_velocity.x *= -restitution;
+    }
+
+    // right
+    if (c.m_position.x + halfW > m_bounds[1][0]) {
+      c.m_position.x = m_bounds[1][0] - halfW;
+      c.m_velocity.x *= -restitution;
+    }
+
+    // bottom
+    if (c.m_position.y - halfH < m_bounds[0][1]) {
+      c.m_position.y = m_bounds[0][1] + halfH;
+      c.m_velocity.y *= -restitution;
+    }
+
+    // top
+    if (c.m_position.y + halfH > m_bounds[1][1]) {
+      c.m_position.y = m_bounds[1][1] - halfH;
+      c.m_velocity.y *= -restitution;
+    }
   }
 }
 
@@ -144,4 +171,46 @@ void SpatialGrid::DrawGridlines() {
   for (int x{0}; x <= WIDTH; x = x + WIDTH / NCELLS) {
     DrawLine(x, projectedBoundsLower.y, x, projectedBoundsUpper.y, GRAY);
   }
+}
+
+bool SpatialGrid::collide(const clientDict &a, const clientDict *b) {
+  Vector2 d{Vector2Subtract(a.m_position, b->m_position)};
+  float r{a.m_dimensions.x + b->m_dimensions.x};
+  return Vector2LengthSqr(d) <= r * r;
+}
+
+void SpatialGrid::momentumConservation(clientDict &a, clientDict *b) {
+  Vector2 normal{Vector2Normalize(a.m_position - b->m_position)};
+  Vector2 velocityDifference{a.m_velocity - b->m_velocity};
+  a.m_velocity =
+      a.m_velocity -
+      Vector2Scale(normal, Vector2DotProduct(velocityDifference, normal));
+  b->m_velocity =
+      b->m_velocity +
+      Vector2Scale(normal, Vector2DotProduct(velocityDifference, normal));
+}
+
+void SpatialGrid::resolveCollision(clientDict &a, clientDict &b) {
+  Vector2 normal = Vector2Subtract(b.m_position, a.m_position);
+  float dist = Vector2Length(normal);
+  if (dist == 0)
+    return; // avoid divide by zero
+  normal = Vector2Scale(normal, 1.0f / dist);
+
+  Vector2 rv = Vector2Subtract(b.m_velocity, a.m_velocity);
+  float velAlongNormal = Vector2DotProduct(rv, normal);
+
+  // only resolve if approaching
+  if (velAlongNormal > 0)
+    return;
+
+  float restitution = 1.0f; // 1 = perfectly elastic, 0 = inelastic
+  float invMassA = 1.0f / 1.0f;
+  float invMassB = 1.0f / 1.0f;
+
+  float j = -(1 + restitution) * velAlongNormal / (invMassA + invMassB);
+
+  Vector2 impulse = Vector2Scale(normal, j);
+  a.m_velocity = Vector2Subtract(a.m_velocity, Vector2Scale(impulse, invMassA));
+  b.m_velocity = Vector2Add(b.m_velocity, Vector2Scale(impulse, invMassB));
 }

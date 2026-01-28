@@ -63,8 +63,11 @@ public:
         m_cells{static_cast<std::size_t>((dimensions.first + 3) *
                                          (dimensions.second + 3))} {
     std::cout << "grid initialized!" << '\n';
-    m_clients.reserve(80000); // not used client(50000) so that we don't start
-                              // 50000 immediately
+    m_clients.reserve(
+        80000); // not used client(50000) so that we don't start
+                // 50000 immediately also have to do this because
+                // when its not reserved and vector grows all the
+                // pointers are moved! then you defer a null pointer
   };
   void DrawGridlines();
   void newClient(const Vector2 &position, const Vector2 &dimensions,
@@ -74,6 +77,9 @@ public:
   void updatePos(float dt);
   void findNearby(clientDict &client);
   void wallCollision();
+  bool collide(const clientDict &a, const clientDict *b);
+  void momentumConservation(clientDict &a, clientDict *b);
+  void resolveCollision(clientDict &a, clientDict &b);
   void updateCells();
 
 private:

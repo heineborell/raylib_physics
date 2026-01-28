@@ -62,14 +62,15 @@ int main() {
   //                          std::ref(accelaration), std::ref(dt), xRange);
   //
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
-  for (int i{0}; i <= 20; ++i) {
+  for (int i{0}; i <= NUM_PARTICLES; ++i) {
 
     int angle{Random::get(1, 20)};
-    float speed{3.0f};
-    Vector2 initialPosition{0.0f, static_cast<float>(Random::get(-1, 1))};
+    float speed{static_cast<float>(Random::get(-3, 3))};
+    Vector2 initialPosition{static_cast<float>(Random::get(-3, 3)),
+                            static_cast<float>(Random::get(-3, 3))};
     Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
                             speed * std::sin(PI / (2 * angle))};
-    Vector2 dimensions{0.70f, 0.70f};
+    Vector2 dimensions{PARTICLE_RADIUS, PARTICLE_RADIUS};
     grid.newClient(initialPosition, dimensions, initialVelocity);
   }
 
@@ -101,28 +102,31 @@ int main() {
     //               1.0 * scaleY, RED);
 
     // Draw all hitbox rectangles
-    for (int i{0}; i < grid.m_cells.size(); ++i) {
-      if (grid.m_cells[i].size() > 0) {
-        for (auto &client : grid.m_cells[i]) {
-          float cellW = WIDTH / (float)NCELLS;
-          float cellH = HEIGHT / (float)NCELLS;
-          int x = i % (NCELLS);
-          int y = i / (NCELLS);
-          DrawRectangle(x * cellW, y * cellH, cellW, cellH, {0, 228, 48, 100});
-        }
-      }
-    }
-    if (!grid.m_clients[0].m_nearby.empty()) {
-      for (auto &client : grid.m_clients[0].m_nearby) {
-        for (auto i : client->m_cellInfo) {
-          float cellW = WIDTH / (float)NCELLS;
-          float cellH = HEIGHT / (float)NCELLS;
-          int x = i.cellNumber % (NCELLS);
-          int y = i.cellNumber / (NCELLS);
-          DrawRectangle(x * cellW, y * cellH, cellW, cellH, MAROON);
-        }
-      }
-    }
+    // for (int i{0}; i < grid.m_cells.size(); ++i) {
+    //   if (grid.m_cells[i].size() > 0) {
+    //     for (auto &client : grid.m_cells[i]) {
+    //       float cellW = WIDTH / (float)NCELLS;
+    //       float cellH = HEIGHT / (float)NCELLS;
+    //       int x = i % (NCELLS);
+    //       int y = i / (NCELLS);
+    //       DrawRectangle(x * cellW, y * cellH, cellW, cellH, {0, 228, 48,
+    //       100});
+    //     }
+    //   }
+    // }
+
+    // Draw the ones that are m_nearby
+    //  if (!grid.m_clients[0].m_nearby.empty()) {
+    //    for (auto &client : grid.m_clients[0].m_nearby) {
+    //      for (auto i : client->m_cellInfo) {
+    //        float cellW = WIDTH / (float)NCELLS;
+    //        float cellH = HEIGHT / (float)NCELLS;
+    //        int x = i.cellNumber % (NCELLS);
+    //        int y = i.cellNumber / (NCELLS);
+    //        DrawRectangle(x * cellW, y * cellH, cellW, cellH, MAROON);
+    //      }
+    //    }
+    //  }
 
     // plotter(pparticles, xRange);
     // std::size_t totalSize{0};
