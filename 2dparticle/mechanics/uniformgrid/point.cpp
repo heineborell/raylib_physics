@@ -62,7 +62,7 @@ int main() {
   //                          std::ref(accelaration), std::ref(dt), xRange);
   //
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
-  for (int i{0}; i <= 300; ++i) {
+  for (int i{0}; i <= 20; ++i) {
 
     int angle{Random::get(1, 20)};
     float speed{3.0f};
@@ -112,8 +112,8 @@ int main() {
         }
       }
     }
-    for (auto &client : grid.m_clients[0].m_nearby) {
-      if (!grid.m_clients[0].m_nearby.empty()) {
+    if (!grid.m_clients[0].m_nearby.empty()) {
+      for (auto &client : grid.m_clients[0].m_nearby) {
         for (auto i : client->m_cellInfo) {
           float cellW = WIDTH / (float)NCELLS;
           float cellH = HEIGHT / (float)NCELLS;

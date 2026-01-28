@@ -60,11 +60,10 @@ std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
 }
 
 void SpatialGrid::update(float dt) {
-  uint64_t queryId{};
   updatePos(dt);
-  findNearby(this->m_clients[0]);
   wallCollision();
   updateCells();
+  findNearby(this->m_clients[0]);
 }
 
 void SpatialGrid::updatePos(float dt) {

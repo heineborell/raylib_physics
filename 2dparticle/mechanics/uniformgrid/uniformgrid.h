@@ -1,6 +1,7 @@
 #include "config.h"
 #include <cstddef>
 #include <cstdint>
+#include <deque>
 #include <iostream>
 #include <raylib.h>
 #include <set>
@@ -62,6 +63,8 @@ public:
         m_cells{static_cast<std::size_t>((dimensions.first + 3) *
                                          (dimensions.second + 3))} {
     std::cout << "grid initialized!" << '\n';
+    m_clients.reserve(80000); // not used client(50000) so that we don't start
+                              // 50000 immediately
   };
   void DrawGridlines();
   void newClient(const Vector2 &position, const Vector2 &dimensions,
