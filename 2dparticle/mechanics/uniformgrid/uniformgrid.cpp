@@ -1,6 +1,7 @@
 #include "uniformgrid.h"
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <raylib.h>
 #include <raymath.h>
@@ -59,7 +60,9 @@ std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
 }
 
 void SpatialGrid::update(float dt) {
+  uint64_t queryId{};
   updatePos(dt);
+  findNearby(this->m_clients[0]);
   wallCollision();
   updateCells();
 }
@@ -69,6 +72,23 @@ void SpatialGrid::updatePos(float dt) {
   for (auto &client : m_clients)
     client.m_position =
         Vector2Add(client.m_position, Vector2Scale(client.m_velocity, dt));
+}
+
+void SpatialGrid::findNearby(clientDict &client) {
+  this->queryId++;
+  client.m_nearby.clear();
+
+  for (auto &cellInfo : client.m_cellInfo) {
+    for (auto &other : m_cells[cellInfo.cellNumber]) {
+      if (other == &client)
+        continue;
+
+      if (other->lastQueryId != queryId) {
+        other->lastQueryId = queryId;
+        client.m_nearby.push_back(other);
+      }
+    }
+  }
 }
 
 void SpatialGrid::wallCollision() {
@@ -88,22 +108,32 @@ void SpatialGrid::wallCollision() {
 void SpatialGrid::updateCells() {
   for (auto &client : m_clients) {
     for (auto &clientInfo : client.m_cellInfo) {
-      // remove client indices m_cells
-      if (m_cells[clientInfo.cellNumber].size() != 0) {
-        clientDict *moved{
-            m_cells[clientInfo.cellNumber]
-                .back()}; // save the pointer of last element then change it
-                          // with the one you want to remove (so you removed!),
-                          // finally popback the end so that you kill the
-                          // double.
-        m_cells[clientInfo.cellNumber][clientInfo.indexInCell] = moved;
-        m_cells[clientInfo.cellNumber].pop_back();
-      }
+      // // remove client indices m_cells
+      // int idx{clientInfo.indexInCell};
+      // int last{static_cast<int>(m_cells[clientInfo.cellNumber].size() - 1)};
+      // if (idx != last) {
+      //   clientDict *moved{
+      //       m_cells[clientInfo.cellNumber]
+      //           .back()}; // save the pointer of last element then change it
+      //                     // with the one you want to remove (so you
+      //                     // removed!),
+      //                     // finally popback the end so that you kill the
+      //                     // double.
+      //   m_cells[clientInfo.cellNumber][clientInfo.indexInCell] = moved;
+      //   for (auto &entry : moved->m_cellInfo) {
+      //     if (entry.cellNumber == clientInfo.cellNumber) {
+      //       entry.indexInCell = idx;
+      //       break;
+      //     }
+      //   }
+      // }
+      m_cells[clientInfo.cellNumber].pop_back();
     }
     client.m_cellInfo.clear();
     insert(client);
   }
 }
+
 void SpatialGrid::DrawGridlines() {
   Vector2 projectedBoundsLower{
       projectedVector({m_bounds[0][0], m_bounds[0][1]}, m_bounds[1][1])};

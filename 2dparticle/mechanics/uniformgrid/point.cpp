@@ -69,7 +69,7 @@ int main() {
     Vector2 initialPosition{0.0f, static_cast<float>(Random::get(-1, 1))};
     Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
                             speed * std::sin(PI / (2 * angle))};
-    Vector2 dimensions{0.10f, 0.10f};
+    Vector2 dimensions{0.70f, 0.70f};
     grid.newClient(initialPosition, dimensions, initialVelocity);
   }
 
@@ -99,7 +99,8 @@ int main() {
     // DrawRectangle(projectedClientpos.x - 1.0 * scaleX * 0.5f,
     //               projectedClientpos.y - 1.0 * scaleY * 0.5f, 1.0 * scaleX,
     //               1.0 * scaleY, RED);
-    // Draw hitbox rectangles
+
+    // Draw all hitbox rectangles
     for (int i{0}; i < grid.m_cells.size(); ++i) {
       if (grid.m_cells[i].size() > 0) {
         for (auto &client : grid.m_cells[i]) {
@@ -107,10 +108,18 @@ int main() {
           float cellH = HEIGHT / (float)NCELLS;
           int x = i % (NCELLS);
           int y = i / (NCELLS);
-          std::cout << x << "----" << y << '\n';
-
-          // DrawRectangle(x * cellW, y * cellH, cellW, cellH, {0, 228, 48,
-          // 100});
+          DrawRectangle(x * cellW, y * cellH, cellW, cellH, {0, 228, 48, 100});
+        }
+      }
+    }
+    for (auto &client : grid.m_clients[0].m_nearby) {
+      if (!grid.m_clients[0].m_nearby.empty()) {
+        for (auto i : client->m_cellInfo) {
+          float cellW = WIDTH / (float)NCELLS;
+          float cellH = HEIGHT / (float)NCELLS;
+          int x = i.cellNumber % (NCELLS);
+          int y = i.cellNumber / (NCELLS);
+          DrawRectangle(x * cellW, y * cellH, cellW, cellH, MAROON);
         }
       }
     }
@@ -124,6 +133,7 @@ int main() {
     // std::cout << totalSize << " size of total hitboxes " << '\n';
     // std::cout << grid.m_clients.size() << '\n';
 
+    // std::cout << grid.m_clients[1].lastQueryId << '\n';
     DrawFPS(10, 10);
     EndDrawing();
   }

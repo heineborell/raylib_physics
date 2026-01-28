@@ -1,5 +1,6 @@
 #include "config.h"
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <raylib.h>
 #include <set>
@@ -21,8 +22,9 @@ public:
   Vector2 m_position{};   // x, y
   Vector2 m_dimensions{}; // width, height
   Vector2 m_velocity{};
+  uint64_t lastQueryId{};
   std::vector<cellEntry> m_cellInfo;
-  // std::pair<std::pair<int, int>, std::pair<int, int>> m_indices{};
+  std::vector<clientDict *> m_nearby;
 
   // Compare ONLY the id
   // bool operator==(const clientDict &other) const { return id == other.id; }
@@ -52,6 +54,7 @@ public:
       m_dimensions; // the basically will control how many cells we have
   std::vector<std::vector<clientDict *>> m_cells;
   std::vector<clientDict> m_clients;
+  uint64_t queryId{0};
 
   SpatialGrid(std::vector<std::vector<float>> bounds,
               std::pair<int, int> dimensions)
@@ -66,6 +69,7 @@ public:
 
   void update(float dt);
   void updatePos(float dt);
+  void findNearby(clientDict &client);
   void wallCollision();
   void updateCells();
 
