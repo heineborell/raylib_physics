@@ -3,10 +3,14 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <mutex>
 #include <raylib.h>
 #include <raymath.h>
+#include <thread>
 #include <utility>
 
+bool isRunning = true;
+std::mutex gLock;
 void SpatialGrid::newClient(const Vector2 &position, const Vector2 &dimensions,
                             const Vector2 &velocity) {
   m_clients.emplace_back(position, dimensions, velocity);

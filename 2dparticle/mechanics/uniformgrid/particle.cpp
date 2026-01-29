@@ -8,8 +8,6 @@
 #include <thread>
 #include <vector>
 
-bool isRunning = true;
-std::mutex gLock;
 std::vector<float> Particle::speeds(NUM_PARTICLES, 0.0f);
 std::vector<int> Particle::bins(BINS, 0);
 

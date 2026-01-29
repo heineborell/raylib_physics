@@ -1,6 +1,5 @@
 #include "Random.h"
 #include "config.h"
-#include "particle.h"
 #include "uniformgrid.h"
 #include <GL/gl.h>
 #include <cmath>
