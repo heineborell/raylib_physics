@@ -67,12 +67,11 @@ void SpatialGrid::update() {
   using clock = std::chrono::steady_clock;
   auto next = clock::now(); // take a note of current time
   while (isRunning) {
-    int deltat{static_cast<int>(dt * 1000)};
+    int deltat{std::min(static_cast<int>(dt * 1000), 33)};
     if (deltat == 0) {
       std::cout << "warning!" << '\n';
-      deltat = 16;
+      deltat = 33;
     }
-    std::cout << deltat << '\n';
     next += std::chrono::milliseconds(deltat); // increment your time by delta t
     {
       std::unique_lock<std::mutex> lock(gLock);
