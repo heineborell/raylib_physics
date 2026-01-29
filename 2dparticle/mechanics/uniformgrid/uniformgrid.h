@@ -89,3 +89,7 @@ private:
   std::pair<std::pair<int, int>, std::pair<int, int>>
   getCellIndices(clientDict &client);
 };
+
+void DrawTexturedCircle(Texture2D tex, Vector2 pos, float radius);
+void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
+             float scaleX);

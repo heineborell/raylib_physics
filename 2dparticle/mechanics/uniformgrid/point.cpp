@@ -13,16 +13,6 @@
 #include <thread>
 #include <vector>
 
-void DrawTexturedCircle(Texture2D tex, Vector2 pos, float radius) {
-  Rectangle src = {0, 0, (float)tex.width, (float)tex.height};
-
-  Rectangle dst = {pos.x, pos.y, radius * 2.0f, radius * 2.0f};
-
-  Vector2 origin = {radius, radius};
-
-  DrawTexturePro(tex, src, dst, origin, 0.0f, WHITE);
-}
-
 int main() {
 
   InitWindow(HEIGHT, WIDTH, "Particle trajectory plot");
@@ -57,8 +47,6 @@ int main() {
   Vector2 accelaration{0, 0};
   float dt{1.0f / 60.0f};
   //
-  // std::thread updateThread(updater, std::ref(pparticles),
-  //                          std::ref(accelaration), std::ref(dt), xRange);
   //
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
   for (int i{0}; i <= NUM_PARTICLES; ++i) {
@@ -73,6 +61,8 @@ int main() {
     grid.newClient(initialPosition, dimensions, initialVelocity);
   }
 
+  std::thread updateThread(&SpatialGrid::update, &grid, dt);
+
   SetTargetFPS(60);
   std::cout << "size of each cell " << 2 * xRange / NCELLS << '\n';
   std::cout << "size of the grid " << grid.m_cells.size() << '\n';
@@ -85,20 +75,9 @@ int main() {
     if (IsKeyPressed(KEY_SPACE))
       ToggleFullscreen();
 
-    grid.update(dt);
     BeginDrawing();
     ClearBackground(BLACK);
 
-    // Draw clients
-    for (auto &client : grid.m_clients) {
-      // std::cout << client << '\n';
-      Vector2 projectedClientpos{projectedVector(client.m_position, xRange)};
-      DrawTexturedCircle(circleTex, projectedClientpos,
-                         client.m_dimensions.x * scaleX * 0.5f);
-      //            client.m_dimensions.x * scaleX * 0.5f, RED);
-      // DrawCircle(projectedClientpos.x, projectedClientpos.y,
-      //            client.m_dimensions.x * scaleX * 0.5f, RED);
-    }
     // DrawRectangle(projectedClientpos.x - 1.0 * scaleX * 0.5f,
     //               projectedClientpos.y - 1.0 * scaleY * 0.5f, 1.0 * scaleX,
     //               1.0 * scaleY, RED);
@@ -140,6 +119,8 @@ int main() {
     // std::cout << grid.m_clients.size() << '\n';
 
     // std::cout << grid.m_clients[1].lastQueryId << '\n';
+
+    plotter(grid, circleTex, xRange, scaleX);
     DrawFPS(10, 10);
     EndDrawing();
   }

@@ -64,18 +64,30 @@ std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
 }
 
 void SpatialGrid::update(float dt) {
-  updatePos(dt);
-  wallCollision();
-  updateCells();
-  for (auto &client : this->m_clients) {
-    findNearby(client);
-    for (auto &other : client.m_nearby) {
-      if (collide(client, other))
-        // momentumConservation(client, other);
-        resolveCollision(client, *other);
-      else
-        continue;
+  using clock = std::chrono::steady_clock;
+  auto next = clock::now(); // take a note of current time
+  while (isRunning) {
+    next += std::chrono::milliseconds(16); // increment your time by delta t
+    {
+      std::unique_lock<std::mutex> lock(gLock);
+      updatePos(dt);
+      wallCollision();
+      updateCells();
+      for (auto &client : this->m_clients) {
+        findNearby(client);
+        for (auto &other : client.m_nearby) {
+          if (collide(client, other))
+            // momentumConservation(client, other);
+            resolveCollision(client, *other);
+          else
+            continue;
+        }
+      }
     }
+    std::this_thread::sleep_until(
+        next); // sleep this thread until noted time+delta t, so good thing is
+               // if this your computation is longer than the delta t this
+               // immediately continues
   }
 }
 
@@ -217,4 +229,30 @@ void SpatialGrid::resolveCollision(clientDict &a, clientDict &b) {
   Vector2 impulse = Vector2Scale(normal, j);
   a.m_velocity = Vector2Subtract(a.m_velocity, Vector2Scale(impulse, invMassA));
   b.m_velocity = Vector2Add(b.m_velocity, Vector2Scale(impulse, invMassB));
+}
+
+// Draw clients
+
+void DrawTexturedCircle(Texture2D tex, Vector2 pos, float radius) {
+  Rectangle src = {0, 0, (float)tex.width, (float)tex.height};
+
+  Rectangle dst = {pos.x, pos.y, radius * 2.0f, radius * 2.0f};
+
+  Vector2 origin = {radius, radius};
+
+  DrawTexturePro(tex, src, dst, origin, 0.0f, WHITE);
+}
+
+void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
+             float scaleX) {
+  for (auto &client : grid.m_clients) {
+    std::unique_lock<std::mutex> lock(gLock);
+    // std::cout << client << '\n';
+    Vector2 projectedClientpos{projectedVector(client.m_position, xRange)};
+    DrawTexturedCircle(circleTex, projectedClientpos,
+                       client.m_dimensions.x * scaleX * 0.5f);
+    //            client.m_dimensions.x * scaleX * 0.5f, RED);
+    // DrawCircle(projectedClientpos.x, projectedClientpos.y,
+    //            client.m_dimensions.x * scaleX * 0.5f, RED);
+  }
 }
