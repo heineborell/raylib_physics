@@ -66,16 +66,16 @@ public:
                                          (dimensions.second + 3))} {
     std::cout << "grid initialized!" << '\n';
     m_clients.reserve(
-        80000); // not used client(50000) so that we don't start
-                // 50000 immediately also have to do this because
-                // when its not reserved and vector grows all the
-                // pointers are moved! then you defer a null pointer
+        NUM_PARTICLES); // not used client(50000) so that we don't start
+                        // 50000 immediately also have to do this because
+                        // when its not reserved and vector grows all the
+                        // pointers are moved! then you defer a null pointer
   };
   void DrawGridlines();
   void newClient(const Vector2 &position, const Vector2 &dimensions,
                  const Vector2 &velocity);
 
-  void update(float dt);
+  void update();
   void updatePos(float dt);
   void findNearby(clientDict &client);
   void wallCollision();
