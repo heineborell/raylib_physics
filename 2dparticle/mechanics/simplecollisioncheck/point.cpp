@@ -1,7 +1,7 @@
 #include "Random.h"
 #include "config.h"
 #include "particle.h"
-#include <GL/gl.h>
+// #include <GL/gl.h>
 #include <chrono>
 #include <cmath>
 #include <iostream>
@@ -18,8 +18,8 @@ int main() {
   SetTargetFPS(FPS);
 
   double xRange{4.0};
-  printf("Renderer: %s\n", glGetString(GL_RENDERER));
-  printf("Vendor:   %s\n", glGetString(GL_VENDOR));
+  // printf("Renderer: %s\n", glGetString(GL_RENDERER));
+  // printf("Vendor:   %s\n", glGetString(GL_VENDOR));
 
   // create particles with random initial positions and velocities
   std::vector<Particle> pparticles;

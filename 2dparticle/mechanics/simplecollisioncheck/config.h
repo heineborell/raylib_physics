@@ -15,7 +15,7 @@ inline constexpr int FPS{60};
 inline constexpr int PARTICLE_RADIUS{2};
 inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
-inline constexpr int NUM_PARTICLES{3600};
+inline constexpr int NUM_PARTICLES{10000};
 inline constexpr int BINS{40};
 
 inline constexpr double zoomSpeed{1.1};

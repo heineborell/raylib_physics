@@ -63,11 +63,17 @@ std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
   return {xIndex, yIndex};
 }
 
-void SpatialGrid::update(float dt) {
+void SpatialGrid::update() {
   using clock = std::chrono::steady_clock;
   auto next = clock::now(); // take a note of current time
   while (isRunning) {
-    next += std::chrono::milliseconds(33); // increment your time by delta t
+    int deltat{static_cast<int>(dt * 1000)};
+    if (deltat == 0) {
+      std::cout << "warning!" << '\n';
+      deltat = 16;
+    }
+    std::cout << deltat << '\n';
+    next += std::chrono::milliseconds(deltat); // increment your time by delta t
     {
       std::unique_lock<std::mutex> lock(gLock);
       updatePos(dt);
@@ -148,29 +154,9 @@ void SpatialGrid::wallCollision() {
 }
 
 void SpatialGrid::updateCells() {
+  for (auto &cell : m_cells)
+    cell.clear();
   for (auto &client : m_clients) {
-    for (auto &clientInfo : client.m_cellInfo) {
-      // // remove client indices m_cells
-      // int idx{clientInfo.indexInCell};
-      // int last{static_cast<int>(m_cells[clientInfo.cellNumber].size() - 1)};
-      // if (idx != last) {
-      //   clientDict *moved{
-      //       m_cells[clientInfo.cellNumber]
-      //           .back()}; // save the pointer of last element then change it
-      //                     // with the one you want to remove (so you
-      //                     // removed!),
-      //                     // finally popback the end so that you kill the
-      //                     // double.
-      //   m_cells[clientInfo.cellNumber][clientInfo.indexInCell] = moved;
-      //   for (auto &entry : moved->m_cellInfo) {
-      //     if (entry.cellNumber == clientInfo.cellNumber) {
-      //       entry.indexInCell = idx;
-      //       break;
-      //     }
-      //   }
-      // }
-      m_cells[clientInfo.cellNumber].pop_back();
-    }
     client.m_cellInfo.clear();
     insert(client);
   }

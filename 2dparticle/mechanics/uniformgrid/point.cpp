@@ -45,7 +45,6 @@ int main() {
   // }
   //
   Vector2 accelaration{0, 0};
-  float dt{1.0f / 60.0f};
   //
   //
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
@@ -61,7 +60,7 @@ int main() {
     grid.newClient(initialPosition, dimensions, initialVelocity);
   }
 
-  std::thread updateThread(&SpatialGrid::update, &grid, dt);
+  std::thread updateThread(&SpatialGrid::update, &grid);
 
   SetTargetFPS(FPS);
   std::cout << "size of each cell " << 2 * xRange / NCELLS << '\n';
@@ -122,6 +121,7 @@ int main() {
 
     plotter(grid, circleTex, xRange, scaleX);
     DrawFPS(10, 10);
+    dt = GetFrameTime();
     EndDrawing();
   }
 
