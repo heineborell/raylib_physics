@@ -66,16 +66,13 @@ std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
 void SpatialGrid::update() {
   using clock = std::chrono::steady_clock;
   auto next = clock::now(); // take a note of current time
+  constexpr int deltat = 1000 / FPS;
+  constexpr float deltaT{1.0f / FPS};
   while (isRunning) {
-    int deltat{std::min(static_cast<int>(dt * 1000), 33)};
-    if (deltat == 0) {
-      std::cout << "warning!" << '\n';
-      deltat = 33;
-    }
     next += std::chrono::milliseconds(deltat); // increment your time by delta t
     {
       std::unique_lock<std::mutex> lock(gLock);
-      updatePos(dt);
+      updatePos(deltaT);
       wallCollision();
       updateCells();
       for (auto &client : this->m_clients) {

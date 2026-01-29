@@ -9,14 +9,14 @@ using std::vector;
 
 inline constexpr int WIDTH{1000};
 inline constexpr int HEIGHT{1000};
-inline constexpr int FPS{30};
+inline constexpr int FPS{60};
 inline constexpr int NCELLS{120};
 inline float dt{1.0f / 30.0f};
 
-inline constexpr float PARTICLE_RADIUS{0.02};
+inline constexpr float PARTICLE_RADIUS{0.1};
 inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
-inline constexpr int NUM_PARTICLES{120000};
+inline constexpr int NUM_PARTICLES{1500};
 inline constexpr int BINS{50};
 
 inline constexpr double zoomSpeed{1.1};
