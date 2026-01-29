@@ -31,7 +31,9 @@ public:
   // bool operator==(const clientDict &other) const { return id == other.id; }
   clientDict(const Vector2 &position, const Vector2 &dimension,
              const Vector2 &velocity)
-      : m_position(position), m_dimensions(dimension), m_velocity(velocity) {};
+      : m_position(position), m_dimensions(dimension), m_velocity(velocity) {
+          // m_nearby.reserve(10);
+        };
 
   void applyForce(Vector2 &force);
   void applyAcc(Vector2 &accelaration, float &dt);

@@ -9,13 +9,13 @@ using std::vector;
 
 inline constexpr int WIDTH{1000};
 inline constexpr int HEIGHT{1000};
-inline constexpr int FPS{60};
-inline constexpr int NCELLS{60};
+inline constexpr int FPS{30};
+inline constexpr int NCELLS{120};
 
-inline constexpr float PARTICLE_RADIUS{0.03};
+inline constexpr float PARTICLE_RADIUS{0.02};
 inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
-inline constexpr int NUM_PARTICLES{15000};
+inline constexpr int NUM_PARTICLES{45000};
 inline constexpr int BINS{50};
 
 inline constexpr double zoomSpeed{1.1};

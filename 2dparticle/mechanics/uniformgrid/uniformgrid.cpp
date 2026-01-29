@@ -67,7 +67,7 @@ void SpatialGrid::update(float dt) {
   using clock = std::chrono::steady_clock;
   auto next = clock::now(); // take a note of current time
   while (isRunning) {
-    next += std::chrono::milliseconds(16); // increment your time by delta t
+    next += std::chrono::milliseconds(33); // increment your time by delta t
     {
       std::unique_lock<std::mutex> lock(gLock);
       updatePos(dt);

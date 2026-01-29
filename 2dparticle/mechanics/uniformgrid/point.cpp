@@ -53,8 +53,8 @@ int main() {
 
     int angle{Random::get(1, 20)};
     float speed{static_cast<float>(Random::get(-3, 3))};
-    Vector2 initialPosition{static_cast<float>(Random::get(-3, 3)),
-                            static_cast<float>(Random::get(-3, 3))};
+    Vector2 initialPosition{-3.9f + (Random::get(0, 7800) / 1000.0f),
+                            -3.9f + (Random::get(0, 7800) / 1000.0f)};
     Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
                             speed * std::sin(PI / (2 * angle))};
     Vector2 dimensions{PARTICLE_RADIUS, PARTICLE_RADIUS};
@@ -63,7 +63,7 @@ int main() {
 
   std::thread updateThread(&SpatialGrid::update, &grid, dt);
 
-  SetTargetFPS(60);
+  SetTargetFPS(FPS);
   std::cout << "size of each cell " << 2 * xRange / NCELLS << '\n';
   std::cout << "size of the grid " << grid.m_cells.size() << '\n';
   Texture2D circleTex = LoadTexture("../../../assets/face.png");
@@ -125,8 +125,8 @@ int main() {
     EndDrawing();
   }
 
-  // std::cout << "Thread no " << updateThread.get_id() << " closed!" << '\n';
-  // updateThread.join();
+  std::cout << "Thread no " << updateThread.get_id() << " closed!" << '\n';
+  updateThread.join();
   UnloadTexture(circleTex);
   isRunning = false;
   CloseWindow();
