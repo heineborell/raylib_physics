@@ -26,7 +26,6 @@ void DrawTexturedCircle(Texture2D tex, Vector2 pos, float radius) {
 int main() {
 
   InitWindow(HEIGHT, WIDTH, "Particle trajectory plot");
-  // SetTargetFPS(FPS);
 
   float xRange{4.0};
   float scaleX{WIDTH / (2 * xRange)};
@@ -73,7 +72,7 @@ int main() {
     grid.newClient(initialPosition, dimensions, initialVelocity);
   }
 
-  SetTargetFPS(60);
+  SetTargetFPS(30);
   std::cout << "size of each cell " << 2 * xRange / NCELLS << '\n';
   std::cout << "size of the grid " << grid.m_cells.size() << '\n';
   Texture2D circleTex = LoadTexture("../../../assets/face.png");
