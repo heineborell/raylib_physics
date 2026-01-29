@@ -175,8 +175,13 @@ void SpatialGrid::DrawGridlines() {
 
 bool SpatialGrid::collide(const clientDict &a, const clientDict *b) {
   Vector2 d{Vector2Subtract(a.m_position, b->m_position)};
-  float r{a.m_dimensions.x + b->m_dimensions.x};
-  return Vector2LengthSqr(d) <= r * r;
+  float distance{Vector2LengthSqr(d)};
+  if (distance == 0)
+    return false;
+  else {
+    float r{a.m_dimensions.x + b->m_dimensions.x};
+    return Vector2LengthSqr(d) <= r * r;
+  }
 }
 
 void SpatialGrid::momentumConservation(clientDict &a, clientDict *b) {
@@ -191,12 +196,7 @@ void SpatialGrid::momentumConservation(clientDict &a, clientDict *b) {
 }
 
 void SpatialGrid::resolveCollision(clientDict &a, clientDict &b) {
-  Vector2 normal = Vector2Subtract(b.m_position, a.m_position);
-  float dist = Vector2Length(normal);
-  if (dist == 0)
-    return; // avoid divide by zero
-  normal = Vector2Scale(normal, 1.0f / dist);
-
+  Vector2 normal = Vector2Normalize(b.m_position - a.m_position);
   Vector2 rv = Vector2Subtract(b.m_velocity, a.m_velocity);
   float velAlongNormal = Vector2DotProduct(rv, normal);
 

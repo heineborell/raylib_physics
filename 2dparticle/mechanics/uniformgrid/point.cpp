@@ -83,6 +83,9 @@ int main() {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
       isRunning = false;
 
+    if (IsKeyPressed(KEY_SPACE))
+      ToggleFullscreen();
+
     grid.update(dt);
     BeginDrawing();
     ClearBackground(BLACK);
