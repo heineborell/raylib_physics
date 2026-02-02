@@ -65,6 +65,11 @@ int main() {
   SetTargetFPS(FPS);
   std::cout << "size of each cell " << 2 * xRange / NCELLS << '\n';
   std::cout << "size of the grid " << grid.m_cells.size() << '\n';
+
+  std::vector<Rectangle> textureGrid{};
+  Texture2D atlas = LoadTexture("../../../assets/shaded-Sheet.png");
+  textureGrid.push_back(Rectangle{0 * 32, 0, 32, 32});
+  textureGrid.push_back(Rectangle{1 * 32, 0, 32, 32});
   Texture2D circleTex = LoadTexture("../../../assets/face.png");
 
   while (isRunning) {
@@ -119,7 +124,7 @@ int main() {
 
     // std::cout << grid.m_clients[1].lastQueryId << '\n';
 
-    plotter(grid, circleTex, xRange, scaleX);
+    plotter(grid, atlas, xRange, scaleX);
     DrawFPS(10, 10);
     dt = GetFrameTime();
     EndDrawing();
@@ -128,6 +133,7 @@ int main() {
   std::cout << "Thread no " << updateThread.get_id() << " closed!" << '\n';
   updateThread.join();
   UnloadTexture(circleTex);
+  UnloadTexture(atlas);
   isRunning = false;
   CloseWindow();
   return 0;

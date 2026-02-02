@@ -215,8 +215,9 @@ void SpatialGrid::resolveCollision(clientDict &a, clientDict &b) {
 
 // Draw clients
 
-void DrawTexturedCircle(Texture2D tex, Vector2 pos, float radius) {
-  Rectangle src = {0, 0, (float)tex.width, (float)tex.height};
+void DrawTexturedCircle(Texture2D &tex, Vector2 &pos, float radius,
+                        float order) {
+  Rectangle src = {order * 32, 0, 32, 32};
 
   Rectangle dst = {pos.x, pos.y, radius * 2.0f, radius * 2.0f};
 
@@ -231,8 +232,12 @@ void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
     std::unique_lock<std::mutex> lock(gLock);
     // std::cout << client << '\n';
     Vector2 projectedClientpos{projectedVector(client.m_position, xRange)};
-    DrawTexturedCircle(circleTex, projectedClientpos,
-                       client.m_dimensions.x * scaleX * 0.5f);
+    if (client.m_cellInfo[0].cellNumber % 2 == 0)
+      DrawTexturedCircle(circleTex, projectedClientpos,
+                         client.m_dimensions.x * scaleX * 0.5f, 0.0f);
+    else
+      DrawTexturedCircle(circleTex, projectedClientpos,
+                         client.m_dimensions.x * scaleX * 0.5f, 1.0f);
     //            client.m_dimensions.x * scaleX * 0.5f, RED);
     // DrawCircle(projectedClientpos.x, projectedClientpos.y,
     //            client.m_dimensions.x * scaleX * 0.5f, RED);
