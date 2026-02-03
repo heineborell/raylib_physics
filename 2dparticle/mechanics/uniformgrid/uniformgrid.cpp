@@ -11,6 +11,7 @@
 
 bool isRunning = true;
 std::mutex gLock;
+
 void SpatialGrid::newClient(const Vector2 &position, const Vector2 &dimensions,
                             const Vector2 &velocity) {
   m_clients.emplace_back(position, dimensions, velocity);
@@ -30,8 +31,6 @@ SpatialGrid::getCellIndices(clientDict &client) {
                    client.m_position.y +
                        client.m_dimensions.y / 2)}; // right upper corner index
 
-  // std::cout << i1.first << "-----" << i1.second << '\n';
-  // std::cout << i2.first << "-----" << i2.second << '\n';
   return {i1, i2};
 }
 
@@ -79,7 +78,6 @@ void SpatialGrid::update() {
         findNearby(client);
         for (auto &other : client.m_nearby) {
           if (collide(client, other))
-            // momentumConservation(client, other);
             resolveCollision(client, *other);
           else
             continue;
@@ -173,12 +171,12 @@ void SpatialGrid::DrawGridlines() {
 
 bool SpatialGrid::collide(const clientDict &a, const clientDict *b) {
   Vector2 d{Vector2Subtract(a.m_position, b->m_position)};
-  float distance{Vector2LengthSqr(d)};
-  if (distance == 0)
+  float ds2{Vector2LengthSqr(d)};
+  if (ds2 == 0)
     return false;
   else {
     float r{a.m_dimensions.x + b->m_dimensions.x};
-    return Vector2LengthSqr(d) <= r * r;
+    return ds2 <= r * r;
   }
 }
 
@@ -194,7 +192,16 @@ void SpatialGrid::momentumConservation(clientDict &a, clientDict *b) {
 }
 
 void SpatialGrid::resolveCollision(clientDict &a, clientDict &b) {
-  Vector2 normal = Vector2Normalize(b.m_position - a.m_position);
+  Vector2 difference{Vector2Subtract(b.m_position, a.m_position)};
+  float length{Vector2Length(difference)};
+  // check if the particles on top of each other!!
+  if (length == 0.0f) {
+    b.m_position.y += 0.001f;
+    difference = Vector2Subtract(b.m_position, a.m_position);
+    length = Vector2Length(difference);
+  }
+
+  Vector2 normal = Vector2Scale(difference, 1.0f / length);
   Vector2 rv = Vector2Subtract(b.m_velocity, a.m_velocity);
   float velAlongNormal = Vector2DotProduct(rv, normal);
 
@@ -230,7 +237,6 @@ void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
              float scaleX) {
   for (auto &client : grid.m_clients) {
     std::unique_lock<std::mutex> lock(gLock);
-    // std::cout << client << '\n';
     Vector2 projectedClientpos{projectedVector(client.m_position, xRange)};
     if (client.m_cellInfo[0].cellNumber % 2 == 0)
       DrawTexturedCircle(circleTex, projectedClientpos,
@@ -238,8 +244,5 @@ void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
     else
       DrawTexturedCircle(circleTex, projectedClientpos,
                          client.m_dimensions.x * scaleX * 0.5f, 1.0f);
-    //            client.m_dimensions.x * scaleX * 0.5f, RED);
-    // DrawCircle(projectedClientpos.x, projectedClientpos.y,
-    //            client.m_dimensions.x * scaleX * 0.5f, RED);
   }
 }

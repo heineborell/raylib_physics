@@ -1,7 +1,6 @@
 #include "Random.h"
 #include "config.h"
 #include "uniformgrid.h"
-// #include <GL/gl.h>
 #include <cmath>
 #include <complex>
 #include <cstddef>
@@ -16,37 +15,13 @@
 int main() {
 
   InitWindow(HEIGHT, WIDTH, "Particle trajectory plot");
-  // SetTargetFPS(FPS);
 
   float xRange{4.0};
   float scaleX{WIDTH / (2 * xRange)};
   float scaleY{HEIGHT / (2 * xRange)}; // or xRange if square
-  // printf("Renderer: %s\n", glGetString(GL_RENDERER));
-  // printf("Vendor:   %s\n", glGetString(GL_VENDOR));
 
-  // // create particles with random initial positions and velocities
-  // std::vector<Particle> pparticles;
-  // float speed{4.0f};
-  //
-  // for (int i{0}; i < NUM_PARTICLES; ++i) {
-  //   if (i < NUM_PARTICLES / 2) {
-  //     int angle{Random::get(1, 20)};
-  //     Vector2 initialPosition{3, static_cast<float>(Random::get(-4, 4))};
-  //     Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
-  //                             speed * std::sin(PI / (2 * angle))};
-  //     pparticles.push_back(Particle{initialPosition, initialVelocity});
-  //   } else {
-  //     int angle{Random::get(1, 20)};
-  //     Vector2 initialPosition{-3, static_cast<float>(Random::get(-4, 4))};
-  //     Vector2 initialVelocity{speed * std::cos(PI / (2 * angle)),
-  //                             speed * std::sin(PI / (2 * angle))};
-  //     pparticles.push_back(Particle{initialPosition, initialVelocity});
-  //   }
-  // }
-  //
+  // Start Grid and Particles
   Vector2 accelaration{0, 0};
-  //
-  //
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
   for (int i{0}; i <= NUM_PARTICLES; ++i) {
 
@@ -60,18 +35,17 @@ int main() {
     grid.newClient(initialPosition, dimensions, initialVelocity);
   }
 
+  // Start updateThread (The physics updater)
   std::thread updateThread(&SpatialGrid::update, &grid);
 
-  SetTargetFPS(FPS);
-  std::cout << "size of each cell " << 2 * xRange / NCELLS << '\n';
-  std::cout << "size of the grid " << grid.m_cells.size() << '\n';
-
+  // Load textures
   std::vector<Rectangle> textureGrid{};
   Texture2D atlas = LoadTexture("../../../assets/shaded-Sheet.png");
   textureGrid.push_back(Rectangle{0 * 32, 0, 32, 32});
   textureGrid.push_back(Rectangle{1 * 32, 0, 32, 32});
   Texture2D circleTex = LoadTexture("../../../assets/face.png");
 
+  SetTargetFPS(FPS);
   while (isRunning) {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
       isRunning = false;
@@ -81,49 +55,6 @@ int main() {
 
     BeginDrawing();
     ClearBackground(BLACK);
-
-    // DrawRectangle(projectedClientpos.x - 1.0 * scaleX * 0.5f,
-    //               projectedClientpos.y - 1.0 * scaleY * 0.5f, 1.0 * scaleX,
-    //               1.0 * scaleY, RED);
-
-    // Draw all hitbox rectangles
-    // for (int i{0}; i < grid.m_cells.size(); ++i) {
-    //   if (grid.m_cells[i].size() > 0) {
-    //     for (auto &client : grid.m_cells[i]) {
-    //       float cellW = WIDTH / (float)NCELLS;
-    //       float cellH = HEIGHT / (float)NCELLS;
-    //       int x = i % (NCELLS);
-    //       int y = i / (NCELLS);
-    //       DrawRectangle(x * cellW, y * cellH, cellW, cellH, {0, 228, 48,
-    //       100});
-    //     }
-    //   }
-    // }
-
-    // Draw the ones that are m_nearby
-    //  if (!grid.m_clients[0].m_nearby.empty()) {
-    //    for (auto &client : grid.m_clients[0].m_nearby) {
-    //      for (auto i : client->m_cellInfo) {
-    //        float cellW = WIDTH / (float)NCELLS;
-    //        float cellH = HEIGHT / (float)NCELLS;
-    //        int x = i.cellNumber % (NCELLS);
-    //        int y = i.cellNumber / (NCELLS);
-    //        DrawRectangle(x * cellW, y * cellH, cellW, cellH, MAROON);
-    //      }
-    //    }
-    //  }
-
-    // plotter(pparticles, xRange);
-    // std::size_t totalSize{0};
-    // for (auto &cell : grid.m_cells) {
-    //   std::size_t length{cell.size()};
-    //   totalSize += length;
-    // }
-    // std::cout << totalSize << " size of total hitboxes " << '\n';
-    // std::cout << grid.m_clients.size() << '\n';
-
-    // std::cout << grid.m_clients[1].lastQueryId << '\n';
-
     plotter(grid, atlas, xRange, scaleX);
     DrawFPS(10, 10);
     dt = GetFrameTime();

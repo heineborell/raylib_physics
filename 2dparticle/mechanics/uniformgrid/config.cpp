@@ -1,6 +1,4 @@
 #include "config.h"
-#include <boost/math/quadrature/gauss_kronrod.hpp>
-#include <boost/math/quadrature/trapezoidal.hpp>
 #include <raylib.h>
 
 void drawVector(Vector2 &vec_2, Vector2 &vec_1, double length, double xRange,
