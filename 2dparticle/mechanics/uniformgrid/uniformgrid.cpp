@@ -1,5 +1,6 @@
 #include "uniformgrid.h"
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #include <mutex>
 #include <raylib.h>
@@ -173,12 +174,16 @@ void SpatialGrid::DrawGridlines() {
 bool SpatialGrid::collide(const clientDict &a, const clientDict *b) {
   int type_collision{static_cast<int>(a.m_shape) +
                      static_cast<int>(b->m_shape)};
+  Vector2 d{Vector2Subtract(a.m_position, b->m_position)};
   switch (type_collision) {
   case 0: {
-    Vector2 d{Vector2Subtract(a.m_position, b->m_position)};
     float ds2{Vector2LengthSqr(d)};
     float r{a.m_dimensions.x * 0.5f + b->m_dimensions.x * 0.5f};
     return ds2 <= r * r;
+  }
+  case 2: {
+    return (std::abs(d.x) <= (a.m_dimensions.x + b->m_dimensions.x) * 0.5f &&
+            std::abs(d.y) <= (a.m_dimensions.y + b->m_dimensions.y) * 0.5f);
   }
   default:
     return false;

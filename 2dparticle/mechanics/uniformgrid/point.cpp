@@ -30,7 +30,7 @@ int main() {
                             speed * std::sin(PI / (2 * angle))};
     Vector2 dimensions{PARTICLE_RADIUS, PARTICLE_RADIUS};
     float mass{1.0};
-    Shape shape{Shape::ball};
+    Shape shape{Shape::rectangle};
     grid.newClient(initialPosition, dimensions, initialVelocity, mass, shape);
   }
 
@@ -39,7 +39,7 @@ int main() {
 
   // Load textures
   std::vector<Rectangle> textureGrid{};
-  Texture2D atlas = LoadTexture("../../../assets/shaded-Sheet.png");
+  Texture2D atlas = LoadTexture("../../../assets/ball_box.png");
   textureGrid.push_back(Rectangle{0 * 32, 0, 32, 32});
   textureGrid.push_back(Rectangle{1 * 32, 0, 32, 32});
   Texture2D circleTex = LoadTexture("../../../assets/face.png");
