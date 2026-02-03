@@ -16,7 +16,7 @@ inline float dt{1.0f / 30.0f};
 inline constexpr float PARTICLE_RADIUS{0.7};
 inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
-inline constexpr int NUM_PARTICLES{30};
+inline constexpr int NUM_PARTICLES{10};
 inline constexpr int BINS{50};
 
 inline constexpr double zoomSpeed{1.1};

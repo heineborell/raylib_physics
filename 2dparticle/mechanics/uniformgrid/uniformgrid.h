@@ -11,6 +11,12 @@
 #include <utility>
 #include <vector>
 
+enum class Shape {
+  ball,
+  rectangle,
+
+};
+
 struct cellEntry {
   int cellNumber;
   int indexInCell;
@@ -23,17 +29,18 @@ public:
   Vector2 m_position{};   // x, y
   Vector2 m_dimensions{}; // width, height
   Vector2 m_velocity{};
+  float m_mass{};
+  Shape m_shape{};
+
   uint64_t lastQueryId{};
   std::vector<cellEntry> m_cellInfo;
   std::vector<clientDict *> m_nearby;
 
   // Compare ONLY the id
-  // bool operator==(const clientDict &other) const { return id == other.id; }
   clientDict(const Vector2 &position, const Vector2 &dimension,
-             const Vector2 &velocity)
-      : m_position(position), m_dimensions(dimension), m_velocity(velocity) {
-          // m_nearby.reserve(10);
-        };
+             const Vector2 &velocity, const float &mass, const Shape &shape)
+      : m_position(position), m_dimensions(dimension), m_velocity(velocity),
+        m_mass(mass), m_shape(shape) {};
 
   void applyForce(Vector2 &force);
   void applyAcc(Vector2 &accelaration, float &dt);
@@ -73,7 +80,8 @@ public:
   };
   void DrawGridlines();
   void newClient(const Vector2 &position, const Vector2 &dimensions,
-                 const Vector2 &velocity);
+                 const Vector2 &velocity, const float &mass,
+                 const Shape &shape);
 
   void update();
   void updatePos(float dt);

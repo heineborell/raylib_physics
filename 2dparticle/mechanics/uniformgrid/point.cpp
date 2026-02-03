@@ -2,12 +2,9 @@
 #include "config.h"
 #include "uniformgrid.h"
 #include <cmath>
-#include <complex>
-#include <cstddef>
 #include <iostream>
 #include <raylib.h>
 #include <raymath.h>
-#include <stdio.h>
 #include <sys/types.h>
 #include <thread>
 #include <vector>
@@ -32,7 +29,9 @@ int main() {
     Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
                             speed * std::sin(PI / (2 * angle))};
     Vector2 dimensions{PARTICLE_RADIUS, PARTICLE_RADIUS};
-    grid.newClient(initialPosition, dimensions, initialVelocity);
+    float mass{1.0};
+    Shape shape{Shape::ball};
+    grid.newClient(initialPosition, dimensions, initialVelocity, mass, shape);
   }
 
   // Start updateThread (The physics updater)

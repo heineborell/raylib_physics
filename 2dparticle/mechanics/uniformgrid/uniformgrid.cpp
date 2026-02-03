@@ -1,7 +1,5 @@
 #include "uniformgrid.h"
 #include <algorithm>
-#include <cstddef>
-#include <cstdint>
 #include <iostream>
 #include <mutex>
 #include <raylib.h>
@@ -13,8 +11,9 @@ bool isRunning = true;
 std::mutex gLock;
 
 void SpatialGrid::newClient(const Vector2 &position, const Vector2 &dimensions,
-                            const Vector2 &velocity) {
-  m_clients.emplace_back(position, dimensions, velocity);
+                            const Vector2 &velocity, const float &mass,
+                            const Shape &shape) {
+  m_clients.emplace_back(position, dimensions, velocity, mass, shape);
   insert(m_clients.back()); // insert client to cell list back basically give
                             // last element reference
 }
@@ -107,6 +106,7 @@ void SpatialGrid::findNearby(clientDict &client) {
       if (other == &client)
         continue;
 
+      // check out queryid to get the other client once
       if (other->lastQueryId != queryId) {
         other->lastQueryId = queryId;
         client.m_nearby.push_back(other);
@@ -116,6 +116,7 @@ void SpatialGrid::findNearby(clientDict &client) {
 }
 
 void SpatialGrid::wallCollision() {
+
   constexpr float restitution{1.0f};
   for (auto &c : m_clients) {
     float halfW = c.m_dimensions.x * 0.5f;
@@ -170,25 +171,18 @@ void SpatialGrid::DrawGridlines() {
 }
 
 bool SpatialGrid::collide(const clientDict &a, const clientDict *b) {
-  Vector2 d{Vector2Subtract(a.m_position, b->m_position)};
-  float ds2{Vector2LengthSqr(d)};
-  if (ds2 == 0)
-    return false;
-  else {
-    float r{a.m_dimensions.x + b->m_dimensions.x};
+  int type_collision{static_cast<int>(a.m_shape) +
+                     static_cast<int>(b->m_shape)};
+  switch (type_collision) {
+  case 0: {
+    Vector2 d{Vector2Subtract(a.m_position, b->m_position)};
+    float ds2{Vector2LengthSqr(d)};
+    float r{a.m_dimensions.x * 0.5f + b->m_dimensions.x * 0.5f};
     return ds2 <= r * r;
   }
-}
-
-void SpatialGrid::momentumConservation(clientDict &a, clientDict *b) {
-  Vector2 normal{Vector2Normalize(a.m_position - b->m_position)};
-  Vector2 velocityDifference{a.m_velocity - b->m_velocity};
-  a.m_velocity =
-      a.m_velocity -
-      Vector2Scale(normal, Vector2DotProduct(velocityDifference, normal));
-  b->m_velocity =
-      b->m_velocity +
-      Vector2Scale(normal, Vector2DotProduct(velocityDifference, normal));
+  default:
+    return false;
+  }
 }
 
 void SpatialGrid::resolveCollision(clientDict &a, clientDict &b) {
@@ -238,7 +232,7 @@ void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
   for (auto &client : grid.m_clients) {
     std::unique_lock<std::mutex> lock(gLock);
     Vector2 projectedClientpos{projectedVector(client.m_position, xRange)};
-    if (client.m_cellInfo[0].cellNumber % 2 == 0)
+    if (client.m_shape == Shape::ball)
       DrawTexturedCircle(circleTex, projectedClientpos,
                          client.m_dimensions.x * scaleX * 0.5f, 0.0f);
     else
