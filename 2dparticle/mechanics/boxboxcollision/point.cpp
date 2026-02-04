@@ -2,6 +2,7 @@
 #include "config.h"
 #include "uniformgrid.h"
 #include <cmath>
+#include <cstddef>
 #include <iostream>
 #include <raylib.h>
 #include <raymath.h>
@@ -24,7 +25,7 @@ int main() {
 
   // Initial Conditions, masses
   double massSmall{1};
-  double massBig{1E6};
+  double massBig{1E2};
   double sqrtMassSmall{std::sqrt(massSmall)};
   double sqrtMassBig{std::sqrt(massBig)};
   RealVector2 initialPositionSmall{-18, 2};
@@ -40,8 +41,8 @@ int main() {
   grid.newClient(initialPositionBig, dimensionsBig, initialVelocityBig, massBig,
                  shape);
   // Conserved quantities
-  double speedSmall{RealVector2Length(initialVelocitySmall)};
-  double speedBig{RealVector2Length(initialVelocityBig)};
+  double speedSmall{initialVelocitySmall.x};
+  double speedBig{initialVelocityBig.x};
   double scaledSpeedSmall{sqrtMassSmall * speedSmall};
   double scaledSpeedBig{sqrtMassBig * scaledSpeedBig};
 
@@ -50,6 +51,8 @@ int main() {
   double energy{energySmall + energyBig};
   // circle plot
   RealVector2 centerCircle{projectedVector({15.0, -15.0}, xRange)};
+  double circleScale{8};
+  std::vector<RealVector2> lines{};
 
   // Load textures
   std::vector<Rectangle> textureGrid{};
@@ -58,7 +61,7 @@ int main() {
   textureGrid.push_back(Rectangle{1 * 32, 0, 32, 32});
   Texture2D circleTex = LoadTexture("../../../assets/face.png");
 
-  SetTargetFPS(FPS);
+  // SetTargetFPS(FPS);
   while (isRunning) {
     if (IsKeyPressed(KEY_ESCAPE) || WindowShouldClose())
       isRunning = false;
@@ -72,19 +75,32 @@ int main() {
     grid.update();
     plotter(grid, atlas, xRange, scaleX);
 
-    speedSmall = RealVector2Length(grid.m_clients[0].m_velocity);
-    speedBig = RealVector2Length(grid.m_clients[1].m_velocity);
-    scaledSpeedSmall = (sqrtMassSmall * speedSmall) / (std::sqrt(2 * energy));
-    scaledSpeedBig = (sqrtMassBig * speedBig) / (std::sqrt(2 * energy));
-    RealVector2 scaledSpeeds{
-        projectedVector(scaledSpeedSmall, scaledSpeedBig, xRange)};
+    speedSmall = (grid.m_clients[0].m_velocity.x);
+    speedBig = (grid.m_clients[1].m_velocity.x);
     energySmall = 0.5 * (massSmall * speedSmall * speedSmall);
     energyBig = 0.5 * (massBig * speedBig * speedBig);
     energy = energySmall + energyBig;
-    std::cout << scaledSpeedBig << '\n';
-    DrawCircleLines(centerCircle.x, centerCircle.y, 4 * scaleX, GREEN);
-    DrawCircle(centerCircle.x + scaledSpeedSmall,
-               centerCircle.y + scaledSpeedBig, 1, RED);
+
+    // Drawing of circle and lines
+    scaledSpeedSmall =
+        circleScale * (sqrtMassSmall * speedSmall) / (std::sqrt(2 * energy));
+    scaledSpeedBig =
+        circleScale * (sqrtMassBig * speedBig) / (std::sqrt(2 * energy));
+    RealVector2 scaledSpeeds{
+        projectedVector(scaledSpeedBig, scaledSpeedSmall, xRange)};
+    lines.push_back(scaledSpeeds);
+
+    if (lines.size() > 1)
+      for (size_t i{0}; i < lines.size(); ++i) {
+        if (i == 0)
+          continue;
+        else
+          DrawLineEx({200 + lines[i].x, 200 + lines[i].y},
+                     {200 + lines[i - 1].x, 200 + lines[i - 1].y}, 1.0, RED);
+      }
+
+    DrawCircleLines(700, 700, circleScale * scaleX, GREEN);
+    DrawCircle(200 + scaledSpeeds.x, 200 + scaledSpeeds.y, 3, RED);
 
     // Draw axes
     DrawFPS(10, 10);
