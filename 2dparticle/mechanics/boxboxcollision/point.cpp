@@ -14,31 +14,42 @@ int main() {
 
   InitWindow(HEIGHT, WIDTH, "Particle trajectory plot");
 
-  float xRange{20.0};
-  float scaleX{WIDTH / (2 * xRange)};
-  float scaleY{HEIGHT / (2 * xRange)}; // or xRange if square
+  double xRange{20.0};
+  double scaleX{WIDTH / (2 * xRange)};
+  double scaleY{HEIGHT / (2 * xRange)}; // or xRange if square
 
   // Start Grid and Particles
-  Vector2 accelaration{0, 0};
+  RealVector2 accelaration{0, 0};
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
 
-  Vector2 initialPositionSmall{-18, 2};
-  Vector2 initialVelocitySmall{0, 0};
-  Vector2 initialPositionBig{-15, 2};
-  Vector2 initialVelocityBig{-2, 0};
-  Vector2 dimensionsSmall{1, 1};
-  Vector2 dimensionsBig{4, 4};
-  float massSmall{1};
-  float massBig{1E6};
+  // Initial Conditions, masses
+  double massSmall{1};
+  double massBig{1E6};
+  double sqrtMassSmall{std::sqrt(massSmall)};
+  double sqrtMassBig{std::sqrt(massBig)};
+  RealVector2 initialPositionSmall{-18, 2};
+  RealVector2 initialVelocitySmall{0, 0};
+  RealVector2 initialPositionBig{-15, 2};
+  RealVector2 initialVelocityBig{-10000, 0};
+  RealVector2 dimensionsSmall{1, 1};
+  RealVector2 dimensionsBig{4, 4};
 
   Shape shape{Shape::ball};
   grid.newClient(initialPositionSmall, dimensionsSmall, initialVelocitySmall,
                  massSmall, shape);
   grid.newClient(initialPositionBig, dimensionsBig, initialVelocityBig, massBig,
                  shape);
+  // Conserved quantities
+  double speedSmall{RealVector2Length(initialVelocitySmall)};
+  double speedBig{RealVector2Length(initialVelocityBig)};
+  double scaledSpeedSmall{sqrtMassSmall * speedSmall};
+  double scaledSpeedBig{sqrtMassBig * scaledSpeedBig};
 
-  // Start updateThread (The physics updater)
-  std::thread updateThread(&SpatialGrid::update, &grid);
+  double energySmall{0.5 * (massBig * speedSmall * speedSmall)};
+  double energyBig{0.5 * (massSmall * speedBig * speedBig)};
+  double energy{energySmall + energyBig};
+  // circle plot
+  RealVector2 centerCircle{projectedVector({15.0, -15.0}, xRange)};
 
   // Load textures
   std::vector<Rectangle> textureGrid{};
@@ -46,7 +57,6 @@ int main() {
   textureGrid.push_back(Rectangle{0 * 32, 0, 32, 32});
   textureGrid.push_back(Rectangle{1 * 32, 0, 32, 32});
   Texture2D circleTex = LoadTexture("../../../assets/face.png");
-  // char counterText = static_cast<char>(counter);
 
   SetTargetFPS(FPS);
   while (isRunning) {
@@ -58,11 +68,26 @@ int main() {
 
     BeginDrawing();
     ClearBackground(BLACK);
+    dt = 0.00000001;
+    grid.update();
     plotter(grid, atlas, xRange, scaleX);
-    std::cout << counter << '\n';
-    DrawFPS(10, 10);
+
+    speedSmall = RealVector2Length(grid.m_clients[0].m_velocity);
+    speedBig = RealVector2Length(grid.m_clients[1].m_velocity);
+    scaledSpeedSmall = (sqrtMassSmall * speedSmall) / (std::sqrt(2 * energy));
+    scaledSpeedBig = (sqrtMassBig * speedBig) / (std::sqrt(2 * energy));
+    RealVector2 scaledSpeeds{
+        projectedVector(scaledSpeedSmall, scaledSpeedBig, xRange)};
+    energySmall = 0.5 * (massSmall * speedSmall * speedSmall);
+    energyBig = 0.5 * (massBig * speedBig * speedBig);
+    energy = energySmall + energyBig;
+    std::cout << scaledSpeedBig << '\n';
+    DrawCircleLines(centerCircle.x, centerCircle.y, 4 * scaleX, GREEN);
+    DrawCircle(centerCircle.x + scaledSpeedSmall,
+               centerCircle.y + scaledSpeedBig, 1, RED);
 
     // Draw axes
+    DrawFPS(10, 10);
     DrawLine(WIDTH / 2, 0, WIDTH / 2, HEIGHT, GRAY);
     DrawLine(0, HEIGHT / 2, WIDTH, HEIGHT / 2, GRAY);
 
@@ -70,15 +95,19 @@ int main() {
     DrawText("X", WIDTH - 20, HEIGHT / 2 + 5, 20, GRAY);
 
     DrawText(TextFormat("Number of Collisions:%i", static_cast<int>(counter)),
-             10, 30, 60,
+             10, 30, 40,
              YELLOW); // draw equation on text
 
-    dt = GetFrameTime();
+    DrawText(
+        TextFormat(
+            "Energy of m1: %.2E, Energy of m2: %.2E, Total energy: : %.2E ",
+            energySmall, energyBig, energy),
+        10, 80, 20,
+        BLUE); // draw equation on text
+
     EndDrawing();
   }
 
-  std::cout << "Thread no " << updateThread.get_id() << " closed!" << '\n';
-  updateThread.join();
   UnloadTexture(circleTex);
   UnloadTexture(atlas);
   isRunning = false;

@@ -1,4 +1,5 @@
 #include "uniformgrid.h"
+#include "config.h"
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
@@ -11,8 +12,9 @@
 bool isRunning = true;
 std::mutex gLock;
 
-void SpatialGrid::newClient(const Vector2 &position, const Vector2 &dimensions,
-                            const Vector2 &velocity, const float &mass,
+void SpatialGrid::newClient(const RealVector2 &position,
+                            const RealVector2 &dimensions,
+                            const RealVector2 &velocity, const double &mass,
                             const Shape &shape) {
   m_clients.emplace_back(position, dimensions, velocity, mass, shape);
   insert(m_clients.back()); // insert client to cell list back basically give
@@ -51,11 +53,12 @@ void SpatialGrid::insert(clientDict &client) {
   }
 }
 
-std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
-  float x_pos{std::clamp(
-      ((x - m_bounds[0][0]) / (m_bounds[1][0] - m_bounds[0][0])), 0.0f, 1.0f)};
-  float y_pos{std::clamp(
-      ((m_bounds[1][1] - y) / (m_bounds[1][1] - m_bounds[0][1])), 0.0f, 1.0f)};
+std::pair<int, int> SpatialGrid::getCellIndex(const double &x,
+                                              const double &y) {
+  double x_pos{std::clamp(
+      ((x - m_bounds[0][0]) / (m_bounds[1][0] - m_bounds[0][0])), 0.0, 1.0)};
+  double y_pos{std::clamp(
+      ((m_bounds[1][1] - y) / (m_bounds[1][1] - m_bounds[0][1])), 0.0, 1.0)};
 
   int xIndex{static_cast<int>((x_pos * (m_dimensions.first)))};
   int yIndex{static_cast<int>((y_pos * (m_dimensions.second)))};
@@ -63,40 +66,28 @@ std::pair<int, int> SpatialGrid::getCellIndex(const float &x, const float &y) {
 }
 
 void SpatialGrid::update() {
-  using clock = std::chrono::steady_clock;
-  auto next = clock::now(); // take a note of current time
-  constexpr int deltat = 1000 / FPS;
-  constexpr float deltaT{1.0f / FPS};
-  while (isRunning) {
-    next += std::chrono::milliseconds(deltat); // increment your time by delta t
-    {
-      std::unique_lock<std::mutex> lock(gLock);
-      updatePos(deltaT);
-      wallCollision();
-      updateCells();
-      for (auto &client : this->m_clients) {
-        findNearby(client);
-        for (auto &other : client.m_nearby) {
-          if (collide(client, other)) {
-            resolveCollision(client, *other);
-            counter += 0.5f;
-          } else
-            continue;
-        }
+  {
+    updatePos(dt);
+    wallCollision();
+    updateCells();
+    for (auto &client : this->m_clients) {
+      findNearby(client);
+      for (auto &other : client.m_nearby) {
+        if (collide(client, other)) {
+          resolveCollision(client, *other);
+          counter += 0.5f;
+        } else
+          continue;
       }
     }
-    std::this_thread::sleep_until(
-        next); // sleep this thread until noted time+delta t, so good thing is
-               // if this your computation is longer than the delta t this
-               // immediately continues
   }
 }
 
-void SpatialGrid::updatePos(float dt) {
+void SpatialGrid::updatePos(double dt) {
   // update position in real world coordinates
   for (auto &client : m_clients)
-    client.m_position =
-        Vector2Add(client.m_position, Vector2Scale(client.m_velocity, dt));
+    client.m_position = RealVector2Add(client.m_position,
+                                       RealVector2Scale(client.m_velocity, dt));
 }
 
 void SpatialGrid::findNearby(clientDict &client) {
@@ -119,16 +110,16 @@ void SpatialGrid::findNearby(clientDict &client) {
 
 void SpatialGrid::wallCollision() {
 
-  constexpr float restitution{1.0f};
+  constexpr double restitution{1.0};
   for (auto &c : m_clients) {
-    float halfW = c.m_dimensions.x * 0.5f;
-    float halfH = c.m_dimensions.y * 0.5f;
+    double halfW = c.m_dimensions.x * 0.5;
+    double halfH = c.m_dimensions.y * 0.5;
 
     // left
     if (c.m_position.x - halfW < m_bounds[0][0]) {
       c.m_position.x = m_bounds[0][0] + halfW;
       c.m_velocity.x *= -restitution;
-      counter += 1.0f;
+      counter += 1.0;
     }
 
     // right
@@ -161,9 +152,9 @@ void SpatialGrid::updateCells() {
 }
 
 void SpatialGrid::DrawGridlines() {
-  Vector2 projectedBoundsLower{
+  RealVector2 projectedBoundsLower{
       projectedVector({m_bounds[0][0], m_bounds[0][1]}, m_bounds[1][1])};
-  Vector2 projectedBoundsUpper{
+  RealVector2 projectedBoundsUpper{
       projectedVector({m_bounds[1][0], m_bounds[1][1]}, m_bounds[1][1])};
   for (int y{0}; y <= HEIGHT; y = y + HEIGHT / NCELLS) {
     DrawLine(projectedBoundsLower.x, y, projectedBoundsUpper.x, y, GRAY);
@@ -176,16 +167,16 @@ void SpatialGrid::DrawGridlines() {
 bool SpatialGrid::collide(const clientDict &a, const clientDict *b) {
   int type_collision{static_cast<int>(a.m_shape) +
                      static_cast<int>(b->m_shape)};
-  Vector2 d{Vector2Subtract(a.m_position, b->m_position)};
+  RealVector2 d{RealVector2Subtract(a.m_position, b->m_position)};
   switch (type_collision) {
   case 0: {
-    float ds2{Vector2LengthSqr(d)};
-    float r{a.m_dimensions.x * 0.5f + b->m_dimensions.x * 0.5f};
+    double ds2{RealVector2LengthSqr(d)};
+    double r{a.m_dimensions.x * 0.5 + b->m_dimensions.x * 0.5};
     return ds2 <= r * r;
   }
   case 2: {
-    return (std::abs(d.x) <= (a.m_dimensions.x + b->m_dimensions.x) * 0.5f &&
-            std::abs(d.y) <= (a.m_dimensions.y + b->m_dimensions.y) * 0.5f);
+    return (std::abs(d.x) <= (a.m_dimensions.x + b->m_dimensions.x) * 0.5 &&
+            std::abs(d.y) <= (a.m_dimensions.y + b->m_dimensions.y) * 0.5);
   }
   default:
     return false;
@@ -193,57 +184,96 @@ bool SpatialGrid::collide(const clientDict &a, const clientDict *b) {
 }
 
 void SpatialGrid::resolveCollision(clientDict &a, clientDict &b) {
-  Vector2 difference{Vector2Subtract(b.m_position, a.m_position)};
-  float length{Vector2Length(difference)};
+  RealVector2 difference{RealVector2Subtract(b.m_position, a.m_position)};
+  double length{RealVector2Length(difference)};
   // check if the particles on top of each other!!
-  if (length == 0.0f) {
-    b.m_position.y += 0.001f;
-    difference = Vector2Subtract(b.m_position, a.m_position);
-    length = Vector2Length(difference);
+  if (length == 0.0) {
+    b.m_position.y += 0.001;
+    difference = RealVector2Subtract(b.m_position, a.m_position);
+    length = RealVector2Length(difference);
   }
 
-  Vector2 normal = Vector2Scale(difference, 1.0f / length);
-  Vector2 rv = Vector2Subtract(b.m_velocity, a.m_velocity);
-  float velAlongNormal = Vector2DotProduct(rv, normal);
+  RealVector2 normal = RealVector2Scale(difference, 1.0 / length);
+  RealVector2 rv = RealVector2Subtract(b.m_velocity, a.m_velocity);
+  double velAlongNormal = RealVector2DotProduct(rv, normal);
 
   // only resolve if approaching
   if (velAlongNormal > 0)
     return;
 
-  float restitution = 1.0f; // 1 = perfectly elastic, 0 = inelastic
-  float invMassA = 1.0f / a.m_mass;
-  float invMassB = 1.0f / b.m_mass;
+  double restitution = 1.0; // 1 = perfectly elastic, 0 = inelastic
+  double invMassA{1.0 / a.m_mass};
+  double invMassB{1.0 / b.m_mass};
 
-  float j = -(1 + restitution) * velAlongNormal / (invMassA + invMassB);
+  double j = -(1 + restitution) * velAlongNormal / (invMassA + invMassB);
 
-  Vector2 impulse = Vector2Scale(normal, j);
-  a.m_velocity = Vector2Subtract(a.m_velocity, Vector2Scale(impulse, invMassA));
-  b.m_velocity = Vector2Add(b.m_velocity, Vector2Scale(impulse, invMassB));
+  RealVector2 impulse = RealVector2Scale(normal, j);
+  a.m_velocity =
+      RealVector2Subtract(a.m_velocity, RealVector2Scale(impulse, invMassA));
+  b.m_velocity =
+      RealVector2Add(b.m_velocity, RealVector2Scale(impulse, invMassB));
 }
 
 // Draw clients
 
-void DrawTexturedCircle(Texture2D &tex, Vector2 &pos, float radius,
+void DrawTexturedCircle(Texture2D &tex, RealVector2 &pos, float radius,
                         float order) {
   Rectangle src = {order * 32, 0, 32, 32};
 
-  Rectangle dst = {pos.x, pos.y, radius * 2.0f, radius * 2.0f};
+  Rectangle dst = {static_cast<float>(pos.x), static_cast<float>(pos.y),
+                   radius * 2.0f, radius * 2.0f};
 
   Vector2 origin = {radius, radius};
 
-  DrawTexturePro(tex, src, dst, origin, 0.0f, WHITE);
+  DrawTexturePro(tex, src, dst, origin, 0.0, WHITE);
 }
 
-void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
-             float scaleX) {
+void plotter(SpatialGrid &grid, Texture2D &circleTex, double xRange,
+             double scaleX) {
   for (auto &client : grid.m_clients) {
-    std::unique_lock<std::mutex> lock(gLock);
-    Vector2 projectedClientpos{projectedVector(client.m_position, xRange)};
+    RealVector2 projectedClientpos{projectedVector(client.m_position, xRange)};
     if (client.m_shape == Shape::ball)
       DrawTexturedCircle(circleTex, projectedClientpos,
-                         client.m_dimensions.x * scaleX * 0.5f, 1.0f);
+                         client.m_dimensions.x * scaleX * 0.5, 1.0);
     else
       DrawTexturedCircle(circleTex, projectedClientpos,
-                         client.m_dimensions.x * scaleX * 0.5f, 1.0f);
+                         client.m_dimensions.x * scaleX * 0.5, 1.0);
   }
+}
+
+// Add two vectors (v1 + v2)
+RealVector2 RealVector2Add(const RealVector2 &v1, const RealVector2 &v2) {
+  RealVector2 result = {v1.x + v2.x, v1.y + v2.y};
+  return result;
+}
+
+// Scale vector
+RealVector2 RealVector2Scale(RealVector2 &v, double scale) {
+  RealVector2 result = {v.x * scale, v.y * scale};
+
+  return result;
+}
+
+// Subtract two vectors (v1 - v2)
+RealVector2 RealVector2Subtract(const RealVector2 &v1, const RealVector2 &v2) {
+  RealVector2 result = {v1.x - v2.x, v1.y - v2.y};
+  return result;
+}
+
+// Calculate vector length
+double RealVector2Length(RealVector2 &v) {
+  double result{sqrtf((v.x * v.x) + (v.y * v.y))};
+  return result;
+}
+
+// Calculate vector square length
+double RealVector2LengthSqr(RealVector2 &v) {
+  double result{(v.x * v.x) + (v.y * v.y)};
+  return result;
+}
+
+// Calculate two vectors dot product
+double RealVector2DotProduct(RealVector2 &v1, RealVector2 &v2) {
+  double result{(v1.x * v2.x + v1.y * v2.y)};
+  return result;
 }

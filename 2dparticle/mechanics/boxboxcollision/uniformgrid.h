@@ -1,4 +1,5 @@
-#include "config.h"
+#pragma once
+#include "constants.h"
 #include <cstddef>
 #include <cstdint>
 #include <deque>
@@ -10,6 +11,11 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+
+struct RealVector2 {
+  double x;
+  double y;
+};
 
 enum class Shape {
   ball,
@@ -26,10 +32,10 @@ struct cellEntry {
 
 class clientDict {
 public:
-  Vector2 m_position{};   // x, y
-  Vector2 m_dimensions{}; // width, height
-  Vector2 m_velocity{};
-  float m_mass{};
+  RealVector2 m_position{};   // x, y
+  RealVector2 m_dimensions{}; // width, height
+  RealVector2 m_velocity{};
+  double m_mass{};
   Shape m_shape{};
 
   uint64_t lastQueryId{};
@@ -37,36 +43,38 @@ public:
   std::vector<clientDict *> m_nearby;
 
   // Compare ONLY the id
-  clientDict(const Vector2 &position, const Vector2 &dimension,
-             const Vector2 &velocity, const float &mass, const Shape &shape)
+  clientDict(const RealVector2 &position, const RealVector2 &dimension,
+             const RealVector2 &velocity, const double &mass,
+             const Shape &shape)
       : m_position(position), m_dimensions(dimension), m_velocity(velocity),
         m_mass(mass), m_shape(shape) {};
 
-  void applyForce(Vector2 &force);
-  void applyAcc(Vector2 &accelaration, float &dt);
+  void applyForce(RealVector2 &force);
+  void applyAcc(RealVector2 &accelaration, double &dt);
   void momentumConservation(std::vector<clientDict> &particleArray);
   void addToSpeeds(std::size_t i);
   static void printSpeeds();
   void binIndex();
   std::vector<int> &getBins();
-  void updatePar(Vector2 &accelaration, float &dt, const float &xRange,
+  void updatePar(RealVector2 &accelaration, double &dt, const double &xRange,
                  std::vector<clientDict> &pparticle);
   void getTrace();
   void showTrace(Color col);
-  void showVel(double length, double xRange, Color c, const Vector2 &start_vel);
+  void showVel(double length, double xRange, Color c,
+               const RealVector2 &start_vel);
   void show();
 };
 
 class SpatialGrid {
 public:
-  std::vector<std::vector<float>> m_bounds; // size of the world
+  std::vector<std::vector<double>> m_bounds; // size of the world
   std::pair<int, int>
       m_dimensions; // the basically will control how many cells we have
   std::vector<std::vector<clientDict *>> m_cells;
   std::vector<clientDict> m_clients;
   uint64_t queryId{0};
 
-  SpatialGrid(std::vector<std::vector<float>> bounds,
+  SpatialGrid(std::vector<std::vector<double>> bounds,
               std::pair<int, int> dimensions)
       : m_bounds{bounds}, m_dimensions(dimensions),
         m_cells{static_cast<std::size_t>((dimensions.first + 3) *
@@ -79,12 +87,12 @@ public:
                         // pointers are moved! then you defer a null pointer
   };
   void DrawGridlines();
-  void newClient(const Vector2 &position, const Vector2 &dimensions,
-                 const Vector2 &velocity, const float &mass,
+  void newClient(const RealVector2 &position, const RealVector2 &dimensions,
+                 const RealVector2 &velocity, const double &mass,
                  const Shape &shape);
 
   void update();
-  void updatePos(float dt);
+  void updatePos(double dt);
   void findNearby(clientDict &client);
   void wallCollision();
   bool collide(const clientDict &a, const clientDict *b);
@@ -95,11 +103,19 @@ public:
 private:
   void insert(clientDict &client);
   void removeClient(clientDict &client);
-  std::pair<int, int> getCellIndex(const float &x, const float &y);
+  std::pair<int, int> getCellIndex(const double &x, const double &y);
   std::pair<std::pair<int, int>, std::pair<int, int>>
   getCellIndices(clientDict &client);
 };
 
-void DrawTexturedCircle(Texture2D tex, Vector2 pos, float radius);
-void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
-             float scaleX);
+void DrawTexturedCircle(Texture2D tex, RealVector2 pos, double radius);
+void plotter(SpatialGrid &grid, Texture2D &circleTex, double xRange,
+             double scaleX);
+
+// Add two vectors (v1 + v2)
+RealVector2 RealVector2Add(const RealVector2 &v1, const RealVector2 &v2);
+RealVector2 RealVector2Scale(RealVector2 &v, double scale);
+RealVector2 RealVector2Subtract(const RealVector2 &v1, const RealVector2 &v2);
+double RealVector2Length(RealVector2 &v);
+double RealVector2LengthSqr(RealVector2 &v);
+double RealVector2DotProduct(RealVector2 &v1, RealVector2 &v2);

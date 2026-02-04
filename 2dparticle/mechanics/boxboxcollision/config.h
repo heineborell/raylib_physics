@@ -1,4 +1,5 @@
 #pragma once
+#include "constants.h"
 #include "raylib.h"
 #include "raymath.h"
 #include <cmath>
@@ -7,27 +8,9 @@
 
 using std::vector;
 
-inline constexpr int WIDTH{1000};
-inline constexpr int HEIGHT{1000};
-inline constexpr int FPS{1000};
-inline constexpr int NCELLS{200};
-inline float dt{1.0f / 60.0f};
-inline float counter{0.0f};
-
-inline constexpr float PARTICLE_RADIUS{1};
-inline constexpr int PARTICLE_MAX_SPEED{2};
-inline constexpr int PARTICLE_MIN_SPEED{1};
-inline constexpr int NUM_PARTICLES{10};
-inline constexpr int BINS{50};
-
-inline constexpr double zoomSpeed{1.1};
-inline constexpr double arrowAngle{PI / 7};
-inline const double arrowSin{std::sin(arrowAngle)};
-inline const double arrowCos{std::cos(arrowAngle)};
-extern bool isRunning;
-
-Vector2 projectedVector(double x, double y, float xRange);
-Vector2 projectedVector(const Vector2 &vec, float xRange);
-Vector2 pullbackVector(Vector2 &screen, double xRange);
-void drawVector(Vector2 &m_vel, Vector2 &m_pos, double length, double xRange,
-                Color c);
+#include "uniformgrid.h"
+RealVector2 projectedVector(double x, double y, double xRange);
+RealVector2 projectedVector(const RealVector2 &vec, double xRange);
+RealVector2 pullbackVector(Vector2 &screen, double xRange);
+void drawVector(RealVector2 &m_vel, RealVector2 &m_pos, double length,
+                double xRange, Color c);
