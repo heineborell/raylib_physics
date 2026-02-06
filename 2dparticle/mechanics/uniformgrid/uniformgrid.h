@@ -1,3 +1,4 @@
+#include "Random.h"
 #include "config.h"
 #include <cstddef>
 #include <cstdint>
@@ -31,6 +32,7 @@ public:
   Vector2 m_velocity{};
   float m_mass{};
   Shape m_shape{};
+  float m_textureCounter{};
 
   uint64_t lastQueryId{};
   std::vector<cellEntry> m_cellInfo;
@@ -40,7 +42,7 @@ public:
   clientDict(const Vector2 &position, const Vector2 &dimension,
              const Vector2 &velocity, const float &mass, const Shape &shape)
       : m_position(position), m_dimensions(dimension), m_velocity(velocity),
-        m_mass(mass), m_shape(shape) {};
+        m_mass(mass), m_shape(shape), m_textureCounter(Random::get(0, 10)) {};
 
   void applyForce(Vector2 &force);
   void applyAcc(Vector2 &accelaration, float &dt);

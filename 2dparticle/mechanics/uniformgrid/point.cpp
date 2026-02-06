@@ -9,6 +9,17 @@
 #include <thread>
 #include <vector>
 
+void ToggleFullscreenWindow(int windowWidth, int windowHeight) {
+  if (!IsWindowFullscreen()) {
+    int monitor{GetCurrentMonitor()};
+    SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
+    ToggleFullscreen();
+  } else {
+    ToggleFullscreen();
+    SetWindowSize(windowWidth, windowHeight);
+  }
+}
+
 int main() {
 
   InitWindow(HEIGHT, WIDTH, "Particle trajectory plot");
@@ -20,7 +31,7 @@ int main() {
   // Start Grid and Particles
   Vector2 accelaration{0, 0};
   SpatialGrid grid{{{-xRange, -xRange}, {xRange, xRange}}, {NCELLS, NCELLS}};
-  for (int i{0}; i <= NUM_PARTICLES; ++i) {
+  for (int i{0}; i < NUM_PARTICLES; ++i) {
 
     int angle{Random::get(1, 20)};
     float speed{static_cast<float>(Random::get(-3, 3))};
@@ -28,14 +39,15 @@ int main() {
                             -3.9f + (Random::get(0, 7800) / 1000.0f)};
     Vector2 initialVelocity{-speed * std::cos(PI / (2 * angle)),
                             speed * std::sin(PI / (2 * angle))};
+
     Vector2 dimensions{PARTICLE_RADIUS, PARTICLE_RADIUS};
     float mass{1.0};
     Shape shape{Shape::ball};
     grid.newClient(initialPosition, dimensions, initialVelocity, mass, shape);
   }
-  Vector2 initialPositionSmall{2, 2};
-  Vector2 initialVelocitySmall{2, -2};
-  Vector2 dimensionsSmall{1, 1};
+  Vector2 initialPositionSmall{4, -4};
+  Vector2 initialVelocitySmall{3, 3};
+  Vector2 dimensionsSmall{0.7, 0.7};
   double massSmall{20};
 
   Shape shape{Shape::ball};
@@ -47,7 +59,7 @@ int main() {
 
   // Load textures
   std::vector<Rectangle> textureGrid{};
-  Texture2D atlas = LoadTexture("../../../assets/colored_ball.png");
+  Texture2D atlas = LoadTexture("../../../assets/colored_ball-Sheet.png");
   textureGrid.push_back(Rectangle{0 * 32, 0, 32, 32});
   textureGrid.push_back(Rectangle{1 * 32, 0, 32, 32});
   Texture2D circleTex = LoadTexture("../../../assets/face.png");
@@ -58,7 +70,7 @@ int main() {
       isRunning = false;
 
     if (IsKeyPressed(KEY_SPACE))
-      ToggleFullscreen();
+      ToggleFullscreenWindow(WIDTH, HEIGHT);
 
     BeginDrawing();
     ClearBackground(BLACK);

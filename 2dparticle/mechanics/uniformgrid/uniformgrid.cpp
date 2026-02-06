@@ -237,11 +237,29 @@ void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
   for (auto &client : grid.m_clients) {
     std::unique_lock<std::mutex> lock(gLock);
     Vector2 projectedClientpos{projectedVector(client.m_position, xRange)};
-    if (client.m_shape == Shape::ball)
-      DrawTexturedCircle(circleTex, projectedClientpos,
-                         client.m_dimensions.x * scaleX * 0.5f, 10.8f, 4.0f);
-    else
+    float angle{atan2(client.m_velocity.y, client.m_velocity.x) / PI};
+    if (client.m_shape == Shape::ball) {
+      float speed{Vector2LengthSqr(client.m_velocity)};
+      client.m_textureCounter += 0.15 * speed;
+
+      DrawTexturedCircle(
+          circleTex, projectedClientpos, client.m_dimensions.x * scaleX * 0.5f,
+          -angle * 180 + 90, static_cast<int>(client.m_textureCounter) % 12);
+    } else
       DrawTexturedCircle(circleTex, projectedClientpos,
                          client.m_dimensions.x * scaleX * 0.5f, 0.8f, 1.0f);
   }
+}
+
+int get_velocity_bin(float velocity, float min_v, float max_v) {
+  if (velocity < min_v)
+    return 0;
+  if (velocity >= max_v)
+    return 11;
+
+  float range = max_v - min_v;
+
+  int binIndex = static_cast<int>((velocity - min_v) / range * 12);
+
+  return std::clamp(binIndex, 0, 11);
 }
