@@ -209,8 +209,8 @@ void SpatialGrid::resolveCollision(clientDict &a, clientDict &b) {
     return;
 
   float restitution = 1.0f; // 1 = perfectly elastic, 0 = inelastic
-  float invMassA = 1.0f / 1.0f;
-  float invMassB = 1.0f / 1.0f;
+  float invMassA = 1.0f / a.m_mass;
+  float invMassB = 1.0f / b.m_mass;
 
   float j = -(1 + restitution) * velAlongNormal / (invMassA + invMassB);
 
@@ -222,14 +222,14 @@ void SpatialGrid::resolveCollision(clientDict &a, clientDict &b) {
 // Draw clients
 
 void DrawTexturedCircle(Texture2D &tex, Vector2 &pos, float radius,
-                        float order) {
+                        float rotation, float order) {
   Rectangle src = {order * 32, 0, 32, 32};
 
   Rectangle dst = {pos.x, pos.y, radius * 2.0f, radius * 2.0f};
 
   Vector2 origin = {radius, radius};
 
-  DrawTexturePro(tex, src, dst, origin, 0.0f, WHITE);
+  DrawTexturePro(tex, src, dst, origin, rotation, WHITE);
 }
 
 void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
@@ -239,9 +239,9 @@ void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
     Vector2 projectedClientpos{projectedVector(client.m_position, xRange)};
     if (client.m_shape == Shape::ball)
       DrawTexturedCircle(circleTex, projectedClientpos,
-                         client.m_dimensions.x * scaleX * 0.5f, 0.0f);
+                         client.m_dimensions.x * scaleX * 0.5f, 10.8f, 4.0f);
     else
       DrawTexturedCircle(circleTex, projectedClientpos,
-                         client.m_dimensions.x * scaleX * 0.5f, 1.0f);
+                         client.m_dimensions.x * scaleX * 0.5f, 0.8f, 1.0f);
   }
 }
