@@ -22,7 +22,7 @@ void ToggleFullscreenWindow(int windowWidth, int windowHeight) {
 
 int main() {
 
-  InitWindow(HEIGHT, WIDTH, "Particle trajectory plot");
+  InitWindow(WIDTH, HEIGHT, "Particle trajectory plot");
 
   float xRange{4.0};
   float scaleX{WIDTH / (2 * xRange)};
