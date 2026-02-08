@@ -222,14 +222,14 @@ void SpatialGrid::resolveCollision(clientDict &a, clientDict &b) {
 // Draw clients
 
 void DrawTexturedCircle(Texture2D &tex, Vector2 &pos, float radius,
-                        float rotation, float order) {
+                        float rotation, float order, Color const &color) {
   Rectangle src = {order * 32, 0, 32, 32};
 
   Rectangle dst = {pos.x, pos.y, radius * 2.0f, radius * 2.0f};
 
   Vector2 origin = {radius, radius};
 
-  DrawTexturePro(tex, src, dst, origin, rotation, WHITE);
+  DrawTexturePro(tex, src, dst, origin, rotation, color);
 }
 
 void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
@@ -242,12 +242,14 @@ void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
       float speed{Vector2LengthSqr(client.m_velocity)};
       client.m_textureCounter += 0.15 * speed;
 
-      DrawTexturedCircle(
-          circleTex, projectedClientpos, client.m_dimensions.x * scaleX * 0.5f,
-          -angle * 180 + 90, static_cast<int>(client.m_textureCounter) % 12);
+      DrawTexturedCircle(circleTex, projectedClientpos,
+                         client.m_dimensions.x * scaleX * 0.5f,
+                         -angle * 180 + 90,
+                         static_cast<int>(client.m_textureCounter) % 12, WHITE);
     } else
       DrawTexturedCircle(circleTex, projectedClientpos,
-                         client.m_dimensions.x * scaleX * 0.5f, 0.8f, 1.0f);
+                         client.m_dimensions.x * scaleX * 0.5f, 0.8f, 1.0f,
+                         WHITE);
   }
 }
 

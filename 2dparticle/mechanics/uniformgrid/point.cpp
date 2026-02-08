@@ -59,7 +59,8 @@ int main() {
 
   // Load textures
   std::vector<Rectangle> textureGrid{};
-  Texture2D atlas = LoadTexture("../../../assets/colored_ball-Sheet.png");
+  Texture2D atlas =
+      LoadTexture("../../../assets/colored_ball_shadow-Sheet.png");
   textureGrid.push_back(Rectangle{0 * 32, 0, 32, 32});
   textureGrid.push_back(Rectangle{1 * 32, 0, 32, 32});
   Texture2D circleTex = LoadTexture("../../../assets/face.png");
