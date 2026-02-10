@@ -12,10 +12,10 @@ inline constexpr int WIDTH{900};
 inline constexpr int HEIGHT{900};
 inline constexpr int FPS{60};
 
-inline constexpr int PARTICLE_RADIUS{2};
+inline constexpr int PARTICLE_RADIUS{20};
 inline constexpr int PARTICLE_MAX_SPEED{2};
 inline constexpr int PARTICLE_MIN_SPEED{1};
-inline constexpr int NUM_PARTICLES{10000};
+inline constexpr int NUM_PARTICLES{10};
 inline constexpr int BINS{40};
 
 inline constexpr double zoomSpeed{1.1};

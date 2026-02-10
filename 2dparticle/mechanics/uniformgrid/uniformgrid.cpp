@@ -1,4 +1,5 @@
 #include "uniformgrid.h"
+#include "config.h"
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
@@ -77,9 +78,9 @@ void SpatialGrid::update() {
       for (auto &client : this->m_clients) {
         findNearby(client);
         for (auto &other : client.m_nearby) {
-          if (collide(client, other))
+          if (collide(client, other)) {
             resolveCollision(client, *other);
-          else
+          } else
             continue;
         }
       }
@@ -208,6 +209,10 @@ void SpatialGrid::resolveCollision(clientDict &a, clientDict &b) {
   if (velAlongNormal > 0)
     return;
 
+  a.m_collided = true;
+  b.m_collided = true;
+  a.m_collisionNormal = a.m_position;
+  b.m_collisionNormal = b.m_position;
   float restitution = 1.0f; // 1 = perfectly elastic, 0 = inelastic
   float invMassA = 1.0f / a.m_mass;
   float invMassB = 1.0f / b.m_mass;
@@ -237,6 +242,8 @@ void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
   for (auto &client : grid.m_clients) {
     std::unique_lock<std::mutex> lock(gLock);
     Vector2 projectedClientpos{projectedVector(client.m_position, xRange)};
+    Vector2 projectedClientnormal{
+        projectedVector(client.m_collisionNormal, xRange)};
     float angle{atan2(client.m_velocity.y, client.m_velocity.x) / PI};
     if (client.m_shape == Shape::ball) {
       float speed{Vector2LengthSqr(client.m_velocity)};
@@ -246,6 +253,12 @@ void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
                          client.m_dimensions.x * scaleX * 0.5f,
                          -angle * 180 + 90,
                          static_cast<int>(client.m_textureCounter) % 12, WHITE);
+      if (client.m_collided) {
+        DrawLineEx(projectedClientpos, projectedVector({0, 0}, xRange), 1.0f,
+                   GREEN);
+        client.m_collided = false;
+      }
+      // std::cout << client.m_collisionNormal.x << '\n';
     } else
       DrawTexturedCircle(circleTex, projectedClientpos,
                          client.m_dimensions.x * scaleX * 0.5f, 0.8f, 1.0f,

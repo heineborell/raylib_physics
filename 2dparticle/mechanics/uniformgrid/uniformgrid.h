@@ -33,6 +33,8 @@ public:
   float m_mass{};
   Shape m_shape{};
   float m_textureCounter{};
+  Vector2 m_collisionNormal{};
+  bool m_collided{false};
 
   uint64_t lastQueryId{};
   std::vector<cellEntry> m_cellInfo;
