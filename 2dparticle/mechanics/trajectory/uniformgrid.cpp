@@ -67,13 +67,11 @@ void SpatialGrid::update() {
   using clock = std::chrono::steady_clock;
   auto next = clock::now(); // take a note of current time
   constexpr int deltat = 1000 / FPS;
-  Vector2 accelaration{0, -9.8};
   constexpr float deltaT{1.0f / FPS};
   while (isRunning) {
     next += std::chrono::milliseconds(deltat); // increment your time by delta t
     {
       std::unique_lock<std::mutex> lock(gLock);
-      updateVel(accelaration, deltaT);
       updatePos(deltaT);
       wallCollision();
       updateCells();
@@ -99,13 +97,6 @@ void SpatialGrid::updatePos(float dt) {
   for (auto &client : m_clients)
     client.m_position =
         Vector2Add(client.m_position, Vector2Scale(client.m_velocity, dt));
-}
-
-void SpatialGrid::updateVel(Vector2 &accelaration, float dt) {
-  // update velocity in real world coordinates
-  for (auto &client : m_clients)
-    client.m_velocity =
-        Vector2Add(client.m_velocity, Vector2Scale(accelaration, dt));
 }
 
 void SpatialGrid::findNearby(clientDict &client) {
@@ -256,7 +247,7 @@ void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
     float angle{atan2(client.m_velocity.y, client.m_velocity.x) / PI};
     if (client.m_shape == Shape::ball) {
       float speed{Vector2LengthSqr(client.m_velocity)};
-      client.m_textureCounter = 0;
+      client.m_textureCounter += 0.15 * speed;
 
       DrawTexturedCircle(circleTex, projectedClientpos,
                          client.m_dimensions.x * scaleX * 0.5f,

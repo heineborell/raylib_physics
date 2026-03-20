@@ -89,7 +89,6 @@ public:
 
   void update();
   void updatePos(float dt);
-  void updateVel(Vector2 &accelaration, float dt);
   void findNearby(clientDict &client);
   void wallCollision();
   bool collide(const clientDict &a, const clientDict *b);

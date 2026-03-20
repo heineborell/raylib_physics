@@ -25,7 +25,7 @@ int main() {
 
   // Initial Conditions, masses
   double massSmall{1};
-  double massBig{1E2};
+  double massBig{1E4};
   double sqrtMassSmall{std::sqrt(massSmall)};
   double sqrtMassBig{std::sqrt(massBig)};
   RealVector2 initialPositionSmall{-18, 2};
