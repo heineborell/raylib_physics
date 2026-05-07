@@ -67,7 +67,7 @@ void SpatialGrid::update() {
   using clock = std::chrono::steady_clock;
   auto next = clock::now(); // take a note of current time
   constexpr int deltat = 1000 / FPS;
-  Vector2 accelaration{0, -9.8};
+  Vector2 accelaration{0, 0};
   constexpr float deltaT{1.0f / FPS};
   while (isRunning) {
     next += std::chrono::milliseconds(deltat); // increment your time by delta t

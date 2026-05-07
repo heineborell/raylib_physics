@@ -97,7 +97,7 @@ int main() {
                        screenHeight / 2 - y1 * (screenHeight / (2 * xRange))};
       Vector2 end = {screenWidth / 2 + x2 * (screenWidth / (2 * xRange)),
                      screenHeight / 2 - y2 * (screenHeight / (2 * xRange))};
-      DrawLineEx(start, end, 2.0f, WHITE);
+      DrawLineEx(start, end, 2.0f, GREEN);
     }
     DrawText(equationText, 10, 10, 20, YELLOW); // draw equation on text
 

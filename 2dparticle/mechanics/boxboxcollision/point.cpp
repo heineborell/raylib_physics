@@ -28,10 +28,10 @@ int main() {
   double massBig{1E4};
   double sqrtMassSmall{std::sqrt(massSmall)};
   double sqrtMassBig{std::sqrt(massBig)};
-  RealVector2 initialPositionSmall{-18, 2};
+  RealVector2 initialPositionSmall{-19, 2};
   RealVector2 initialVelocitySmall{0, 0};
-  RealVector2 initialPositionBig{-15, 2};
-  RealVector2 initialVelocityBig{-10000, 0};
+  RealVector2 initialPositionBig{-13, 2};
+  RealVector2 initialVelocityBig{-5000, 0};
   RealVector2 dimensionsSmall{1, 1};
   RealVector2 dimensionsBig{4, 4};
 

@@ -45,14 +45,14 @@ int main() {
     Shape shape{Shape::ball};
     grid.newClient(initialPosition, dimensions, initialVelocity, mass, shape);
   }
-  Vector2 initialPositionSmall{4, -4};
-  Vector2 initialVelocitySmall{3, 3};
-  Vector2 dimensionsSmall{0.7, 0.7};
-  double massSmall{20};
-
-  Shape shape{Shape::ball};
-  grid.newClient(initialPositionSmall, dimensionsSmall, initialVelocitySmall,
-                 massSmall, shape);
+  // Vector2 initialPositionSmall{4, -4};
+  // Vector2 initialVelocitySmall{3, 3};
+  // Vector2 dimensionsSmall{0.7, 0.7};
+  // double massSmall{20};
+  //
+  // Shape shape{Shape::ball};
+  // grid.newClient(initialPositionSmall, dimensionsSmall, initialVelocitySmall,
+  //                massSmall, shape);
 
   // Start updateThread (The physics updater)
   std::thread updateThread(&SpatialGrid::update, &grid);
