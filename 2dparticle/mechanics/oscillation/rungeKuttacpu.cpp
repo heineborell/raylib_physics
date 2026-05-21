@@ -225,32 +225,6 @@ int main() {
   rhs.push_back(
       [beta](double x, double y, double z) { return x * y - beta * z; });
 
-  // create X,Y,Z and set initial value (this is for rungeKutta4OrderCpu)
-  for (int i{0}; i < particleNumber; ++i) {
-    double x0{Random::get(1, 200) * 0.1};
-    double y0{Random::get(1, 200) * 0.1};
-    double z0{Random::get(1, 200) * 0.1};
-    X[0 * particleNumber * dimT + i] = x0; // x initial
-    X[1 * particleNumber * dimT + i] = y0; // y initial
-    X[2 * particleNumber * dimT + i] = z0; // z initial
-  }
-  // showMatrix(X, particleNumber * dimT, dimY);
-
-  // // Launch threads
-  Timer timeCpu;
-  std::vector<std::thread> threads;
-  for (int i{0}; i < particleNumber; ++i) {
-    threads.push_back(
-        std::thread(rungeKutta4OrderCpu, std::ref(X), std::ref(rhs), i, dt));
-  }
-  // Join threads before program execution terminates
-  for (auto &th : threads) {
-    th.join();
-  }
-
-  std::cout << timeCpu.elapsed() << " seconds elapsed for the first solver."
-            << '\n';
-
   // Do the same thing for the other solver cpu2 which is supposed to be faster?
   // create X,Y,Z and set initial value (this is for rungeKutta4OrderCpu)
   for (int i{0}; i < particleNumber; ++i) {
@@ -277,5 +251,32 @@ int main() {
 
   std::cout << timeCpu2.elapsed()
             << " seconds elapsed for the optimised solver?" << '\n';
+
+  // create X,Y,Z and set initial value (this is for rungeKutta4OrderCpu)
+  for (int i{0}; i < particleNumber; ++i) {
+    double x0{Random::get(1, 200) * 0.1};
+    double y0{Random::get(1, 200) * 0.1};
+    double z0{Random::get(1, 200) * 0.1};
+    X[0 * particleNumber * dimT + i] = x0; // x initial
+    X[1 * particleNumber * dimT + i] = y0; // y initial
+    X[2 * particleNumber * dimT + i] = z0; // z initial
+  }
+  // showMatrix(X, particleNumber * dimT, dimY);
+
+  // // Launch threads
+  Timer timeCpu;
+  std::vector<std::thread> threads;
+  for (int i{0}; i < particleNumber; ++i) {
+    threads.push_back(
+        std::thread(rungeKutta4OrderCpu, std::ref(X), std::ref(rhs), i, dt));
+  }
+  // Join threads before program execution terminates
+  for (auto &th : threads) {
+    th.join();
+  }
+
+  std::cout << timeCpu.elapsed() << " seconds elapsed for the first solver."
+            << '\n';
+
   return 0;
 }
