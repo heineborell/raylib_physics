@@ -113,6 +113,8 @@ void plotter(int dimX, float L, std::vector<float> &resultFloatX, std::size_t i,
     const std::size_t offset = i * dimT + t;
     const std::size_t stride = dimT * particleNumber;
 
+    // TODO: make this bob thing independent of number of bobs
+
     // first bob
     float x1{L * sin(resultFloatX[0 * stride + offset])};     // current x value
     float x2{L * sin(resultFloatX[0 * stride + offset + 1])}; // next x value
@@ -130,7 +132,6 @@ void plotter(int dimX, float L, std::vector<float> &resultFloatX, std::size_t i,
               L * cos(resultFloatX[1 * stride + offset + 1])}; // next value
     mapper(x1, y1, x2, y2, xRange, GREEN);
     mapper(x12, y12, x22, y22, xRange, GREEN);
-    // TODO: make this bob thing independent of number of bobs
   }
 }
 
