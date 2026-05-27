@@ -13,7 +13,7 @@
 const int screenWidth{980};
 const int screenHeight{600};
 
-constexpr std::size_t particleNumber{10};
+constexpr std::size_t particleNumber{100};
 constexpr double dt{0.001};
 constexpr double totalT{40.0};
 constexpr std::size_t dimT{static_cast<std::size_t>(totalT / dt)};
@@ -137,15 +137,18 @@ void plotter(double L, Texture2D &tex, std::vector<double> &X, int t,
   // first bob
   double x1{L * sin(X[0 * stride + offset])};
   double y1{-L * cos(X[0 * stride + offset])};
-  Vector2 first{static_cast<float>(x1 + i), static_cast<float>(y1)};
+  Vector2 first{static_cast<float>(-xRange + x1 + 2 * i * L),
+                static_cast<float>(y1)};
   Vector2 projectedfirst{projectedVector(first, xRange)};
 
   // second bob
   double x2{x1 + L * sin(X[1 * stride + offset])};
   double y2{y1 - L * cos(X[1 * stride + offset])};
-  Vector2 second{static_cast<float>(x2 + i), static_cast<float>(y2)};
+  Vector2 second{static_cast<float>(-xRange + x2 + 2 * i * L),
+                 static_cast<float>(y2)};
   Vector2 projectedsecond{projectedVector(second, xRange)};
-  Vector2 projectedorigin{projectedVector({static_cast<float>(i), 0}, xRange)};
+  Vector2 projectedorigin{
+      projectedVector({static_cast<float>(-xRange + 2 * i * L), 0}, xRange)};
 
   // DrawTexturedCircle(tex, projectedfirst, 0.5, 0, 0, WHITE);
   // DrawTexturedCircle(tex, projectedsecond, 0.5, 0, 0, WHITE);
@@ -161,9 +164,12 @@ int main() {
 
   std::vector<std::function<double(double, double, double, double)>> rhs;
 
+  // plotting range
+  float xRange{10.0f};
+
   // functions  to be integrated (rhs)
-  double L{0.4}; // lenght of pendulums
-  double g{1};   // gravitational const
+  double L{xRange / particleNumber}; // length of pendulums
+  double g{1};                       // gravitational const
 
   rhs.push_back(
       [](double theta1, double theta2, double x1, double x2) { return x1; });
@@ -216,9 +222,6 @@ int main() {
             << '\n';
   std::vector<float> farray{castArray(X)};
 
-  // plotting range
-  float xRange{10.0f};
-
   InitWindow(screenWidth, screenHeight, "X-Y plot");
   SetTargetFPS(60);
   const float zoomSpeed{1.1f};
@@ -234,7 +237,7 @@ int main() {
   int currentFrame{0};
   while (!WindowShouldClose()) {
     if (currentFrame < dimT - 1) {
-      currentFrame = currentFrame + 60;
+      currentFrame = currentFrame + 10;
     } else {
       currentFrame = 0; // Loop the animation back to the beginning
     }
