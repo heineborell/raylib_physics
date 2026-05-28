@@ -13,10 +13,10 @@
 const int screenWidth{980};
 const int screenHeight{600};
 
-constexpr std::size_t particleNoRoot{5};
+constexpr std::size_t particleNoRoot{80};
 constexpr std::size_t particleNumber{particleNoRoot * particleNoRoot};
 constexpr double dt{0.001};
-constexpr double totalT{10.0};
+constexpr double totalT{70.0};
 constexpr std::size_t dimT{static_cast<std::size_t>(totalT / dt)};
 constexpr std::size_t dimY{4};
 constexpr std::size_t arraySize{particleNumber * dimT * dimY};
@@ -135,27 +135,30 @@ void plotter(double L, Texture2D &tex, std::vector<double> &X, int t,
   std::size_t k{i % particleNoRoot};
   if (k == 0)
     ++j;
-  // std::cout << j << " particle number " << i << '\n';
   const std::size_t offset{i * dimT + t};
   const std::size_t stride{dimT * particleNumber};
 
   // first bob
   double x1{L * sin(X[0 * stride + offset])};
   double y1{-L * cos(X[0 * stride + offset])};
-  Vector2 first{static_cast<float>(-xRange + x1 + 2 * k * L),
-                static_cast<float>(-xRange + 2 * L * (j + 1) + y1)};
+  Vector2 first{
+      static_cast<float>(-xRange + x1 + k * (2 * xRange / particleNoRoot)),
+      static_cast<float>(-xRange + (2 * xRange / particleNoRoot) * (j + 1) +
+                         y1)};
   Vector2 projectedfirst{projectedVector(first, xRange)};
 
   // second bob
   double x2{x1 + L * sin(X[1 * stride + offset])};
   double y2{y1 - L * cos(X[1 * stride + offset])};
-  Vector2 second{static_cast<float>(-xRange + x2 + 2 * k * L),
-                 static_cast<float>(-xRange + 2 * L * (j + 1) + y2)};
+  Vector2 second{
+      static_cast<float>(-xRange + x2 + k * (2 * xRange / particleNoRoot)),
+      static_cast<float>(-xRange + (2 * xRange / particleNoRoot) * (j + 1) +
+                         y2)};
   Vector2 projectedsecond{projectedVector(second, xRange)};
-  Vector2 projectedorigin{
-      projectedVector({static_cast<float>(-xRange + 2 * k * L),
-                       static_cast<float>(-xRange + 2 * L * (j + 1))},
-                      xRange)};
+  Vector2 projectedorigin{projectedVector(
+      {static_cast<float>(-xRange + k * (2 * xRange / particleNoRoot)),
+       static_cast<float>(-xRange + (2 * xRange / particleNoRoot) * (j + 1))},
+      xRange)};
 
   // DrawTexturedCircle(tex, projectedfirst, 0.5, 0, 0, WHITE);
   // DrawTexturedCircle(tex, projectedsecond, 0.5, 0, 0, WHITE);
@@ -175,7 +178,7 @@ int main() {
   float xRange{10.0f};
 
   // functions  to be integrated (rhs)
-  double L{xRange / particleNumber}; // length of pendulums
+  double L{xRange / particleNoRoot}; // length of pendulums
   double g{1};                       // gravitational const
 
   rhs.push_back(
@@ -207,7 +210,6 @@ int main() {
     if (i % particleNoRoot == 0) {
       ++j;
     }
-    std::cout << i << " particle number " << j << '\n';
     double th2{PI * j / particleNoRoot};
     double x1{0.2};
     double x2{0.2};
@@ -249,7 +251,7 @@ int main() {
   int currentFrame{0};
   while (!WindowShouldClose()) {
     if (currentFrame < dimT - 1) {
-      currentFrame = currentFrame + 5;
+      currentFrame = currentFrame + 20;
     } else {
       currentFrame = 0; // Loop the animation back to the beginning
     }
