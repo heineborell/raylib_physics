@@ -13,10 +13,10 @@
 const int screenWidth{980};
 const int screenHeight{600};
 
-constexpr std::size_t particleNoRoot{80};
+constexpr std::size_t particleNoRoot{20};
 constexpr std::size_t particleNumber{particleNoRoot * particleNoRoot};
 constexpr double dt{0.001};
-constexpr double totalT{70.0};
+constexpr double totalT{100.0};
 constexpr std::size_t dimT{static_cast<std::size_t>(totalT / dt)};
 constexpr std::size_t dimY{4};
 constexpr std::size_t arraySize{particleNumber * dimT * dimY};
@@ -251,7 +251,7 @@ int main() {
   int currentFrame{0};
   while (!WindowShouldClose()) {
     if (currentFrame < dimT - 1) {
-      currentFrame = currentFrame + 20;
+      currentFrame = currentFrame + 50;
     } else {
       currentFrame = 0; // Loop the animation back to the beginning
     }

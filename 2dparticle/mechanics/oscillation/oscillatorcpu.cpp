@@ -13,7 +13,7 @@
 const int screenWidth{980};
 const int screenHeight{600};
 
-constexpr std::size_t particleNumber{1};
+constexpr std::size_t particleNumber{2};
 constexpr double dt{0.001};
 constexpr double totalT{100.0};
 constexpr std::size_t dimT{static_cast<std::size_t>(totalT / dt)};
@@ -106,31 +106,55 @@ void mapper(float x1, float y1, float x2, float y2, float xRange, Color color) {
                  screenHeight / 2 - y2 * (screenHeight / (2 * xRange))};
   DrawLineEx(start, end, 1.5f, color);
 }
-void plotter(int dimX, float L, std::vector<float> &resultFloatX, std::size_t i,
-             float xRange, Color color) {
-  for (std::size_t t{0}; t < dimT - 1; ++t) {
 
-    const std::size_t offset = i * dimT + t;
-    const std::size_t stride = dimT * particleNumber;
+// Projecting to screen coordinates
+Vector2 projectedVector(const Vector2 &vec, float xRange) {
+  float width{static_cast<float>(screenWidth)};
+  float height{static_cast<float>(screenHeight)};
+  Vector2 projected = {
+      static_cast<float>(width / 2 + vec.x * (width / (2 * xRange))),
+      static_cast<float>(height / 2 - vec.y * (height / (2 * xRange)))};
+  return projected;
+}
 
-    // first bob
-    float x1{L * sin(resultFloatX[0 * stride + offset])};     // current x value
-    float x2{L * sin(resultFloatX[0 * stride + offset + 1])}; // next x value
-    float y1{-L * cos(resultFloatX[0 * stride + offset])};    // current y value
-    float y2{-L * cos(resultFloatX[0 * stride + offset + 1])}; // next value
+void DrawTexturedCircle(Texture2D &tex, Vector2 &pos, float radius,
+                        float rotation, float order, Color const &color) {
+  Rectangle src = {order * 32, 0, 32, 32};
 
-    // second bob
-    float x12{x1 +
-              L * sin(resultFloatX[1 * stride + offset])}; // current x value
-    float x22{x2 +
-              L * sin(resultFloatX[1 * stride + offset + 1])}; // next x value
-    float y12{y1 -
-              L * cos(resultFloatX[1 * stride + offset])}; // current y value
-    float y22{y2 -
-              L * cos(resultFloatX[1 * stride + offset + 1])}; // next value
-    mapper(x1, y1, x2, y2, xRange, GREEN);
-    mapper(x12, y12, x22, y22, xRange, GREEN);
-    // TODO: make this bob thing independent of number of bobs
+  Rectangle dst = {pos.x, pos.y, radius * 2.0f, radius * 2.0f};
+
+  Vector2 origin = {radius, radius};
+
+  DrawTexturePro(tex, src, dst, origin, rotation, color);
+}
+
+void plotter(double L, Texture2D &tex, std::vector<double> &X, int t,
+             std::size_t i, int &j, float xRange) {
+
+  const std::size_t offset{i * dimT + t};
+  const std::size_t stride{dimT * particleNumber};
+
+  // first bob
+  double x1{L * sin(X[0 * stride + offset])};
+  double y1{-L * cos(X[0 * stride + offset])};
+  Vector2 first{static_cast<float>(x1), static_cast<float>(y1)};
+  Vector2 projectedfirst{projectedVector(first, xRange)};
+
+  // second bob
+  double x2{x1 + L * sin(X[1 * stride + offset])};
+  double y2{y1 - L * cos(X[1 * stride + offset])};
+  Vector2 second{static_cast<float>(x2), static_cast<float>(y2)};
+  Vector2 projectedsecond{projectedVector(second, xRange)};
+  Vector2 projectedorigin{projectedVector({0.0, 0.0}, xRange)};
+
+  // DrawTexturedCircle(tex, projectedfirst, 0.5, 0, 0, WHITE);
+  // DrawTexturedCircle(tex, projectedsecond, 0.5, 0, 0, WHITE);
+  if (i % 2 == 0) {
+    DrawLineEx(projectedfirst, projectedsecond, 1.0f, GREEN);
+    DrawLineEx(projectedorigin, projectedfirst, 1.0f, GREEN);
+  } else {
+    DrawLineEx(projectedfirst, projectedsecond, 1.0f, MAROON);
+    DrawLineEx(projectedorigin, projectedfirst, 1.0f, MAROON);
   }
 }
 
@@ -142,9 +166,12 @@ int main() {
 
   std::vector<std::function<double(double, double, double, double)>> rhs;
 
+  // plotting range
+  float xRange{10.0f};
+
   // functions  to be integrated (rhs)
-  double L{2};
-  double g{1};
+  double L{2}; // length of pendulums
+  double g{1}; // gravitational const
 
   rhs.push_back(
       [](double theta1, double theta2, double x1, double x2) { return x1; });
@@ -169,16 +196,18 @@ int main() {
 
   // create thetas and its derivatives and set initial value (this is for
   // rungeKutta4OrderCpu)
+  int j{0};
   for (int i{0}; i < particleNumber; ++i) {
-    double th1{PI / 2};
-    double th2{2};
-    double x1{0.2};
-    double x2{0.1};
-    X[0 * particleNumber * dimT + i] = th1; // theta1 initial
-    X[1 * particleNumber * dimT + i] = th2; // theta2 initial
-    X[2 * particleNumber * dimT + i] = x1;  // x1 initial
-    X[3 * particleNumber * dimT + i] = x2;  // x2 initial
+    double th1{PI / 2 + i * 0.00001};
+    double th2{PI / 2};
+    double x1{0.1};
+    double x2{0.2};
+    X[0 * particleNumber * dimT + i * dimT] = th1; // theta1 initial
+    X[1 * particleNumber * dimT + i * dimT] = th2; // theta2 initial
+    X[2 * particleNumber * dimT + i * dimT] = x1;  // x1 initial
+    X[3 * particleNumber * dimT + i * dimT] = x2;  // x2 initial
   }
+  // showMatrix(X, particleNumber * dimT, dimY);
 
   // // Launch threads
   Timer timeCpu;
@@ -194,17 +223,27 @@ int main() {
 
   std::cout << timeCpu.elapsed() << " seconds elapsed for the first solver."
             << '\n';
-  // showMatrix(X, particleNumber * dimT, dimY);
   std::vector<float> farray{castArray(X)};
-
-  // plotting range
-  float xRange{10.0f};
 
   InitWindow(screenWidth, screenHeight, "X-Y plot");
   SetTargetFPS(60);
   const float zoomSpeed{1.1f};
 
+  // Load textures
+  std::vector<Rectangle> textureGrid{};
+  Texture2D atlas =
+      LoadTexture("../../../assets/colored_ball_shadow-Sheet.png");
+  textureGrid.push_back(Rectangle{0 * 32, 0, 32, 32});
+  textureGrid.push_back(Rectangle{1 * 32, 0, 32, 32});
+  Texture2D circleTex = LoadTexture("../../../assets/face.png");
+
+  int currentFrame{0};
   while (!WindowShouldClose()) {
+    if (currentFrame < dimT - 1) {
+      currentFrame = currentFrame + 1;
+    } else {
+      currentFrame = 0; // Loop the animation back to the beginning
+    }
     if (IsKeyPressed(KEY_UP))
       xRange /= zoomSpeed; // zoom in
     if (IsKeyPressed(KEY_DOWN))
@@ -225,8 +264,10 @@ int main() {
 
     DrawText("Y", screenWidth / 2 + 5, 5, 20, GRAY);
     DrawText("X", screenWidth - 20, screenHeight / 2 + 5, 20, GRAY);
+
+    int j = 0;
     for (std::size_t i{0}; i < particleNumber; ++i)
-      plotter(dimT, L, farray, i, xRange, GREEN);
+      plotter(L, circleTex, X, currentFrame, i, j, xRange);
 
     EndDrawing();
   }

@@ -13,9 +13,9 @@
 const int screenWidth{980};
 const int screenHeight{600};
 
-constexpr std::size_t particleNumber{1};
+constexpr std::size_t particleNumber{2};
 constexpr double dt{0.001};
-constexpr double totalT{10.0};
+constexpr double totalT{100};
 constexpr std::size_t dimT{static_cast<std::size_t>(totalT / dt)};
 constexpr std::size_t dimY{4};
 constexpr std::size_t arraySize{particleNumber * dimT * dimY};
@@ -113,8 +113,6 @@ void plotter(int dimX, float L, std::vector<float> &resultFloatX, std::size_t i,
     const std::size_t offset = i * dimT + t;
     const std::size_t stride = dimT * particleNumber;
 
-    // TODO: make this bob thing independent of number of bobs
-
     // first bob
     float x1{L * sin(resultFloatX[0 * stride + offset])};     // current x value
     float x2{L * sin(resultFloatX[0 * stride + offset + 1])}; // next x value
@@ -130,8 +128,9 @@ void plotter(int dimX, float L, std::vector<float> &resultFloatX, std::size_t i,
               L * cos(resultFloatX[1 * stride + offset])}; // current y value
     float y22{y2 -
               L * cos(resultFloatX[1 * stride + offset + 1])}; // next value
-    mapper(x1, y1, x2, y2, xRange, GREEN);
-    mapper(x12, y12, x22, y22, xRange, GREEN);
+    mapper(x1, y1, x2, y2, xRange, color);
+    mapper(x12, y12, x22, y22, xRange, color);
+    // TODO: make this bob thing independent of number of bobs
   }
 }
 
@@ -145,29 +144,40 @@ int main() {
 
   // functions  to be integrated (rhs)
   double L{2};
+  double g{1};
 
   rhs.push_back(
       [](double theta1, double theta2, double x1, double x2) { return x1; });
   rhs.push_back(
       [](double theta1, double theta2, double x1, double x2) { return x2; });
-  rhs.push_back([L](double theta1, double theta2, double x1, double x2) {
-    return -1 / L * (2 * theta1 - theta2);
+  rhs.push_back([L, g](double theta1, double theta2, double x1, double x2) {
+    double delta = theta1 - theta2;
+    double den = L * (2.0 - cos(delta) * cos(delta));
+
+    double num = g * (sin(theta2) * cos(delta) - 2.0 * sin(theta1)) -
+                 L * (x2 * x2 + x1 * x1 * cos(delta)) * sin(delta);
+    return num / den;
   });
-  rhs.push_back([L](double theta1, double theta2, double x1, double x2) {
-    return -1 / L * (-2 * theta1 + 2 * theta2);
+  rhs.push_back([L, g](double theta1, double theta2, double x1, double x2) {
+    double delta = theta1 - theta2;
+    double den = L * (2.0 - cos(delta) * cos(delta));
+
+    double num = 2.0 * g * (sin(theta1) * cos(delta) - sin(theta2)) +
+                 L * (2.0 * x1 * x1 + x2 * x2 * cos(delta)) * sin(delta);
+    return num / den;
   });
 
   // create thetas and its derivatives and set initial value (this is for
   // rungeKutta4OrderCpu)
   for (int i{0}; i < particleNumber; ++i) {
-    double th1{0.01};
-    double th2{0.02};
+    double th1{PI / 2 + i * PI * 0.00001};
+    double th2{2};
     double x1{0.2};
     double x2{0.1};
-    X[0 * particleNumber * dimT + i] = th1; // theta1 initial
-    X[1 * particleNumber * dimT + i] = th2; // theta2 initial
-    X[2 * particleNumber * dimT + i] = x1;  // x1 initial
-    X[3 * particleNumber * dimT + i] = x2;  // x2 initial
+    X[0 * particleNumber * dimT + i * dimT] = th1; // theta1 initial
+    X[1 * particleNumber * dimT + i * dimT] = th2; // theta2 initial
+    X[2 * particleNumber * dimT + i * dimT] = x1;  // x1 initial
+    X[3 * particleNumber * dimT + i * dimT] = x2;  // x2 initial
   }
 
   // // Launch threads
@@ -215,9 +225,9 @@ int main() {
 
     DrawText("Y", screenWidth / 2 + 5, 5, 20, GRAY);
     DrawText("X", screenWidth - 20, screenHeight / 2 + 5, 20, GRAY);
-    for (std::size_t i{0}; i < particleNumber; ++i)
-      plotter(dimT, L, farray, i, xRange, GREEN);
-
+    // for (std::size_t i{0}; i < particleNumber; ++i)
+    plotter(dimT, L, farray, 0, xRange, GREEN);
+    plotter(dimT, L, farray, 1, xRange, MAROON);
     EndDrawing();
   }
   return 0;
