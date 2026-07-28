@@ -256,7 +256,7 @@ void plotter(SpatialGrid &grid, Texture2D &circleTex, float xRange,
     float angle{atan2(client.m_velocity.y, client.m_velocity.x) / PI};
     if (client.m_shape == Shape::ball) {
       float speed{Vector2LengthSqr(client.m_velocity)};
-      client.m_textureCounter = 0;
+      client.m_textureCounter += 0.19 * speed;
 
       DrawTexturedCircle(circleTex, projectedClientpos,
                          client.m_dimensions.x * scaleX * 0.5f,

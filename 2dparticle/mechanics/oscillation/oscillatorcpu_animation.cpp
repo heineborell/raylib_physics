@@ -10,10 +10,10 @@
 #include <thread>
 #include <vector>
 
-const int screenWidth{980};
-const int screenHeight{600};
+const int screenWidth{2160};
+const int screenHeight{1200};
 
-constexpr std::size_t particleNoRoot{20};
+constexpr std::size_t particleNoRoot{60};
 constexpr std::size_t particleNumber{particleNoRoot * particleNoRoot};
 constexpr double dt{0.001};
 constexpr double totalT{100.0};
@@ -206,11 +206,11 @@ int main() {
   // rungeKutta4OrderCpu)
   int j{0};
   for (int i{0}; i < particleNumber; ++i) {
-    double th1{PI * (i % particleNoRoot) / particleNoRoot};
+    double th1{static_cast<double>(PI * (i % particleNoRoot) / particleNoRoot)};
     if (i % particleNoRoot == 0) {
       ++j;
     }
-    double th2{PI * j / particleNoRoot};
+    double th2{static_cast<double>(PI * j / particleNoRoot)};
     double x1{0.2};
     double x2{0.2};
     X[0 * particleNumber * dimT + i * dimT] = th1; // theta1 initial

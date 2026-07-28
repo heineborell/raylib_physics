@@ -240,7 +240,7 @@ int main() {
   int currentFrame{0};
   while (!WindowShouldClose()) {
     if (currentFrame < dimT - 1) {
-      currentFrame = currentFrame + 1;
+      currentFrame = currentFrame + 60;
     } else {
       currentFrame = 0; // Loop the animation back to the beginning
     }
